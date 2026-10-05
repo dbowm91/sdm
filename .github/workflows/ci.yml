@@ -12,4 +12,5 @@ jobs:
       - run: cargo fmt --all -- --check
       - run: cargo test --workspace --locked
       - run: cargo check -p sdm-runtime --locked
+      - run: cargo check -p sdm-runtime --examples --locked
       - run: cargo tree -p sdm-runtime --locked

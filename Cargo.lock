@@ -125,6 +125,7 @@ dependencies = [
 name = "sdm-runtime"
 version = "0.1.0"
 dependencies = [
+ "libc",
  "sdm-core",
  "serde",
  "serde_json",

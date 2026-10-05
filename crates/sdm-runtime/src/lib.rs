@@ -73,6 +73,14 @@ impl Runtime {
     }
     pub fn decide(&self, request: &DecisionRequest) -> Result<DecisionResponse, DecisionError> {
         request.validate()?;
+        let context = request
+            .state
+            .iter()
+            .map(|field| field.value.as_str())
+            .collect::<Vec<_>>()
+            .join(" ")
+            .to_lowercase();
+        let context_tokens: std::collections::BTreeSet<_> = tokens(&context).collect();
         let state_bytes: usize = request
             .state
             .iter()
@@ -91,7 +99,7 @@ impl Runtime {
                 let ranked: Vec<_> = candidates
                     .iter()
                     .map(|c| {
-                        let score = self.score(request, c);
+                        let score = self.score(&context_tokens, c);
                         RankedDecisionCandidate {
                             candidate_id: c.id.clone(),
                             relevance: 1.0 / (1.0 + (-score).exp()),
@@ -144,15 +152,13 @@ impl Runtime {
         response.validate_for(request)?;
         Ok(response)
     }
-    fn score(&self, request: &DecisionRequest, candidate: &DecisionCandidate) -> f64 {
-        let context = request
-            .state
-            .iter()
-            .map(|f| f.value.as_str())
-            .collect::<Vec<_>>()
-            .join(" ");
+    fn score(
+        &self,
+        context: &std::collections::BTreeSet<String>,
+        candidate: &DecisionCandidate,
+    ) -> f64 {
         let option = format!("{} {}", candidate.label, candidate.description).to_lowercase();
-        features_for(&context.to_lowercase(), &option)
+        features_for_tokens(context, &option)
             .into_iter()
             .map(|token| self.artifact.weights.get(&token).copied().unwrap_or(0.0))
             .sum::<f64>()
@@ -228,6 +234,13 @@ pub fn tokens(text: &str) -> impl Iterator<Item = String> + '_ {
 /// Sparse, domain-neutral context/option and lexical-overlap features.
 pub fn features_for(context: &str, option: &str) -> Vec<String> {
     let context: std::collections::BTreeSet<_> = tokens(context).collect();
+    features_for_tokens(&context, option)
+}
+
+pub fn features_for_tokens(
+    context: &std::collections::BTreeSet<String>,
+    option: &str,
+) -> Vec<String> {
     let option: std::collections::BTreeSet<_> = tokens(option).collect();
     let mut features: Vec<_> = context.iter().map(|t| format!("ctx:{t}")).collect();
     features.extend(option.iter().map(|t| format!("opt:{t}")));

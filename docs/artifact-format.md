@@ -15,3 +15,7 @@ Architecture `sdm-binary-linear-v1` declares Rank capability. Rank candidates ar
 scored independently, allowing multiple candidates to be relevant. Other decision
 semantics receive an explicit Unsupported response. Runtime callers must validate
 requests and apply their own policy to every response.
+
+The runtime's benchmark example measures cold load, warmed request p50/p95 at the
+supported candidate bounds, artifact bytes, malformed-artifact rejection latency, and
+process peak RSS after warmup. It uses no training dependency.

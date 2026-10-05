@@ -31,6 +31,7 @@ other semantics. Multiple relevant Rank candidates remain independent labels.
 ```sh
 cargo test --workspace --locked
 cargo check -p sdm-runtime --locked
+cargo check -p sdm-runtime --examples --locked
 cargo tree -p sdm-runtime --locked
 cargo run -p sdm-training --bin sdm-check-compat -- \
   fixtures/codegg-compatibility-v1.jsonl path/to/artifact.json
@@ -45,6 +46,11 @@ training/qualification evidence remain in CodeGG. No user session data was copie
 `scripts/import-codegg-compat-fixtures.py` regenerates the small Rank training set from
 only the frozen source fixtures. `artifacts/compatibility-rank-v1.json` is a reproducible
 baseline artifact, not a qualified or production-promoted model.
+`cargo run -p sdm-runtime --example benchmark -- fixtures/benchmark-rank-request.json
+artifacts/compatibility-rank-v1.json` emits cold load, artifact bytes, peak resident
+memory after warming, p50/p95 latency for 16/64/128/256 candidates, and malformed
+artifact rejection latency. The RSS number is the process high-water mark, so report it
+as a conservative peak rather than an isolated runtime allocation measurement.
 
 ## Provenance
 
@@ -57,4 +63,5 @@ model-weight provenance from CodeGG.
 
 See [`docs/extraction-inventory.md`](docs/extraction-inventory.md),
 [`docs/artifact-format.md`](docs/artifact-format.md), and
-[`docs/reproducibility.md`](docs/reproducibility.md).
+[`docs/reproducibility.md`](docs/reproducibility.md), plus the
+[`docs/benchmark-baseline.md`](docs/benchmark-baseline.md) runtime snapshot.

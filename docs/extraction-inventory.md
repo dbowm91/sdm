@@ -42,13 +42,17 @@ source or dependency was deleted or switched.
 | `scripts/generate_tool_advisor_corpus.py` | CodeGG adapter/policy — retain | Generates the CodeGG-specific corpus; no implicit dataset export. |
 | `scripts/generate_tool_advisor_qualification_holdout.py` | Historical evidence — retain | Qualification holdout provenance remains in place. |
 | `scripts/generate_tool_advisor_qualification_v3_holdout.py` | Historical evidence — retain | Qualification holdout provenance remains in place. |
+| `scripts/generate_causal_m005_holdout.py` | CodeGG adapter/policy — retain | Frozen CodeGG causal-frontier qualification input. |
 | `assets/decision-runtime/compatibility-v1.jsonl` | CodeGG adapter/policy — retain | Authoritative fixtures remain in CodeGG; sanitized copy exported to SDM. |
 | `assets/tool-advisor/corpus.jsonl`, `tiny-training.json`, `contextual-*-training.json` | Historical evidence — retain | Domain labels and experiment input; no user data export. |
+| `assets/tool-advisor/causal-frontier-v1.jsonl`, `causal-frontier-m00*-*.json`, `causal-frontier-m005-*.json` | CodeGG adapter/policy — retain | Causal-frontier contracts and qualification evidence remain CodeGG-owned. |
+| `assets/tool-advisor/downstream-suite.jsonl`, `c004-requalification.json` | Historical evidence — retain | Downstream trajectory qualification and requalification evidence. |
 | `assets/tool-advisor/*holdout*`, `*result*`, `*preregistration*`, `*freeze*`, `*selection*` | Historical evidence — retain | Immutable qualification/evidence records; not rewritten or moved. |
 | `assets/tool-advisor/*ranking*`, `*retrieval*`, `*reference-models*` | Obsolete experiment implementation — retain until M006 | Model/architecture-specific research evidence remains traceable in CodeGG. |
 | Cargo features `tool-advisor`, `tool-advisor-training`, `tool-advisor-encoder-experiment`, `tool-advisor-encoder-training` | CodeGG adapter/policy — retain for now | Removal is explicitly M006 after consumer migration. |
 | Optional `candle-core`, `candle-nn`, `candle-transformers` dependencies | Obsolete experiment implementation — retain until M006 | Feature-gated experimental dependency set; not copied into SDM runtime. |
 | `serde`, `serde_json`, `sha2`, `thiserror`, `async-trait` | Shared utility requiring deliberate split | Minimal semantic dependencies carried into independent SDM workspace. |
+| `anyhow`, `url`, `unicode-normalization` | Shared utility requiring deliberate split | Used by capture and/or CodeGG scoring paths; remain workspace-level or CodeGG-owned, not pulled into SDM runtime. |
 
 ## Explicitly retained CodeGG responsibilities
 
