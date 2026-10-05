@@ -1,0 +1,15 @@
+name: CI
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo fmt --all -- --check
+      - run: cargo test --workspace --locked
+      - run: cargo check -p sdm-runtime --locked
+      - run: cargo tree -p sdm-runtime --locked
