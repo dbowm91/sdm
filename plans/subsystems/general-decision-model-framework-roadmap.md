@@ -1,9 +1,9 @@
 # General Decision-Model Framework and First Consumer Roadmap
 
-Status: M001-M007 outcomes recorded; generic framework work complete, M005 external evidence gate remains
+Status: M001-M007 historical results retained; M008 ready, M009-M011 dependency-blocked; M005 deferred
 Audit baseline: dbowm91/sdm@8139b064bdcf3212e8f6fd912e801a479b55751c (2026-10-05)
 Planning date: 2026-10-10
-Primary architectural decision: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md
+Primary decisions: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md; plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md
 Planning governance: plans/003-planning-process.md
 External ownership authority: CodeGG ADR-0013 (https://github.com/dbowm91/codegg/blob/main/plans/adrs/ADR-0013-external-decision-model-training-and-runtime-boundary.md)
 
@@ -13,7 +13,7 @@ Develop SDM as a reusable small decision-model dataset, training, evaluation and
 
 ## 2. Current implementation evidence
 
-The public MIT workspace comprises sdm-core, sdm-runtime and sdm-training at v0.1.0 (Rust MSRV 1.89). Core validates Binary, Choice, Score and Rank. Only Rank uses local learned inference via a sparse logistic relevance model with independently relevant candidates. JSON LinearArtifact schema v1 has a 4 MiB cap, 100k parameter cap and SHA-256 integrity/provenance. Training uses seeded group splits; evaluation reports only correct/total candidate predictions. Frozen CodeGG compatibility: 12 validated fixtures, 11 valid executions, contract-shape tolerance only; not a predictive-quality or promotion gate. Benchmark: 2,560-byte model, cold load 510 µs, p95 0.291/1.139/2.317/4.624 ms for 16/64/128/256 candidates on a recorded Rosetta host. Existing main CI is green, but it does not enforce complete qualification or multi-platform performance.
+At the original 2026-10-05 baseline, the MIT workspace comprised sdm-core, sdm-runtime and sdm-training at v0.1.0 (declared Rust MSRV 1.89). Core validates Binary, Choice, Score and Rank. Only Rank uses local learned inference via a sparse logistic relevance model with independently relevant candidates. JSON LinearArtifact schema v1 has a 4 MiB cap, 100k parameter cap and SHA-256 integrity/provenance. Training uses seeded group splits; evaluation reports only correct/total candidate predictions. Frozen CodeGG compatibility: 12 validated fixtures, 11 valid executions, contract-shape tolerance only; not a predictive-quality or promotion gate. Benchmark: 2,560-byte model, cold load 510 µs, p95 0.291/1.139/2.317/4.624 ms for 16/64/128/256 candidates on a recorded Rosetta host. Existing main CI is green, but it does not enforce complete qualification or multi-platform performance.
 
 CodeGG negative predecessor evidence: the formerly tested contextual architectures failed the held-out gates against hashed linear and BM25 (see plans/closure/tool-selection-advisor-evidence-integrity-corrective/004-status.md in CodeGG). Initial SDM work must never claim to supersede that result without new independent evaluation.
 
@@ -56,15 +56,15 @@ M001 also has a cross-repository *interface* dependency on the existing CodeGG v
 ## 6. Milestones and acceptance summaries
 
 ### M001 — Versioned feature/artifact/runtime contracts
-Class: infrastructure. Status: ready. Plan: plans/implementation/general-decision-model-framework/001-versioned-feature-artifact-runtime-contracts.md.
+Class: infrastructure. Status: closed. Plan: plans/implementation/general-decision-model-framework/001-versioned-feature-artifact-runtime-contracts.md.
 Introduce additive typed feature projections, explicit capabilities, model/feature schema identity, architecture-bound artifact resource limits and independent architecture dispatch, preserving v1 byte identity and CodeGG compatibility. No new trainable neural architecture.
 
 ### M002 — Generic dataset provenance and frozen splits
-Class: infrastructure. Status: blocked (hard M001). Plan: plans/implementation/general-decision-model-framework/002-dataset-provenance-and-split-integrity.md.
+Class: infrastructure. Status: conditionally closed. Plan: plans/implementation/general-decision-model-framework/002-dataset-provenance-and-split-integrity.md.
 Introduce independent sdm-data and importer/manifests; support labels for all semantics without requiring model implementations for them; frozen group/family/counterfactual splits and leakage tests; explicit provenance and consent.
 
 ### M003 — Semantic evaluation and preregistered qualification
-Class: capability. Status: blocked (hard M002). Plan: plans/implementation/general-decision-model-framework/003-semantic-evaluation-and-qualification.md.
+Class: capability. Status: conditionally closed. Plan: plans/implementation/general-decision-model-framework/003-semantic-evaluation-and-qualification.md.
 Introduce independent sdm-eval with task-specific metrics, no-candidate/abstention and calibration reporting, artifact/split binding, frozen protocol and negative-valid verdicts. Test data cannot influence model or threshold.
 
 ### M004 — Second trained architecture and portable inference
@@ -80,6 +80,30 @@ Class: corrective infrastructure/capability. Status: conditionally closed; resid
 
 ### M007 — Qualification depth and trained ablations
 Class: capability/evidence. Status: closed. Plan: plans/implementation/general-decision-model-framework/007-qualification-depth-and-trained-ablations.md. Generic evidence is recorded in plans/closure/general-decision-model-framework/007-status.md. M005 remains indeterminate pending CodeGG approval.
+
+## Standalone-framework successor M008-M011
+
+Decision: ADR-0002. This workstream is independent of CodeGG and has no requirement for an application-specific corpus. M005 remains deferred/indeterminate, retains its historical closure, and is not a prerequisite for M008-M011. No generated synthetic example is represented as real CodeGG effectiveness evidence.
+
+Current implemented state at 319a05805f3a8383574d0d0712ca5975d16546ff: six crates exist (sdm-core, sdm-data, sdm-eval, sdm-training, sdm-nonlinear, sdm-runtime). M007 recorded slice calibration, trained synthetic interaction smoke, and Linux x86_64/ARM64 plus Apple Silicon CPU inference benchmark artifacts. However its 16 trained examples are evaluated in-sample, and hosted benchmarks use initialized weights. The old CLI paths are disconnected; typed feature projections do not yet reach the nonlinear model directly; non-Rank model heads are absent.
+
+### M008 — End-to-end standalone Rank experiment
+Class: capability/infrastructure. **Status: ready.** Plan: plans/implementation/general-decision-model-framework/008-standalone-experiment-pipeline.md.
+Provide a reusable library + one CLI path to validate explicit local data, use frozen splits, train linear/nonlinear Rank, tune on dev only, package and reload verified artifacts, predict exact candidates and evaluate a genuinely held-out synthetic partition.
+
+### M009 — Typed feature model ingress
+Class: infrastructure/capability. Status: blocked on accepted M008 closure. Plan: plans/implementation/general-decision-model-framework/009-typed-feature-model-ingress.md.
+Implement one canonical bounded typed feature encoder for train/infer with real numerical, categorical and boolean inputs, frozen preprocessing and a versioned runtime contract; retain legacy lexical v1 behavior.
+
+### M010 — Learned Binary, Choice and Score heads
+Class: capability. Status: blocked on accepted M009 closure. Plan: plans/implementation/general-decision-model-framework/010-generic-decision-task-heads.md.
+Complete train/package/infer/evaluate paths for every declared semantic family using small bounded models, correct abstention and option/score semantics, and independent datasets. Existing Rank continues working.
+
+### M011 — Held-out standalone qualification and release review
+Class: capability/release infrastructure. Status: blocked on accepted M010 closure. Plan: plans/implementation/general-decision-model-framework/011-standalone-release-qualification.md.
+Require genuine unseen synthetic groups, preregistered positive/negative/indeterminate gates, trained-artifact three-target benchmarks, an actual Rust 1.89 MSRV CI job, independent consumer usage, docs reconciliation and explicit security/dependency/format review. It does not auto-publish or qualify CodeGG.
+
+Dependency graph: M008 -> M009 -> M010 -> M011. Each milestone requires its own plans/closure/general-decision-model-framework/NNN-status.md evidence and registry update. CodeGG M005 stays deferred on a separate external gate.
 
 ## 7. Cross-cutting requirements
 
@@ -108,4 +132,4 @@ Create plans/closure/general-decision-model-framework/NNN-status.md for each mil
 
 ## 10. Readiness
 
-M001-M006 outcomes are recorded under plans/closure/general-decision-model-framework/. M005 is indeterminate because no new approved independent CodeGG labels were available. The v1 consumer contract remains unchanged; nonlinear v2 mechanics are registered, but no trained model is promoted.
+M001-M007 outcomes are retained under plans/closure/general-decision-model-framework/. M008 is ready; M009-M011 are blocked only on predecessor closures. M005 stays indeterminate because no approved independent CodeGG corpus or consumer adapter exists. The v1 consumer contract remains unchanged and no CodeGG model is promoted.
