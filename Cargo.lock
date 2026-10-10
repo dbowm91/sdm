@@ -122,6 +122,41 @@ dependencies = [
 ]
 
 [[package]]
+name = "sdm-data"
+version = "0.1.0"
+dependencies = [
+ "sdm-core",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror",
+]
+
+[[package]]
+name = "sdm-eval"
+version = "0.1.0"
+dependencies = [
+ "sdm-core",
+ "sdm-data",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror",
+]
+
+[[package]]
+name = "sdm-nonlinear"
+version = "0.1.0"
+dependencies = [
+ "sdm-core",
+ "sdm-runtime",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror",
+]
+
+[[package]]
 name = "sdm-runtime"
 version = "0.1.0"
 dependencies = [

@@ -19,3 +19,19 @@ requests and apply their own policy to every response.
 The runtime's benchmark example measures cold load, warmed request p50/p95 at the
 supported candidate bounds, artifact bytes, malformed-artifact rejection latency, and
 process peak RSS after warmup. It uses no training dependency.
+
+## Artifact envelope v2 (additive contract)
+
+`sdm_runtime::ArtifactEnvelopeV2` identifies an architecture and model, required
+feature-schema fingerprint, semantic capability set, calibration digest, resource
+limits, payload digest, license and source. The v2 payload is capped at 16 MiB and
+1,000,000 declared parameters; candidate count remains at most 256. These hashes
+detect byte changes but do not authenticate a publisher. `load_artifact` preserves v1
+loading and returns a validated `UnsupportedV2` for an architecture without a
+registered runtime. The first nonlinear CPU implementation currently lives in
+`sdm-nonlinear`; it is not yet registered in runtime dispatch.
+
+Typed `FeatureSchemaV2` and `FeatureProjectionV2` live in `sdm-core`. Schema
+fingerprints use canonical JSON ordering by feature ID and category. Missing required
+values, type mismatches, unknown IDs, non-finite numbers and category violations fail
+validation. The original v1 textual state projection and artifact remain unchanged.

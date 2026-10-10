@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/sdm-core", "crates/sdm-runtime", "crates/sdm-training"]
+members = ["crates/sdm-core", "crates/sdm-runtime", "crates/sdm-training", "crates/sdm-data", "crates/sdm-eval", "crates/sdm-nonlinear"]
 
 [workspace.package]
 version = "0.1.0"

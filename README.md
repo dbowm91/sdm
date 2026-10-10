@@ -20,6 +20,9 @@ projection, disclosure, capture consent, and causal-frontier behavior stay in Co
   dependency on `sdm-training`.
 - `sdm-training`: generic decision-case dataset validation, deterministic group
   splitting, model fitting, dev-only threshold selection, and test evaluation.
+- `sdm-data`: provenance-bearing labels and frozen leakage-aware group splits.
+- `sdm-eval`: algorithm-neutral semantic metrics and preregistered offline reports.
+- `sdm-nonlinear`: optional bounded nonlinear CPU scorer and deterministic local SGD.
 
 Initial runtime architecture is a sparse binary relevance model applied independently
 to Rank candidates. The semantic core supports Binary, Choice, Score, and Rank; the
@@ -80,3 +83,8 @@ M002-M005 have explicit dependency blockers in the [active registry](plans/regis
 This planning work does not qualify any new model or alter CodeGG's current
 pinned SDM runtime. Details and negative historical model evidence are preserved
 in [the research note](docs/general-framework-research-2026-10.md).
+
+New offline data/evaluation commands are `sdm-dataset validate`, `sdm-dataset split`,
+and `sdm-qualify`. They consume explicit local files and do not access network sources.
+The nonlinear prototype is not yet registered with runtime dispatch and does not
+qualify or promote a CodeGG model.

@@ -20,6 +20,206 @@ pub const MAX_CANDIDATES: usize = 256;
 pub const MAX_ID_BYTES: usize = 256;
 pub const MAX_LABEL_BYTES: usize = 1024;
 pub const MAX_REASON_BYTES: usize = 512;
+pub const FEATURE_SCHEMA_VERSION: u16 = 2;
+pub const MAX_FEATURES: usize = 256;
+pub const MAX_FEATURE_ID_BYTES: usize = 128;
+
+/// Shared legacy lexical projection. Kept stable for v1 artifact parity.
+pub fn tokens(text: &str) -> impl Iterator<Item = String> + '_ {
+    text.split(|c: char| !c.is_alphanumeric())
+        .filter(|s| !s.is_empty())
+        .map(str::to_lowercase)
+}
+
+pub fn features_for(context: &str, option: &str) -> Vec<String> {
+    let context: BTreeSet<_> = tokens(context).collect();
+    features_for_tokens(&context, option)
+}
+
+pub fn features_for_tokens(context: &BTreeSet<String>, option: &str) -> Vec<String> {
+    let option: BTreeSet<_> = tokens(option).collect();
+    let mut features: Vec<_> = context.iter().map(|t| format!("ctx:{t}")).collect();
+    features.extend(option.iter().map(|t| format!("opt:{t}")));
+    features.extend(
+        context
+            .intersection(&option)
+            .map(|t| format!("overlap:{t}")),
+    );
+    features
+}
+
+/// A bounded, typed value in the additive feature projection contract.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "type", content = "value", rename_all = "snake_case")]
+pub enum FeatureValue {
+    Text(String),
+    Number(f64),
+    Boolean(bool),
+    Category(String),
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct FeatureField {
+    pub id: String,
+    pub required: bool,
+    pub value: Option<FeatureValue>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct FeatureSchemaV2 {
+    pub version: u16,
+    pub fields: Vec<FeatureSchemaField>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FeatureSchemaField {
+    pub id: String,
+    pub value_type: FeatureType,
+    pub required: bool,
+    pub categories: Vec<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum FeatureType {
+    Text,
+    Number,
+    Boolean,
+    Category,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct FeatureProjectionV2 {
+    pub schema_version: u16,
+    pub schema_sha256: String,
+    pub fields: Vec<FeatureField>,
+}
+
+impl FeatureSchemaV2 {
+    pub fn validate(&self) -> Result<(), DecisionError> {
+        if self.version != FEATURE_SCHEMA_VERSION || self.fields.len() > MAX_FEATURES {
+            return Err(DecisionError::InvalidRequest(
+                "unsupported or oversized feature schema".into(),
+            ));
+        }
+        let mut ids = BTreeSet::new();
+        for field in &self.fields {
+            if field.id.is_empty()
+                || field.id.len() > MAX_FEATURE_ID_BYTES
+                || !ids.insert(&field.id)
+            {
+                return Err(DecisionError::InvalidRequest(
+                    "invalid or duplicate feature id".into(),
+                ));
+            }
+            if field.value_type != FeatureType::Category && !field.categories.is_empty() {
+                return Err(DecisionError::InvalidRequest(
+                    "categories only apply to category features".into(),
+                ));
+            }
+            let mut categories = BTreeSet::new();
+            if field
+                .categories
+                .iter()
+                .any(|v| v.is_empty() || v.len() > MAX_LABEL_BYTES || !categories.insert(v))
+            {
+                return Err(DecisionError::InvalidRequest(
+                    "invalid or duplicate category".into(),
+                ));
+            }
+        }
+        Ok(())
+    }
+
+    pub fn fingerprint(&self) -> Result<String, DecisionError> {
+        self.validate()?;
+        let mut schema = self.clone();
+        schema.fields.sort_by(|a, b| a.id.cmp(&b.id));
+        for field in &mut schema.fields {
+            field.categories.sort();
+        }
+        let bytes = serde_json::to_vec(&schema)
+            .map_err(|e| DecisionError::InvalidRequest(e.to_string()))?;
+        Ok(format!("sha256:{:x}", Sha256::digest(bytes)))
+    }
+}
+
+impl FeatureProjectionV2 {
+    pub fn validate_for(&self, schema: &FeatureSchemaV2) -> Result<(), DecisionError> {
+        schema.validate()?;
+        if self.schema_version != FEATURE_SCHEMA_VERSION
+            || self.schema_sha256 != schema.fingerprint()?
+        {
+            return Err(DecisionError::InvalidRequest(
+                "feature schema fingerprint mismatch".into(),
+            ));
+        }
+        if self.fields.len() > MAX_FEATURES {
+            return Err(DecisionError::InvalidRequest(
+                "too many feature values".into(),
+            ));
+        }
+        let expected: std::collections::BTreeMap<_, _> =
+            schema.fields.iter().map(|f| (f.id.as_str(), f)).collect();
+        let mut seen = BTreeSet::new();
+        for field in &self.fields {
+            let spec = expected
+                .get(field.id.as_str())
+                .ok_or_else(|| DecisionError::InvalidRequest("unknown feature id".into()))?;
+            if !seen.insert(field.id.as_str()) {
+                return Err(DecisionError::InvalidRequest("duplicate feature id".into()));
+            }
+            match &field.value {
+                None if field.required || spec.required => {
+                    return Err(DecisionError::InvalidRequest(
+                        "required feature missing".into(),
+                    ))
+                }
+                None => {}
+                Some(value) => {
+                    let ty = match value {
+                        FeatureValue::Text(_) => FeatureType::Text,
+                        FeatureValue::Number(n) if n.is_finite() => FeatureType::Number,
+                        FeatureValue::Number(_) => {
+                            return Err(DecisionError::InvalidRequest("non-finite feature".into()))
+                        }
+                        FeatureValue::Boolean(_) => FeatureType::Boolean,
+                        FeatureValue::Category(_) => FeatureType::Category,
+                    };
+                    if ty != spec.value_type {
+                        return Err(DecisionError::InvalidRequest(
+                            "feature type mismatch".into(),
+                        ));
+                    }
+                    let text = match value {
+                        FeatureValue::Text(s) | FeatureValue::Category(s) => Some(s.as_str()),
+                        _ => None,
+                    };
+                    if text.is_some_and(|s| {
+                        s.len() > MAX_STATE_VALUE_BYTES
+                            || (ty == FeatureType::Category
+                                && !spec.categories.is_empty()
+                                && !spec.categories.iter().any(|c| c == s))
+                    }) {
+                        return Err(DecisionError::InvalidRequest(
+                            "feature value outside schema bounds".into(),
+                        ));
+                    }
+                }
+            }
+        }
+        if schema
+            .fields
+            .iter()
+            .any(|f| f.required && !seen.contains(f.id.as_str()))
+        {
+            return Err(DecisionError::InvalidRequest(
+                "required feature missing".into(),
+            ));
+        }
+        Ok(())
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct StateField {
@@ -475,6 +675,50 @@ impl DecisionEngine for NoopDecisionEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn typed_feature_projection_checks_schema_identity_and_values() {
+        let schema = FeatureSchemaV2 {
+            version: FEATURE_SCHEMA_VERSION,
+            fields: vec![
+                FeatureSchemaField {
+                    id: "risk".into(),
+                    value_type: FeatureType::Number,
+                    required: true,
+                    categories: vec![],
+                },
+                FeatureSchemaField {
+                    id: "kind".into(),
+                    value_type: FeatureType::Category,
+                    required: false,
+                    categories: vec!["safe".into()],
+                },
+            ],
+        };
+        let projection = FeatureProjectionV2 {
+            schema_version: FEATURE_SCHEMA_VERSION,
+            schema_sha256: schema.fingerprint().unwrap(),
+            fields: vec![
+                FeatureField {
+                    id: "risk".into(),
+                    required: true,
+                    value: Some(FeatureValue::Number(0.5)),
+                },
+                FeatureField {
+                    id: "kind".into(),
+                    required: false,
+                    value: Some(FeatureValue::Category("safe".into())),
+                },
+            ],
+        };
+        projection.validate_for(&schema).unwrap();
+        let mut bad = projection.clone();
+        bad.schema_sha256 = "sha256:wrong".into();
+        assert!(bad.validate_for(&schema).is_err());
+        let mut bad = projection;
+        bad.fields[0].value = Some(FeatureValue::Number(f64::NAN));
+        assert!(bad.validate_for(&schema).is_err());
+    }
 
     fn rank_request() -> DecisionRequest {
         DecisionRequest {

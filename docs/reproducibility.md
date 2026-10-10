@@ -25,3 +25,22 @@ artifact digest/runtime version. Frozen advisor relevance and answered/abstained
 labels are not used as a production quality claim for this unqualified sparse baseline;
 the compatibility tolerance is contract shape, bounded finite values, candidate
 identity, and provenance, while predictive quality remains experiment evidence.
+
+## Dataset and qualification contracts
+
+`sdm-data` represents labels independently of runtime responses and records source,
+license, consent scope, label lineage and redistributability. `sdm-dataset validate
+<bundle.json>` checks a bounded bundle; `sdm-dataset split <bundle.json> <seed>
+<manifest.json>` emits a content-bound train/dev/test manifest after group-disjoint
+assignment. Reusing a split requires the same dataset digest and exact case coverage.
+
+`sdm-eval` contains independent semantic metrics and frozen protocol identity checks.
+`sdm-qualify <frozen-input.json>` validates dataset/split/artifact/calibration hashes,
+checks the preregistered minimum sample count, and reports Rank metrics and per-gate
+pass/fail/indeterminate outcomes. Unsupported gate names are indeterminate. It never
+promotes a model. Binary, Choice and bounded Score metric functions are available to
+other adapters; the CLI report currently covers Rank predictions only.
+
+The CPU nonlinear prototype is `sdm-nonlinear`; enable its `training` feature for
+deterministic bounded SGD helpers. Runtime v2 dispatch remains unsupported for this
+architecture pending a separately validated engine adapter.
