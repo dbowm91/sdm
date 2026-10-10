@@ -1,7 +1,7 @@
 # M006 closure — Qualification and portability corrective
 
 Status: conditionally closed; remaining qualification depth is tracked by ready M007
-Implementation commit: pending commit for this corrective pass
+Implementation commit: `ee0f613`
 
 ## Requirement-to-evidence
 

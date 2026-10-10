@@ -1,7 +1,7 @@
 # M003 closure — Semantic evaluation and preregistered qualification
 
 Status: conditionally closed
-Implementation commit: pending commit for this corrective pass
+Implementation commit: `ee0f613`
 
 ## Requirement-to-evidence
 

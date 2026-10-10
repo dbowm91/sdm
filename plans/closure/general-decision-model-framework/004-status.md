@@ -1,7 +1,7 @@
 # M004 closure — Nonlinear architecture and Rust training/inference
 
 Status: conditionally closed
-Implementation commit: pending commit for this corrective pass
+Implementation commit: `ee0f613`
 
 ## Requirement-to-evidence
 

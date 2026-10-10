@@ -1,7 +1,7 @@
 # M002 closure — Dataset provenance and split integrity
 
 Status: conditionally closed (generic leakage/import safeguards implemented; semantic audit coverage remains bounded)
-Implementation commit: pending commit for this corrective pass
+Implementation commit: `ee0f613`
 
 ## Requirement-to-evidence
 
