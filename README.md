@@ -100,9 +100,10 @@ cargo run -p sdm-experiment --locked -- experiment run --config fixtures/synthet
 cargo run -p sdm-experiment --locked -- experiment run --config fixtures/synthetic-score-typed-v1.experiment.json
 ```
 
-Both configs use the redistributable 36-example synthetic corpus and its frozen
-group split. The result is mechanics evidence only and makes no real-world quality
-claim. The CLI reads only the paths named in the config and refuses to overwrite
+These configs use redistributable synthetic corpora and frozen group splits. The
+M008/M009 Rank corpus has 36 examples; M011 adds fresh 400-example-per-task suites
+with counterfactual pairs, held-out-family exclusions, and a test-only shifted family. Results establish mechanics
+only and make no real-world quality claim. The CLI reads only named paths and refuses to overwrite
 artifact/report outputs. Legacy `sdm-train`, `sdm-dataset`, and `sdm-qualify`
 commands remain available. The typed Rank path demonstrates train-only numeric
 scaling and text vocabulary, declared categories, boolean inputs, and runtime
@@ -112,3 +113,8 @@ no CodeGG model is promoted.
 
 Task feature, abstention, and artifact behavior is described in
 [`docs/typed-task-heads.md`](docs/typed-task-heads.md).
+M011's preregistered protocol is in
+[`docs/release-qualification-protocol.md`](docs/release-qualification-protocol.md),
+with current local outcomes in [`docs/m011-local-results.md`](docs/m011-local-results.md).
+A separate consumer crate can be compiled with
+`cargo check --manifest-path examples/standalone-consumer/Cargo.toml --locked`.

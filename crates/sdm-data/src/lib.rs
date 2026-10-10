@@ -401,6 +401,24 @@ pub fn freeze_splits(
     seed: u64,
     excluded_families: &BTreeSet<String>,
 ) -> Result<SplitManifest, DataError> {
+    freeze_splits_with_family_holdouts(
+        examples,
+        dataset_sha256,
+        seed,
+        excluded_families,
+        &BTreeSet::new(),
+    )
+}
+
+/// Freezes group-disjoint partitions, optionally excluding complete families
+/// and routing complete held-out families to test.
+pub fn freeze_splits_with_family_holdouts(
+    examples: &[DatasetExample],
+    dataset_sha256: &str,
+    seed: u64,
+    excluded_families: &BTreeSet<String>,
+    test_families: &BTreeSet<String>,
+) -> Result<SplitManifest, DataError> {
     let mut groups = BTreeMap::<&str, Vec<&DatasetExample>>::new();
     for e in examples {
         groups.entry(&e.leakage_group).or_default().push(e);
@@ -415,6 +433,9 @@ pub fn freeze_splits(
                 .as_ref()
                 .is_some_and(|f| excluded_families.contains(f))
         });
+        let family_test = rows
+            .iter()
+            .any(|e| e.family.as_ref().is_some_and(|f| test_families.contains(f)));
         let bucket = u64::from_be_bytes(
             Sha256::digest([seed.to_le_bytes().as_slice(), group.as_bytes()].concat())[..8]
                 .try_into()
@@ -423,6 +444,8 @@ pub fn freeze_splits(
         for e in rows {
             if family_excluded {
                 excluded.push(e.case_id.clone());
+            } else if family_test {
+                test.push(e.case_id.clone());
             } else if bucket < 70 {
                 train.push(e.case_id.clone());
             } else if bucket < 85 {
@@ -604,6 +627,107 @@ mod tests {
             }
         )
         .is_err());
+    }
+
+    #[test]
+    fn frozen_split_excludes_complete_families() {
+        let mut rows: Vec<_> = (0..100).map(row).collect();
+        for (index, example) in rows.iter_mut().enumerate() {
+            example.family = Some(
+                if index < 10 {
+                    "heldout-family"
+                } else {
+                    "main-family"
+                }
+                .into(),
+            );
+        }
+        let provenance = Provenance {
+            source: "synthetic".into(),
+            license: "MIT".into(),
+            consent_scope: "synthetic-only".into(),
+            label_lineage: "generated".into(),
+            redistributable: true,
+        };
+        let digest = validate_dataset(&rows, &provenance).unwrap();
+        let split = freeze_splits(
+            &rows,
+            &digest,
+            42,
+            &BTreeSet::from(["heldout-family".to_string()]),
+        )
+        .unwrap();
+        validate_split(&rows, &split, &digest).unwrap();
+        let excluded: BTreeSet<_> = split.excluded.iter().map(String::as_str).collect();
+        assert!(rows[..10]
+            .iter()
+            .all(|example| excluded.contains(example.case_id.as_str())));
+        assert!(rows[10..]
+            .iter()
+            .all(|example| !excluded.contains(example.case_id.as_str())));
+    }
+
+    #[test]
+    fn frozen_split_routes_complete_families_to_test() {
+        let mut rows: Vec<_> = (0..100).map(row).collect();
+        for (index, example) in rows.iter_mut().enumerate() {
+            example.family = Some(
+                if index < 10 {
+                    "excluded-family"
+                } else if index < 20 {
+                    "ood-test-family"
+                } else {
+                    "trainable-family"
+                }
+                .into(),
+            );
+        }
+        let provenance = Provenance {
+            source: "synthetic".into(),
+            license: "MIT".into(),
+            consent_scope: "synthetic-only".into(),
+            label_lineage: "generated".into(),
+            redistributable: true,
+        };
+        let digest = validate_dataset(&rows, &provenance).unwrap();
+        let split = freeze_splits_with_family_holdouts(
+            &rows,
+            &digest,
+            42,
+            &BTreeSet::from(["excluded-family".to_string()]),
+            &BTreeSet::from(["ood-test-family".to_string()]),
+        )
+        .unwrap();
+        validate_split(&rows, &split, &digest).unwrap();
+        let memberships = [
+            ("train", &split.train),
+            ("dev", &split.dev),
+            ("test", &split.test),
+            ("excluded", &split.excluded),
+        ];
+        for example in &rows[..10] {
+            assert!(
+                memberships
+                    .iter()
+                    .find(|(_, ids)| ids.contains(&example.case_id))
+                    .unwrap()
+                    .0
+                    == "excluded"
+            );
+        }
+        for example in &rows[10..20] {
+            assert!(
+                memberships
+                    .iter()
+                    .find(|(_, ids)| ids.contains(&example.case_id))
+                    .unwrap()
+                    .0
+                    == "test"
+            );
+        }
+        assert!(rows[20..]
+            .iter()
+            .any(|example| split.train.contains(&example.case_id)));
     }
 
     #[test]

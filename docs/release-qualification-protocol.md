@@ -1,6 +1,6 @@
 # M011 synthetic release qualification protocol v1
 
-Status: recorded in the working tree before M011 held-out runs. It had not yet been committed when those runs were read, so this is not a cryptographically timestamped preregistration; release review must treat the gate-freeze audit as incomplete.
+Status: this protocol snapshot and the M011 v2 generator/membership files are committed before v2 held-out inference. Earlier v1 runs are development evidence and are excluded from v2 gates.
 
 ## Scope and limitations
 
@@ -18,7 +18,7 @@ This protocol qualifies only reproducible standalone mechanics on generated data
 
 ## Data generation and report identity
 
-M011 data must use a new generator version and seed, fresh case IDs/groups, explicit synthetic-only provenance, train/dev/test group disjointness, and task-family/counterfactual separation. Store dataset, split, protocol, model, calibration, artifact and report SHA-256 identities. New generators and membership files are committed before test inference. Generated values and metrics are never represented as human or application evidence.
+M011 data must use a new generator version and seed, fresh case IDs/groups, explicit synthetic-only provenance, train/dev/test group disjointness, whole-family exclusions, a test-only out-of-distribution family, and paired counterfactuals. Store dataset, split, protocol, model, calibration, artifact and report SHA-256 identities. New generators and membership files are committed before test inference. Generated values and metrics are never represented as human or application evidence.
 
 ## Disposition rules
 

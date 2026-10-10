@@ -44,7 +44,16 @@ pub struct ExperimentRunManifest {
     pub artifact_sha256: String,
     pub report_sha256: String,
     pub metrics: sdm_eval::RankMetrics,
+    pub outcomes: Vec<RankCaseOutcome>,
     pub verdict: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RankCaseOutcome {
+    pub case_id: String,
+    pub leakage_group: String,
+    pub relevance: BTreeMap<String, f64>,
+    pub prediction: Vec<CandidatePrediction>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -69,7 +78,17 @@ pub struct SemanticExperimentRunManifest {
     pub report_sha256: String,
     pub metrics: SemanticMetrics,
     pub abstentions: usize,
+    pub outcomes: Vec<SemanticCaseOutcome>,
     pub verdict: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SemanticCaseOutcome {
+    pub case_id: String,
+    pub leakage_group: String,
+    pub target: serde_json::Value,
+    pub prediction: serde_json::Value,
+    pub score: Option<f64>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -772,6 +791,7 @@ pub fn run_semantic(
         ));
     };
     let mut abstentions = 0usize;
+    let mut outcomes = Vec::with_capacity(test.len());
     let metrics =
         match task {
             "binary" => {
@@ -793,6 +813,13 @@ pub fn run_semantic(
                         .binary_probability(&e.request, b)
                         .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
                     probabilities.push(probs);
+                    outcomes.push(SemanticCaseOutcome {
+                        case_id: e.case_id.clone(),
+                        leakage_group: e.leakage_group.clone(),
+                        target: serde_json::json!(y),
+                        prediction: serde_json::json!(probs >= 0.5),
+                        score: Some(probs),
+                    });
                 }
                 SemanticMetrics::Binary(
                     sdm_eval::evaluate_binary(&truth, &probabilities, 0.5)
@@ -826,6 +853,19 @@ pub fn run_semantic(
                                 .map_err(|e| ExperimentError::Invalid(e.to_string()))?,
                         );
                     }
+                    let predicted = match r.answer {
+                        Some(sdm_core::DecisionAnswer::Choice { option_id, .. }) => {
+                            serde_json::Value::String(option_id)
+                        }
+                        _ => serde_json::Value::Null,
+                    };
+                    outcomes.push(SemanticCaseOutcome {
+                        case_id: e.case_id.clone(),
+                        leakage_group: e.leakage_group.clone(),
+                        target: serde_json::json!(target),
+                        prediction: predicted,
+                        score: None,
+                    });
                 }
                 SemanticMetrics::Choice(
                     sdm_eval::evaluate_choice(&truth, &probs)
@@ -833,51 +873,62 @@ pub fn run_semantic(
                 )
             }
             "score" => {
-                let mut truth = Vec::new();
-                let mut predicted = Vec::new();
+                let mut scored = Vec::new();
                 for e in &test {
                     let TargetLabel::Score(y) = e.label else {
                         unreachable!()
                     };
-                    truth.push(y);
                     let b = e.typed_rank_features.as_ref().unwrap();
                     let r = runtime
                         .decide_typed(&e.request, b)
                         .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
                     if let Some(sdm_core::DecisionAnswer::Score { value, .. }) = r.answer {
-                        predicted.push(value)
+                        let sdm_core::DecisionSpec::Score {
+                            minimum, maximum, ..
+                        } = &e.request.spec
+                        else {
+                            unreachable!()
+                        };
+                        if !y.is_finite()
+                            || !value.is_finite()
+                            || y < *minimum
+                            || y > *maximum
+                            || value < *minimum
+                            || value > *maximum
+                        {
+                            return Err(ExperimentError::Invalid(
+                                "score outside per-example rubric".into(),
+                            ));
+                        }
+                        scored.push((y, value));
+                        outcomes.push(SemanticCaseOutcome {
+                            case_id: e.case_id.clone(),
+                            leakage_group: e.leakage_group.clone(),
+                            target: serde_json::json!(y),
+                            prediction: serde_json::json!(value),
+                            score: Some(value),
+                        });
                     } else {
                         abstentions += 1;
-                        predicted.push(y);
+                        outcomes.push(SemanticCaseOutcome {
+                            case_id: e.case_id.clone(),
+                            leakage_group: e.leakage_group.clone(),
+                            target: serde_json::json!(y),
+                            prediction: serde_json::Value::Null,
+                            score: None,
+                        });
                     }
                 }
                 let mut squared = 0.0;
                 let mut absolute = 0.0;
-                for ((y, p), e) in truth.iter().zip(&predicted).zip(&test) {
-                    let sdm_core::DecisionSpec::Score {
-                        minimum, maximum, ..
-                    } = &e.request.spec
-                    else {
-                        unreachable!()
-                    };
-                    if !y.is_finite()
-                        || !p.is_finite()
-                        || *y < *minimum
-                        || *y > *maximum
-                        || *p < *minimum
-                        || *p > *maximum
-                    {
-                        return Err(ExperimentError::Invalid(
-                            "score outside per-example rubric".into(),
-                        ));
-                    }
+                for (y, p) in &scored {
                     absolute += (y - p).abs();
                     squared += (y - p).powi(2);
                 }
                 SemanticMetrics::Score(sdm_eval::ScoreMetrics {
-                    count: truth.len(),
-                    mae: (!truth.is_empty()).then_some(absolute / truth.len() as f64),
-                    rmse: (!truth.is_empty()).then_some((squared / truth.len() as f64).sqrt()),
+                    count: scored.len(),
+                    mae: (!scored.is_empty()).then_some(absolute / scored.len() as f64),
+                    rmse: (!scored.is_empty()).then_some((squared / scored.len() as f64).sqrt()),
                 })
             }
             _ => unreachable!(),
@@ -896,6 +947,7 @@ pub fn run_semantic(
         report_sha256: String::new(),
         metrics,
         abstentions,
+        outcomes,
         verdict: "synthetic-mechanics-only".into(),
     };
     report.report_sha256 = digest(&(
@@ -906,6 +958,7 @@ pub fn run_semantic(
         &report.calibration_sha256,
         &report.metrics,
         &report.abstentions,
+        &report.outcomes,
     ))?;
     atomic_write(&spec.artifact_path, &artifact)?;
     atomic_write(&spec.report_path, &serde_json::to_vec_pretty(&report)?)?;
@@ -1074,6 +1127,21 @@ pub fn run(spec: &ExperimentSpec) -> Result<ExperimentRunManifest, ExperimentErr
     }
     let metrics = evaluate_rank(&test_examples, &predictions, 5)
         .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+    let outcomes = test_examples
+        .iter()
+        .zip(&predictions)
+        .map(|(example, prediction)| {
+            let TargetLabel::Rank { relevance, .. } = &example.label else {
+                unreachable!()
+            };
+            RankCaseOutcome {
+                case_id: example.case_id.clone(),
+                leakage_group: example.leakage_group.clone(),
+                relevance: relevance.clone(),
+                prediction: prediction.candidates.clone(),
+            }
+        })
+        .collect::<Vec<_>>();
     let artifact_sha256 = format!("sha256:{:x}", Sha256::digest(&artifact_bytes));
     let mut report = ExperimentRunManifest {
         dataset_sha256: dataset_sha256.clone(),
@@ -1088,6 +1156,7 @@ pub fn run(spec: &ExperimentSpec) -> Result<ExperimentRunManifest, ExperimentErr
         artifact_sha256,
         report_sha256: String::new(),
         metrics,
+        outcomes,
         verdict: "indeterminate".into(),
     };
     // Synthetic corpus mechanics are informative, but do not claim real-world qualification.
@@ -1099,6 +1168,7 @@ pub fn run(spec: &ExperimentSpec) -> Result<ExperimentRunManifest, ExperimentErr
         &report.model_sha256,
         &report.calibration_sha256,
         &report.metrics,
+        &report.outcomes,
     ))?;
     atomic_write(&spec.artifact_path, &artifact_bytes)?;
     atomic_write(&spec.report_path, &serde_json::to_vec_pretty(&report)?)?;

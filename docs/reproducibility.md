@@ -33,6 +33,9 @@ license, consent scope, label lineage and redistributability. `sdm-dataset valid
 <bundle.json>` checks a bounded bundle; `sdm-dataset split <bundle.json> <seed>
 <manifest.json>` emits a content-bound train/dev/test manifest after group-disjoint
 assignment. Reusing a split requires the same dataset digest and exact case coverage.
+The split command also supports `--exclude-family NAME` and `--test-family NAME`
+for preregistered family holdouts; either routing applies to the complete leakage
+group.
 
 `sdm-eval` contains independent semantic metrics and frozen protocol identity checks.
 `sdm-qualify <frozen-input.json>` validates dataset/split/artifact/calibration hashes,
