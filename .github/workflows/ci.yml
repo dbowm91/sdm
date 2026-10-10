@@ -32,6 +32,9 @@ jobs:
           cargo run -p sdm-experiment --locked -- experiment run --config fixtures/standalone-rank-linear.experiment.json
           cargo run -p sdm-experiment --locked -- experiment run --config fixtures/standalone-rank-nonlinear.experiment.json
           cargo run -p sdm-experiment --locked -- experiment run --config fixtures/standalone-typed-rank.experiment.json
+          cargo run -p sdm-experiment --locked -- experiment run --config fixtures/synthetic-binary-typed-v1.experiment.json
+          cargo run -p sdm-experiment --locked -- experiment run --config fixtures/synthetic-choice-typed-v1.experiment.json
+          cargo run -p sdm-experiment --locked -- experiment run --config fixtures/synthetic-score-typed-v1.experiment.json
       - name: Capture runtime benchmark
         run: cargo run -p sdm-runtime --example benchmark -- fixtures/benchmark-rank-request.json artifacts/compatibility-rank-v1.json > benchmark-${{ matrix.name }}.json
       - name: Capture nonlinear runtime benchmark

@@ -1,7 +1,7 @@
 # M008 closure — Standalone reproducible Rank experiment pipeline
 
 Status: closed for end-to-end mechanics; no predictive-quality or CodeGG claim
-Implementation commit: pending commit for this closure
+Implementation commit: `6c49fedfcf8f8711ce8fe5079553f4328b95e730`
 Baseline: M008 handoff baseline `319a05805f3a8383574d0d0712ca5975d16546ff`; source head re-audited at branch head before implementation
 
 ## Requirement-to-evidence

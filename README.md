@@ -26,10 +26,10 @@ projection, disclosure, capture consent, and causal-frontier behavior stay in Co
 - `sdm-experiment`: explicit-input Rank orchestration, frozen-split training,
   dev-only threshold selection, runtime reload and held-out reporting.
 
-Initial runtime architecture is a sparse binary relevance model applied independently
-to Rank candidates. The semantic core supports Binary, Choice, Score, and Rank; the
-first trainer/runtime artifact supports Rank and returns explicit Unsupported for the
-other semantics. Multiple relevant Rank candidates remain independent labels.
+Legacy linear and pairwise Rank artifacts remain supported. Additive typed artifact
+versions also serve Binary, Choice, Score, and typed Rank heads. Multiple relevant
+Rank candidates remain independent labels. Applications still own policy, authority,
+and abstention handling.
 
 ## Build and qualify
 
@@ -80,11 +80,10 @@ SDM M001-M007 historical implementation and qualification outcomes are available
 The next implementation workstream focuses on making SDM a complete independent
 training, typed-feature inference, and qualification framework.
 
-**Next ready handoff:** [M008 standalone Rank experiment pipeline](plans/implementation/general-decision-model-framework/008-standalone-experiment-pipeline.md).
-Subsequent dependency-ordered plans are
-[M009 typed feature model ingress](plans/implementation/general-decision-model-framework/009-typed-feature-model-ingress.md),
+Completed milestones: [M008](plans/closure/general-decision-model-framework/008-status.md) and
+[M009](plans/closure/general-decision-model-framework/009-status.md). Active handoff:
 [M010 Binary/Choice/Score trainable model heads](plans/implementation/general-decision-model-framework/010-generic-decision-task-heads.md),
-and [M011 standalone held-out release qualification](plans/implementation/general-decision-model-framework/011-standalone-release-qualification.md).
+followed by [M011 standalone held-out release qualification](plans/implementation/general-decision-model-framework/011-standalone-release-qualification.md).
 [ADR-0002](plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md)
 defers CodeGG-specific effectiveness (M005) until an approved independent corpus exists;
 **M008-M011 do not require CodeGG data or a CodeGG checkout**.
@@ -96,6 +95,9 @@ mkdir -p target/experiments
 cargo run -p sdm-experiment --locked -- experiment run --config fixtures/standalone-rank-linear.experiment.json
 cargo run -p sdm-experiment --locked -- experiment run --config fixtures/standalone-rank-nonlinear.experiment.json
 cargo run -p sdm-experiment --locked -- experiment run --config fixtures/standalone-typed-rank.experiment.json
+cargo run -p sdm-experiment --locked -- experiment run --config fixtures/synthetic-binary-typed-v1.experiment.json
+cargo run -p sdm-experiment --locked -- experiment run --config fixtures/synthetic-choice-typed-v1.experiment.json
+cargo run -p sdm-experiment --locked -- experiment run --config fixtures/synthetic-score-typed-v1.experiment.json
 ```
 
 Both configs use the redistributable 36-example synthetic corpus and its frozen
@@ -104,5 +106,9 @@ claim. The CLI reads only the paths named in the config and refuses to overwrite
 artifact/report outputs. Legacy `sdm-train`, `sdm-dataset`, and `sdm-qualify`
 commands remain available. The typed Rank path demonstrates train-only numeric
 scaling and text vocabulary, declared categories, boolean inputs, and runtime
-schema checks. Learned Binary/Choice/Score heads remain subsequent work; no CodeGG
-model is promoted.
+schema checks. Binary, Choice, and Score have separate bounded typed heads and
+task-specific metrics. Their synthetic runs establish pipeline mechanics only;
+no CodeGG model is promoted.
+
+Task feature, abstention, and artifact behavior is described in
+[`docs/typed-task-heads.md`](docs/typed-task-heads.md).

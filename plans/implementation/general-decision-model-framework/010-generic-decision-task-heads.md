@@ -1,6 +1,6 @@
 # SDM M010 — Trainable Binary, Choice and Score Decision Heads
 
-Status: blocked (hard M009)
+Status: closed (mechanics; no predictive-quality claim)
 Class: capability
 Planning baseline: 319a05805f3a8383574d0d0712ca5975d16546ff; re-audit when ready
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md

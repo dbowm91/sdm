@@ -1,7 +1,7 @@
 # M009 closure — Task-neutral typed feature ingress
 
 Status: closed for typed Rank train/infer mechanics; no quality or application claim
-Implementation commit: pending commit for this closure
+Implementation commit: `6c49fedfcf8f8711ce8fe5079553f4328b95e730`
 Hard predecessor: M008, closed in 008-status.md
 
 ## Requirement-to-evidence

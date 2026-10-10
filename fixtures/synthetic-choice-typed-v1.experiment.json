@@ -1,0 +1,17 @@
+{
+  "dataset_path": "fixtures/synthetic-choice-typed-v1.json",
+  "split_path": "fixtures/synthetic-choice-typed-v1.split.json",
+  "architecture": "typed-choice",
+  "seed": 73,
+  "epochs": 120,
+  "learning_rate": 0.2,
+  "artifact_path": "target/experiments/choice.artifact.json",
+  "report_path": "target/experiments/choice.report.json",
+  "provenance": {
+    "source": "SDM generated independent synthetic task mechanics corpus v1",
+    "license": "MIT",
+    "consent_scope": "synthetic-only; no human or application data",
+    "label_lineage": "deterministic formulas over generated typed fields",
+    "redistributable": true
+  }
+}

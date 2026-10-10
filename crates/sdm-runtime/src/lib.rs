@@ -35,11 +35,104 @@ pub struct ArtifactEnvelopeV2 {
 }
 
 impl ArtifactEnvelopeV2 {
+    #[allow(clippy::too_many_arguments)]
+    pub fn for_typed_task(
+        task: &str,
+        encoder: &sdm_core::FittedFeatureEncoderV2,
+        weights: Vec<f64>,
+        bias: f64,
+        answerability_weights: Option<Vec<f64>>,
+        answerability_bias: Option<f64>,
+        threshold: f64,
+        calibration_fingerprint: impl Into<String>,
+        training_fingerprint: impl Into<String>,
+        model_id: impl Into<String>,
+        max_candidates: usize,
+    ) -> Result<Self, RuntimeError> {
+        if !["binary", "choice", "score"].contains(&task)
+            || !bias.is_finite()
+            || !threshold.is_finite()
+            || !(0.0..=1.0).contains(&threshold)
+        {
+            return Err(RuntimeError::InvalidArtifact(
+                "invalid typed task metadata".into(),
+            ));
+        }
+        encoder
+            .validate()
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let dim = encoder
+            .dimension()
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let multiplier = if task == "choice" { 3 } else { 2 };
+        if weights.len() != dim.saturating_mul(multiplier)
+            || weights
+                .iter()
+                .any(|w| !w.is_finite() || w.abs() > 1_000_000.0)
+            || bias.abs() > 1_000_000.0
+        {
+            return Err(RuntimeError::InvalidArtifact(
+                "typed task weight shape or value mismatch".into(),
+            ));
+        }
+        if task == "choice" {
+            if answerability_weights.as_ref().is_none_or(|v| {
+                v.len() != dim || v.iter().any(|w| !w.is_finite() || w.abs() > 1_000_000.0)
+            }) || answerability_bias.is_none_or(|b| !b.is_finite() || b.abs() > 1_000_000.0)
+            {
+                return Err(RuntimeError::InvalidArtifact(
+                    "Choice answerability head is missing or malformed".into(),
+                ));
+            }
+        } else if answerability_weights.is_some() || answerability_bias.is_some() {
+            return Err(RuntimeError::InvalidArtifact(
+                "unexpected answerability head".into(),
+            ));
+        }
+        let payload = serde_json::to_vec(&TypedTaskPayload {
+            task: task.into(),
+            encoder: encoder.clone(),
+            weights,
+            bias,
+            answerability_weights,
+            answerability_bias,
+            training_fingerprint: training_fingerprint.into(),
+        })
+        .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let calibration_payload = serde_json::to_vec(&TypedCalibration {
+            threshold,
+            dev_fingerprint: calibration_fingerprint.into(),
+            policy: "dev-answerability-v1".into(),
+        })
+        .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let envelope = Self {
+            schema_version: ARTIFACT_ENVELOPE_V2,
+            architecture: "sdm-typed-task-v1".into(),
+            model_id: model_id.into(),
+            required_feature_schema_sha256: encoder
+                .schema
+                .fingerprint()
+                .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?,
+            capabilities: vec![task.into()],
+            max_candidates,
+            parameter_count: payload.len(),
+            tensor_payload_sha256: format!("sha256:{:x}", Sha256::digest(&payload)),
+            calibration_sha256: format!("sha256:{:x}", Sha256::digest(&calibration_payload)),
+            calibration_payload,
+            license: "MIT".into(),
+            source: "sdm-experiment".into(),
+            payload,
+        };
+        envelope.validate()?;
+        Ok(envelope)
+    }
+    #[allow(clippy::too_many_arguments)]
     pub fn for_typed_rank(
         encoder: &sdm_core::FittedFeatureEncoderV2,
         weights: Vec<f64>,
         bias: f64,
         threshold: f64,
+        calibration_fingerprint: impl Into<String>,
         training_fingerprint: impl Into<String>,
         model_id: impl Into<String>,
         max_candidates: usize,
@@ -67,8 +160,12 @@ impl ArtifactEnvelopeV2 {
             training_fingerprint: training_fingerprint.into(),
         })
         .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
-        let calibration_payload = serde_json::to_vec(&RankCalibration { threshold })
-            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let calibration_payload = serde_json::to_vec(&TypedCalibration {
+            threshold,
+            dev_fingerprint: calibration_fingerprint.into(),
+            policy: "dev-max-relevance-v1".into(),
+        })
+        .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
         let envelope = Self {
             schema_version: ARTIFACT_ENVELOPE_V2,
             architecture: "sdm-typed-linear-rank-v1".into(),
@@ -252,12 +349,19 @@ pub enum LoadedArtifact {
     LinearV1(Runtime),
     NonlinearV2(NonlinearRuntime),
     TypedRankV2(TypedRankRuntime),
+    TypedTaskV2(TypedTaskRuntime),
     UnsupportedV2(ArtifactEnvelopeV2),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct RankCalibration {
     threshold: f64,
+}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct TypedCalibration {
+    threshold: f64,
+    dev_fingerprint: String,
+    policy: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -266,6 +370,334 @@ struct TypedRankPayload {
     weights: Vec<f64>,
     bias: f64,
     training_fingerprint: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct TypedTaskPayload {
+    task: String,
+    encoder: sdm_core::FittedFeatureEncoderV2,
+    weights: Vec<f64>,
+    bias: f64,
+    #[serde(default)]
+    answerability_weights: Option<Vec<f64>>,
+    #[serde(default)]
+    answerability_bias: Option<f64>,
+    training_fingerprint: String,
+}
+#[derive(Debug, Clone)]
+pub struct TypedTaskRuntime {
+    payload: TypedTaskPayload,
+    model_id: String,
+    max_candidates: usize,
+    threshold: f64,
+    digest: String,
+}
+
+impl TypedTaskRuntime {
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self, RuntimeError> {
+        let envelope = ArtifactEnvelopeV2::from_bytes(bytes)?;
+        if envelope.architecture != "sdm-typed-task-v1" {
+            return Err(RuntimeError::InvalidArtifact(
+                "unsupported typed task architecture".into(),
+            ));
+        }
+        let payload: TypedTaskPayload = serde_json::from_slice(&envelope.payload)
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        payload
+            .encoder
+            .validate()
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let dim = payload
+            .encoder
+            .dimension()
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        if !["binary", "choice", "score"].contains(&payload.task.as_str())
+            || envelope.capabilities != [payload.task.as_str()]
+            || payload.weights.len()
+                != dim.saturating_mul(if payload.task == "choice" { 3 } else { 2 })
+            || payload
+                .weights
+                .iter()
+                .any(|w| !w.is_finite() || w.abs() > 1_000_000.0)
+            || !payload.bias.is_finite()
+            || payload.bias.abs() > 1_000_000.0
+            || payload.training_fingerprint.is_empty()
+            || payload
+                .encoder
+                .schema
+                .fingerprint()
+                .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?
+                != envelope.required_feature_schema_sha256
+        {
+            return Err(RuntimeError::InvalidArtifact(
+                "invalid typed task payload".into(),
+            ));
+        }
+        if payload.task == "choice" {
+            if payload.answerability_weights.as_ref().is_none_or(|v| {
+                v.len() != dim || v.iter().any(|w| !w.is_finite() || w.abs() > 1_000_000.0)
+            }) || payload
+                .answerability_bias
+                .is_none_or(|b| !b.is_finite() || b.abs() > 1_000_000.0)
+            {
+                return Err(RuntimeError::InvalidArtifact(
+                    "Choice answerability head is malformed".into(),
+                ));
+            }
+        } else if payload.answerability_weights.is_some() || payload.answerability_bias.is_some() {
+            return Err(RuntimeError::InvalidArtifact(
+                "unexpected answerability head".into(),
+            ));
+        }
+        let calibration: TypedCalibration =
+            serde_json::from_slice(&envelope.calibration_payload)
+                .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        if !calibration.threshold.is_finite()
+            || !(0.0..=1.0).contains(&calibration.threshold)
+            || calibration.dev_fingerprint.is_empty()
+            || calibration.policy != "dev-answerability-v1"
+        {
+            return Err(RuntimeError::InvalidArtifact(
+                "invalid typed task calibration".into(),
+            ));
+        }
+        Ok(Self {
+            payload,
+            model_id: envelope.model_id,
+            max_candidates: envelope.max_candidates,
+            threshold: calibration.threshold,
+            digest: format!("sha256:{:x}", Sha256::digest(bytes)),
+        })
+    }
+    pub fn digest(&self) -> &str {
+        &self.digest
+    }
+    pub fn binary_probability(
+        &self,
+        request: &DecisionRequest,
+        features: &sdm_core::TypedRankProjectionV2,
+    ) -> Result<f64, DecisionError> {
+        request.validate()?;
+        if self.payload.task != "binary"
+            || !matches!(request.spec, sdm_core::DecisionSpec::Binary { .. })
+            || features.schema.fingerprint()? != self.payload.encoder.schema.fingerprint()?
+        {
+            return Err(DecisionError::InvalidRequest(
+                "binary task or schema mismatch".into(),
+            ));
+        }
+        features.context.validate_for(&features.schema)?;
+        if !features.candidates.is_empty() {
+            return Err(DecisionError::InvalidRequest(
+                "Binary typed input cannot contain options".into(),
+            ));
+        }
+        let context = self.payload.encoder.encode(&features.context)?;
+        Ok(1.0 / (1.0 + (-self.score(&context, None)?).exp()))
+    }
+    fn score(
+        &self,
+        context: &[f64],
+        item: Option<&sdm_core::FeatureProjectionV2>,
+    ) -> Result<f64, DecisionError> {
+        let mut x = context.to_vec();
+        if let Some(p) = item {
+            let item = self.payload.encoder.encode(p)?;
+            x.extend(item.iter().copied());
+            if self.payload.task == "choice" {
+                x.extend(context.iter().zip(&item).map(|(a, b)| a * b));
+            }
+        } else {
+            x.resize(
+                context.len() * if self.payload.task == "choice" { 3 } else { 2 },
+                0.0,
+            );
+        }
+        Ok(x.iter()
+            .zip(&self.payload.weights)
+            .map(|(a, b)| a * b)
+            .sum::<f64>()
+            + self.payload.bias)
+    }
+    fn answerability(&self, context: &[f64]) -> f64 {
+        let weights = self
+            .payload
+            .answerability_weights
+            .as_ref()
+            .expect("validated Choice head");
+        1.0 / (1.0
+            + (-(context.iter().zip(weights).map(|(x, w)| x * w).sum::<f64>()
+                + self.payload.answerability_bias.unwrap_or(0.0)))
+            .exp())
+    }
+    pub fn choice_probabilities(
+        &self,
+        request: &DecisionRequest,
+        features: &sdm_core::TypedRankProjectionV2,
+    ) -> Result<Vec<f64>, DecisionError> {
+        request.validate()?;
+        let sdm_core::DecisionSpec::Choice { options, .. } = &request.spec else {
+            return Err(DecisionError::InvalidRequest(
+                "choice probabilities require Choice request".into(),
+            ));
+        };
+        if self.payload.task != "choice"
+            || options.len() > self.max_candidates
+            || features.schema.fingerprint()? != self.payload.encoder.schema.fingerprint()?
+        {
+            return Err(DecisionError::InvalidRequest(
+                "choice task or schema mismatch".into(),
+            ));
+        }
+        let expected: std::collections::BTreeSet<_> =
+            options.iter().map(|o| o.id.as_str()).collect();
+        if features
+            .candidates
+            .keys()
+            .map(String::as_str)
+            .collect::<std::collections::BTreeSet<_>>()
+            != expected
+        {
+            return Err(DecisionError::InvalidRequest(
+                "typed option identities mismatch".into(),
+            ));
+        }
+        let context = self.payload.encoder.encode(&features.context)?;
+        let scores = options
+            .iter()
+            .map(|o| self.score(&context, Some(&features.candidates[&o.id])))
+            .collect::<Result<Vec<_>, _>>()?;
+        let max = scores.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+        let exps: Vec<_> = scores.iter().map(|x| (x - max).exp()).collect();
+        let sum = exps.iter().sum::<f64>();
+        Ok(exps.into_iter().map(|x| x / sum).collect())
+    }
+    pub fn decide_typed(
+        &self,
+        request: &DecisionRequest,
+        features: &sdm_core::TypedRankProjectionV2,
+    ) -> Result<DecisionResponse, DecisionError> {
+        request.validate()?;
+        let task = match request.spec {
+            sdm_core::DecisionSpec::Binary { .. } => "binary",
+            sdm_core::DecisionSpec::Choice { .. } => "choice",
+            sdm_core::DecisionSpec::Score { .. } => "score",
+            sdm_core::DecisionSpec::Rank { .. } => {
+                return Err(DecisionError::InvalidRequest(
+                    "typed task artifact does not support Rank".into(),
+                ))
+            }
+        };
+        if task != self.payload.task {
+            return Err(DecisionError::InvalidRequest(
+                "typed artifact/task mismatch".into(),
+            ));
+        }
+        if features.schema.fingerprint()? != self.payload.encoder.schema.fingerprint()? {
+            return Err(DecisionError::InvalidRequest(
+                "typed schema differs from artifact".into(),
+            ));
+        }
+        features.context.validate_for(&features.schema)?;
+        let expected: std::collections::BTreeSet<&str> = match &request.spec {
+            sdm_core::DecisionSpec::Choice { options, .. } => {
+                options.iter().map(|o| o.id.as_str()).collect()
+            }
+            _ => std::collections::BTreeSet::new(),
+        };
+        if features
+            .candidates
+            .keys()
+            .map(String::as_str)
+            .collect::<std::collections::BTreeSet<_>>()
+            != expected
+        {
+            return Err(DecisionError::InvalidRequest(
+                "typed option identities mismatch".into(),
+            ));
+        }
+        let context = self.payload.encoder.encode(&features.context)?;
+        let (status, answer) = match &request.spec {
+            sdm_core::DecisionSpec::Binary { .. } => {
+                let p = 1.0 / (1.0 + (-self.score(&context, None)?).exp());
+                let confidence = p.max(1.0 - p);
+                if confidence < self.threshold {
+                    (
+                        sdm_core::DecisionStatus::Abstained {
+                            reason: Some("typed binary confidence below dev threshold".into()),
+                        },
+                        None,
+                    )
+                } else {
+                    (
+                        sdm_core::DecisionStatus::Answered,
+                        Some(DecisionAnswer::Binary {
+                            probability_true: p,
+                            confidence: Some(confidence),
+                        }),
+                    )
+                }
+            }
+            sdm_core::DecisionSpec::Choice { options, .. } => {
+                if options.len() > self.max_candidates {
+                    return Err(DecisionError::InvalidRequest(
+                        "typed Choice item limit exceeded".into(),
+                    ));
+                }
+                let probs = self.choice_probabilities(request, features)?;
+                let best = (0..options.len())
+                    .max_by(|a, b| {
+                        probs[*a]
+                            .total_cmp(&probs[*b])
+                            .then_with(|| options[*b].id.cmp(&options[*a].id))
+                    })
+                    .unwrap();
+                if self.answerability(&context) < self.threshold {
+                    (
+                        sdm_core::DecisionStatus::Abstained {
+                            reason: Some("typed choice confidence below dev threshold".into()),
+                        },
+                        None,
+                    )
+                } else {
+                    (
+                        sdm_core::DecisionStatus::Answered,
+                        Some(DecisionAnswer::Choice {
+                            option_id: options[best].id.clone(),
+                            probability: Some(probs[best]),
+                        }),
+                    )
+                }
+            }
+            sdm_core::DecisionSpec::Score {
+                minimum, maximum, ..
+            } => {
+                let p = 1.0 / (1.0 + (-self.score(&context, None)?).exp());
+                (
+                    sdm_core::DecisionStatus::Answered,
+                    Some(DecisionAnswer::Score {
+                        value: minimum + p * (maximum - minimum),
+                        confidence: None,
+                    }),
+                )
+            }
+            sdm_core::DecisionSpec::Rank { .. } => unreachable!(),
+        };
+        let response = DecisionResponse {
+            request_id: request.request_id.clone(),
+            schema_version: request.schema_version,
+            status,
+            answer,
+            provenance: DecisionProvenance {
+                backend: "sdm-local-typed-task".into(),
+                model: Some(self.model_id.clone()),
+                runtime_version: Some(RUNTIME_VERSION.into()),
+                latency_micros: 0,
+            },
+        };
+        response.validate_for(request)?;
+        Ok(response)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -314,9 +746,14 @@ impl TypedRankRuntime {
                 "invalid typed Rank payload".into(),
             ));
         }
-        let calibration: RankCalibration = serde_json::from_slice(&envelope.calibration_payload)
-            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
-        if !calibration.threshold.is_finite() || !(0.0..=1.0).contains(&calibration.threshold) {
+        let calibration: TypedCalibration =
+            serde_json::from_slice(&envelope.calibration_payload)
+                .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        if !calibration.threshold.is_finite()
+            || !(0.0..=1.0).contains(&calibration.threshold)
+            || calibration.dev_fingerprint.is_empty()
+            || calibration.policy != "dev-max-relevance-v1"
+        {
             return Err(RuntimeError::InvalidArtifact(
                 "invalid typed Rank threshold".into(),
             ));
@@ -584,6 +1021,10 @@ pub fn load_artifact(bytes: &[u8]) -> Result<LoadedArtifact, RuntimeError> {
             )?))
         } else if envelope.architecture == "sdm-typed-linear-rank-v1" {
             Ok(LoadedArtifact::TypedRankV2(TypedRankRuntime::from_bytes(
+                bytes,
+            )?))
+        } else if envelope.architecture == "sdm-typed-task-v1" {
+            Ok(LoadedArtifact::TypedTaskV2(TypedTaskRuntime::from_bytes(
                 bytes,
             )?))
         } else {
@@ -878,6 +1319,7 @@ mod tests {
             vec![0.0, 0.0, 5.0, 0.0],
             0.0,
             0.5,
+            "dev-sha",
             "train-sha",
             "typed-model",
             8,

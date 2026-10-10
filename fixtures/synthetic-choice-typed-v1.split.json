@@ -1,0 +1,49 @@
+{
+  "version": 3,
+  "dataset_sha256": "sha256:6fe99ce53fb2e1ac6320f5dd3d47314c3dd886eb9e3634d0946af6e087454076",
+  "seed": 73,
+  "train": [
+    "choice-001",
+    "choice-002",
+    "choice-003",
+    "choice-005",
+    "choice-006",
+    "choice-007",
+    "choice-008",
+    "choice-009",
+    "choice-010",
+    "choice-011",
+    "choice-012",
+    "choice-013",
+    "choice-015",
+    "choice-026",
+    "choice-029",
+    "choice-030",
+    "choice-033",
+    "choice-034",
+    "choice-036",
+    "choice-038",
+    "choice-040",
+    "choice-042",
+    "choice-043",
+    "choice-078",
+    "choice-082",
+    "choice-086"
+  ],
+  "dev": [
+    "choice-004",
+    "choice-045",
+    "choice-050",
+    "choice-055"
+  ],
+  "test": [
+    "choice-020",
+    "choice-025",
+    "choice-032",
+    "choice-037",
+    "choice-051",
+    "choice-056"
+  ],
+  "excluded": [],
+  "fingerprint": "sha256:c190e583d117faf909920cb33fbfe6fa1c59d64bbf5214b95fa9b6438b2f99a6"
+}

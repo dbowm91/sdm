@@ -1,0 +1,3935 @@
+{
+  "provenance": {
+    "source": "SDM generated independent synthetic task mechanics corpus v1",
+    "license": "MIT",
+    "consent_scope": "synthetic-only; no human or application data",
+    "label_lineage": "deterministic formulas over generated typed fields",
+    "redistributable": true
+  },
+  "examples": [
+    {
+      "case_id": "binary-001",
+      "leakage_group": "binary-group-0",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-1",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": false
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 7.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-002",
+      "leakage_group": "binary-group-1",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-2",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 3.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-003",
+      "leakage_group": "binary-group-2",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-3",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": false
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 10.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-004",
+      "leakage_group": "binary-group-3",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-4",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 6.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-005",
+      "leakage_group": "binary-group-4",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-5",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": false
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 2.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-006",
+      "leakage_group": "binary-group-5",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-6",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 9.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-007",
+      "leakage_group": "binary-group-6",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-7",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": false
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 5.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-008",
+      "leakage_group": "binary-group-7",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-8",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 1.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-009",
+      "leakage_group": "binary-group-8",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-9",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": false
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 8.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-010",
+      "leakage_group": "binary-group-9",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-10",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 4.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-011",
+      "leakage_group": "binary-group-10",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-11",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": false
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 0.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-012",
+      "leakage_group": "binary-group-11",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-12",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 7.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-013",
+      "leakage_group": "binary-group-12",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-13",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": false
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 3.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-014",
+      "leakage_group": "binary-group-13",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-14",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 10.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-015",
+      "leakage_group": "binary-group-14",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-15",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": false
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 6.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-016",
+      "leakage_group": "binary-group-15",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-16",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 2.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-017",
+      "leakage_group": "binary-group-16",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-17",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": false
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 9.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-018",
+      "leakage_group": "binary-group-17",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-18",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 5.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-021",
+      "leakage_group": "binary-group-20",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-21",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": false
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 4.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-028",
+      "leakage_group": "binary-group-27",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-28",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 9.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-033",
+      "leakage_group": "binary-group-32",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-33",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": false
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 0.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-036",
+      "leakage_group": "binary-group-35",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-36",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 10.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-039",
+      "leakage_group": "binary-group-38",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-39",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": false
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 9.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-041",
+      "leakage_group": "binary-group-40",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-41",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": false
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 1.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-044",
+      "leakage_group": "binary-group-43",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-44",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 0.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-047",
+      "leakage_group": "binary-group-46",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-47",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": false
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 10.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-049",
+      "leakage_group": "binary-group-48",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-49",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": false
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 2.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-052",
+      "leakage_group": "binary-group-51",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-52",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 1.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-060",
+      "leakage_group": "binary-group-59",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-60",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 2.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-063",
+      "leakage_group": "binary-group-62",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-63",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": false
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 1.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-064",
+      "leakage_group": "binary-group-63",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-64",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 8.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-066",
+      "leakage_group": "binary-group-65",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-66",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 0.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-068",
+      "leakage_group": "binary-group-67",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-68",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 3.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-070",
+      "leakage_group": "binary-group-69",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-70",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 6.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-080",
+      "leakage_group": "binary-group-79",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-80",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": true
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 10.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "binary-081",
+      "leakage_group": "binary-group-80",
+      "family": "synthetic-binary",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "binary-81",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "binary",
+          "question": "Is this task active?"
+        }
+      },
+      "label": {
+        "kind": "binary",
+        "value": false
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 6.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "activity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "binary"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    }
+  ]
+}

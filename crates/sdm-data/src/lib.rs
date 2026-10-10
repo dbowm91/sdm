@@ -302,11 +302,6 @@ pub fn validate_dataset(
             .validate()
             .map_err(|x| DataError::Invalid(x.to_string()))?;
         if let Some(typed) = &e.typed_rank_features {
-            let sdm_core::DecisionSpec::Rank { candidates, .. } = &e.request.spec else {
-                return Err(DataError::Invalid(
-                    "typed Rank features attached to non-Rank request".into(),
-                ));
-            };
             typed
                 .schema
                 .validate()
@@ -315,11 +310,22 @@ pub fn validate_dataset(
                 .context
                 .validate_for(&typed.schema)
                 .map_err(|x| DataError::Invalid(x.to_string()))?;
-            let expected: BTreeSet<_> = candidates.iter().map(|c| c.id.as_str()).collect();
+            let expected: BTreeSet<_> = match &e.request.spec {
+                sdm_core::DecisionSpec::Rank { candidates, .. } => {
+                    candidates.iter().map(|c| c.id.as_str()).collect()
+                }
+                sdm_core::DecisionSpec::Choice { options, .. } => {
+                    options.iter().map(|o| o.id.as_str()).collect()
+                }
+                sdm_core::DecisionSpec::Binary { .. } | sdm_core::DecisionSpec::Score { .. } => {
+                    BTreeSet::new()
+                }
+            };
             let supplied: BTreeSet<_> = typed.candidates.keys().map(String::as_str).collect();
             if expected != supplied {
                 return Err(DataError::Invalid(
-                    "typed candidate features must exactly match candidate identities".into(),
+                    "typed item features must exactly match the request's approved item identities"
+                        .into(),
                 ));
             }
             for projection in typed.candidates.values() {
