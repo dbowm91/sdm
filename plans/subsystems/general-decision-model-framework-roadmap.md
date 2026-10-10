@@ -1,6 +1,6 @@
 # General Decision-Model Framework and First Consumer Roadmap
 
-Status: M001-M010 evidence retained; M011 active; M005 deferred
+Status: M001-M011 evidence retained; no standalone milestone active; M005 deferred
 Audit baseline: dbowm91/sdm@8139b064bdcf3212e8f6fd912e801a479b55751c (2026-10-05)
 Planning date: 2026-10-10
 Primary decisions: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md; plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md
@@ -100,10 +100,10 @@ Class: capability. Status: closed for mechanics; no quality claim. Evidence: pla
 Complete train/package/infer/evaluate paths for every declared semantic family using small bounded models, correct abstention and option/score semantics, and independent datasets. Existing Rank continues working.
 
 ### M011 — Held-out standalone qualification and release review
-Class: capability/release infrastructure. Status: active. Plan: plans/implementation/general-decision-model-framework/011-standalone-release-qualification.md.
-Require genuine unseen synthetic groups, preregistered positive/negative/indeterminate gates, trained-artifact three-target benchmarks, an actual Rust 1.89 MSRV CI job, independent consumer usage, docs reconciliation and explicit security/dependency/format review. It does not auto-publish or qualify CodeGG.
+Class: capability/release infrastructure. Status: closed; evidence: plans/closure/general-decision-model-framework/011-status.md. Plan: plans/implementation/general-decision-model-framework/011-standalone-release-qualification.md.
+Frozen held-out suites, positive/negative/indeterminate gates, the same trained artifact on three targets, Rust 1.89, independent consumer compilation, documentation, dependency/license metadata and package verification are recorded. Binary OOD evidence is negative; Choice quality and some OOD slices are indeterminate. This is a mechanics/release candidate only and does not qualify CodeGG or auto-publish.
 
-Dependency graph: M008 -> M009 -> M010 -> M011. Each milestone requires its own plans/closure/general-decision-model-framework/NNN-status.md evidence and registry update. CodeGG M005 stays deferred on a separate external gate.
+Dependency graph: M008 -> M009 -> M010 -> M011 is complete. Each milestone has its own plans/closure/general-decision-model-framework/NNN-status.md evidence and registry update. CodeGG M005 stays deferred on a separate external gate. No other registered work line is currently eligible.
 
 ## 7. Cross-cutting requirements
 
@@ -132,4 +132,4 @@ Create plans/closure/general-decision-model-framework/NNN-status.md for each mil
 
 ## 10. Readiness
 
-M001-M010 outcomes are retained under plans/closure/general-decision-model-framework/. M011 is active. M005 stays indeterminate because no approved independent CodeGG corpus or consumer adapter exists. The v1 consumer contract remains unchanged and no CodeGG model is promoted.
+M001-M011 outcomes are retained under plans/closure/general-decision-model-framework/. M005 stays indeterminate because no approved independent CodeGG corpus or consumer adapter exists. The v1 consumer contract remains unchanged and no CodeGG model is promoted. The repository has no active SDM-owned implementation plan after M011; future work requires a newly approved handoff or the external M005 gate to change.

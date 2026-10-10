@@ -1,6 +1,6 @@
 # SDM M011 — Independent Held-Out Qualification and Release Readiness
 
-Status: active
+Status: closed; see plans/closure/general-decision-model-framework/011-status.md
 Class: capability/release infrastructure
 Planning baseline: 319a05805f3a8383574d0d0712ca5975d16546ff; re-audit at start
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md

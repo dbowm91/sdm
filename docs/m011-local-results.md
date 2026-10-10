@@ -26,10 +26,13 @@ The checked-in CI workflow executes all six workflows on three hosted targets.
 
 Protocol SHA-256:
 `sha256:f563e89dc7a2165edf4e48bffdd669db0337a2cdbf2b760d54713558d78c05d2`.
-The locally reproduced machine report (including the explicit constant-baseline
+The locally reproduced machine report (including explicit constant-baseline
 negative controls) was
-`sha256:fa33a0fa2a5b1c347b9576e87f421194dd055e76cf1504b31fa1d72d7337b17d`;
-hosted CI regenerates this report for the same frozen data and protocol.
+`sha256:fa33a0fa2a5b1c347b9576e87f421194dd055e76cf1504b31fa1d72d7337b17d`.
+The final hosted Linux x86_64 report is
+`sha256:b338774e9f4dbcc247ac44eb5f7413c5d4f27ee0eeef4abd294723ddde2170d6`.
+Small floating-point differences across compiler/host builds can change model,
+artifact, and report hashes; CI archives the full per-platform reports.
 
 | Task | Held-out cases / groups | Baseline comparison (paired group 95% CI) | OOD disposition | Counterfactual target / prediction changes |
 | --- | ---: | --- | --- | ---: |
@@ -62,4 +65,4 @@ tests preserve model/calibration digests. The report records negative and
 indeterminate predictive-quality outcomes without claiming they passed the
 quality gate. Hosted trained-artifact resource results and cross-platform
 loading of the same trained artifact are recorded in the numbered M011 closure
-after the final CI run completes.
+in [plans/closure/general-decision-model-framework/011-status.md](../plans/closure/general-decision-model-framework/011-status.md).

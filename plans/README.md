@@ -2,7 +2,7 @@
 
 This directory follows the CodeGG planning and handoff convention as adapted in [003-planning-process.md](003-planning-process.md).
 
-**Start here:** [Registry](registry.md) -> [General decision-model framework roadmap](subsystems/general-decision-model-framework-roadmap.md) -> active handoff M011. The [framework boundary ADR](adrs/ADR-0001-general-framework-and-model-boundaries.md) governs the milestone plans.
+**Start here:** [Registry](registry.md) -> [General decision-model framework roadmap](subsystems/general-decision-model-framework-roadmap.md) -> accepted closure evidence. No SDM-owned milestone is active; M005 is externally deferred. The [framework boundary ADR](adrs/ADR-0001-general-framework-and-model-boundaries.md) governs the milestone plans.
 
 ## Completed handoffs
 
@@ -17,9 +17,9 @@ M007 is closed with generic synthetic qualification, slice calibration and train
 - [M008 — Reproducible Rank experiment pipeline](implementation/general-decision-model-framework/008-standalone-experiment-pipeline.md): closed; [evidence](closure/general-decision-model-framework/008-status.md).
 - [M009 — Typed feature training and runtime](implementation/general-decision-model-framework/009-typed-feature-model-ingress.md): closed; [evidence](closure/general-decision-model-framework/009-status.md).
 - [M010 — Trainable Binary/Choice/Score heads](implementation/general-decision-model-framework/010-generic-decision-task-heads.md): closed; mechanics evidence in [closure](closure/general-decision-model-framework/010-status.md).
-- [M011 — Standalone held-out/release qualification](implementation/general-decision-model-framework/011-standalone-release-qualification.md): active.
+- [M011 — Standalone held-out/release qualification](implementation/general-decision-model-framework/011-standalone-release-qualification.md): closed; [qualification and release audit](closure/general-decision-model-framework/011-status.md).
 
-All four milestones are SDM-owned, use explicitly provided synthetic data, preserve v1 CodeGG compatibility and require new numbered closure files. No CodeGG corpus or checkout is needed.
+All four milestones are SDM-owned, use explicitly provided synthetic data, preserve v1 CodeGG compatibility, and have numbered closure files. M011 closes this currently eligible work line. No CodeGG corpus or checkout was needed.
 
 Research and predecessor evidence are recorded in [docs/general-framework-research-2026-10.md](../docs/general-framework-research-2026-10.md).
 

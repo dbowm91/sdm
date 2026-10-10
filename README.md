@@ -72,18 +72,19 @@ See [`docs/extraction-inventory.md`](docs/extraction-inventory.md),
 [`docs/benchmark-baseline.md`](docs/benchmark-baseline.md) runtime snapshot.
 
 
-## Active development planning (October 2026)
+## Planning record (October 2026)
 
 SDM M001-M007 historical implementation and qualification outcomes are available in
 [the planning registry](plans/registry.md) and
 [closure records](plans/closure/general-decision-model-framework/).
-The next implementation workstream focuses on making SDM a complete independent
-training, typed-feature inference, and qualification framework.
+The standalone framework successor work completed M008 through M011. Historical
+conditional closures and the external M005 gate remain visible in the registry.
 
 Completed milestones: [M008](plans/closure/general-decision-model-framework/008-status.md),
-[M009](plans/closure/general-decision-model-framework/009-status.md), and
-[M010 Binary/Choice/Score trainable model heads](plans/closure/general-decision-model-framework/010-status.md).
-Active handoff: [M011 standalone held-out release qualification](plans/implementation/general-decision-model-framework/011-standalone-release-qualification.md).
+[M009](plans/closure/general-decision-model-framework/009-status.md),
+[M010 Binary/Choice/Score trainable model heads](plans/closure/general-decision-model-framework/010-status.md), and
+[M011 standalone held-out release qualification](plans/closure/general-decision-model-framework/011-status.md).
+No standalone framework milestone is active. M005 remains externally deferred until an approved CodeGG corpus and consumer-owned evidence exist.
 [ADR-0002](plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md)
 defers CodeGG-specific effectiveness (M005) until an approved independent corpus exists;
 **M008-M011 do not require CodeGG data or a CodeGG checkout**.
@@ -115,6 +116,8 @@ Task feature, abstention, and artifact behavior is described in
 [`docs/typed-task-heads.md`](docs/typed-task-heads.md).
 M011's preregistered protocol is in
 [`docs/release-qualification-protocol.md`](docs/release-qualification-protocol.md),
-with current local outcomes in [`docs/m011-local-results.md`](docs/m011-local-results.md).
+with local and hosted synthetic outcomes in [`docs/m011-local-results.md`](docs/m011-local-results.md)
+and the numbered closure record in
+[`plans/closure/general-decision-model-framework/011-status.md`](plans/closure/general-decision-model-framework/011-status.md).
 A separate consumer crate can be compiled with
 `cargo check --manifest-path examples/standalone-consumer/Cargo.toml --locked`.
