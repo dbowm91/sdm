@@ -70,21 +70,25 @@ See [`docs/extraction-inventory.md`](docs/extraction-inventory.md),
 [`docs/benchmark-baseline.md`](docs/benchmark-baseline.md) runtime snapshot.
 
 
-## Active development planning
+## Active development planning (October 2026)
 
-The next framework workstream is registered under [plans/](plans/README.md).
-Its [roadmap](plans/subsystems/general-decision-model-framework-roadmap.md) separates
-versioned contracts (M001), generic data and split provenance (M002),
-independent evaluation/qualification (M003), a second trainable architecture
-(M004), and CodeGG as the first application-level experiment (M005).
+SDM M001-M007 historical implementation and qualification outcomes are available in
+[the planning registry](plans/registry.md) and
+[closure records](plans/closure/general-decision-model-framework/).
+The next implementation workstream focuses on making SDM a complete independent
+training, typed-feature inference, and qualification framework.
 
-[M001 is ready for implementation](plans/implementation/general-decision-model-framework/001-versioned-feature-artifact-runtime-contracts.md);
-M002-M005 have explicit dependency blockers in the [active registry](plans/registry.md).
-This planning work does not qualify any new model or alter CodeGG's current
-pinned SDM runtime. Details and negative historical model evidence are preserved
-in [the research note](docs/general-framework-research-2026-10.md).
+**Next ready handoff:** [M008 standalone Rank experiment pipeline](plans/implementation/general-decision-model-framework/008-standalone-experiment-pipeline.md).
+Subsequent dependency-ordered plans are
+[M009 typed feature model ingress](plans/implementation/general-decision-model-framework/009-typed-feature-model-ingress.md),
+[M010 Binary/Choice/Score trainable model heads](plans/implementation/general-decision-model-framework/010-generic-decision-task-heads.md),
+and [M011 standalone held-out release qualification](plans/implementation/general-decision-model-framework/011-standalone-release-qualification.md).
+[ADR-0002](plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md)
+defers CodeGG-specific effectiveness (M005) until an approved independent corpus exists;
+**M008-M011 do not require CodeGG data or a CodeGG checkout**.
 
-New offline data/evaluation commands are `sdm-dataset validate`, `sdm-dataset split`,
-and `sdm-qualify`. They consume explicit local files and do not access network sources.
-The nonlinear CPU Rank engine is registered in v2 runtime dispatch. It remains an
-unqualified framework architecture and does not promote a CodeGG model.
+Current single-purpose commands include `sdm-dataset validate`, `sdm-dataset split`,
+legacy `sdm-train` (linear Rank), and `sdm-qualify` (precomputed Rank predictions).
+A unified experiment runner, generalized typed inference and non-Rank trained
+model heads are planned, **not implemented yet**. The working v2 nonlinear Rank
+engine is an unqualified mechanics prototype; no CodeGG model is promoted.
