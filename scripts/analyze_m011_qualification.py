@@ -35,6 +35,16 @@ def bootstrap(group_deltas, seed):
             "confidence": 0.95, "replicates": len(means)}
 
 
+def disposition(interval):
+    if interval["groups"] < 20:
+        return "indeterminate"
+    if interval["lower"] is not None and interval["lower"] > 0:
+        return "positive"
+    if interval["upper"] is not None and interval["upper"] < 0:
+        return "negative"
+    return "indeterminate"
+
+
 def ndcg(relevance, ordered_ids):
     if not any(value > 0 for value in relevance.values()):
         return None
@@ -116,18 +126,18 @@ def main():
             {group: sum(values) / len(values) for group, values in ood_group_values.items()},
             13011 + TASKS.index(task),
         )
-        ood_disposition = "indeterminate"
-        if ood_interval["groups"] >= 20:
-            if ood_interval["lower"] is not None and ood_interval["lower"] > 0:
-                ood_disposition = "positive"
-            elif ood_interval["upper"] is not None and ood_interval["upper"] < 0:
-                ood_disposition = "negative"
-        disposition = "indeterminate"
-        if interval["groups"] >= 20:
-            if interval["lower"] is not None and interval["lower"] > 0:
-                disposition = "positive"
-            elif interval["upper"] is not None and interval["upper"] < 0:
-                disposition = "negative"
+        ood_disposition = disposition(ood_interval)
+        model_disposition = disposition(interval)
+        # The preregistered constant/input-order baseline is also run as a
+        # negative control against itself. It must never pass the positive
+        # quality gate on feature-dependent held-out cases.
+        control_interval = bootstrap(
+            {group: 0.0 for group in group_values},
+            15011 + TASKS.index(task),
+        )
+        control_disposition = disposition(control_interval)
+        if control_disposition == "positive":
+            raise AssertionError(f"{task} constant negative control passed the positive gate")
         results["tasks"][task] = {
             "dataset_sha256": report["dataset_sha256"],
             "split_fingerprint": report["split_fingerprint"],
@@ -137,7 +147,13 @@ def main():
             "report_sha256": report["report_sha256"],
             "metrics": report["metrics"],
             "test_cases": len(outcomes), "baseline": baseline,
-            "paired_group_bootstrap": interval, "disposition": disposition,
+            "paired_group_bootstrap": interval, "disposition": model_disposition,
+            "constant_negative_control": {
+                "comparison": "frozen baseline against itself",
+                "paired_group_bootstrap": control_interval,
+                "disposition": control_disposition,
+                "positive_quality_gate_passed": False,
+            },
             "ood_slice": {
                 "test_cases": sum("-ood-v2" in by_id[cid]["family"] for cid in split["test"]),
                 "paired_group_bootstrap": ood_interval,
@@ -168,6 +184,13 @@ def main():
             outcome_by_id[ids[0]]["prediction"] != outcome_by_id[ids[1]]["prediction"]
             for ids in complete_pairs
         )
+        feature_dependent_pairs = results["tasks"][task]["counterfactual_target_changed"]
+        if feature_dependent_pairs == 0:
+            raise AssertionError(f"{task} suite lacks feature-dependent counterfactuals")
+        results["tasks"][task]["constant_negative_control"].update({
+            "feature_dependent_pairs": feature_dependent_pairs,
+            "prediction_changes": 0,
+        })
         if task == "rank":
             comparisons = {}
             for architecture in ("linear", "nonlinear"):
