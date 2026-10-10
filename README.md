@@ -86,5 +86,5 @@ in [the research note](docs/general-framework-research-2026-10.md).
 
 New offline data/evaluation commands are `sdm-dataset validate`, `sdm-dataset split`,
 and `sdm-qualify`. They consume explicit local files and do not access network sources.
-The nonlinear prototype is not yet registered with runtime dispatch and does not
-qualify or promote a CodeGG model.
+The nonlinear CPU Rank engine is registered in v2 runtime dispatch. It remains an
+unqualified framework architecture and does not promote a CodeGG model.

@@ -1,7 +1,7 @@
 # M002 closure — Dataset provenance and split integrity
 
-Status: conditionally closed  
-Implementation commit: `e02fab714540868f5619e2c2dc2c6aaf0549d8eb`
+Status: conditionally closed (generic leakage/import safeguards implemented; semantic audit coverage remains bounded)
+Implementation commit: pending commit for this corrective pass
 
 ## Requirement-to-evidence
 
@@ -12,12 +12,12 @@ Implementation commit: `e02fab714540868f5619e2c2dc2c6aaf0549d8eb`
 | Content fingerprint and bounded local input | `validate_dataset`; 64 MiB/100k case bounds; `sdm-dataset` capped local bundle reader | Pass |
 | Freeze group-disjoint train/dev/test assignments and bind to dataset revision | `freeze_splits`, `validate_split`; unit test covers fingerprint drift and exact assignment coverage | Pass |
 | Preserve counterfactual-pair cohesion | Pair identifiers must share leakage group; group assignment is indivisible | Pass |
-| Detect canonical/near duplicates and perform full leakage audit | Not implemented; only explicit group and pair metadata are checked | Gap |
-| Streaming import and atomic split-manifest finalization | Bundle reader is bounded but reads the complete JSON file; split CLI writes a synced temporary file then renames | Partial |
-| Synthetic non-CodeGG validation | In-memory generated 100-row Binary dataset exercised in tests; no four-semantics checked-in fixture | Partial |
+| Detect exact and near duplicate leakage | `audit_exact_duplicates` canonicalizes requests without request IDs; bounded MinHash/LSH candidate generation applies exact Jaccard verification; unit test checks duplicates, near matches and label conflict | Pass (text/Jaccard only; advisory candidates) |
+| Bounded streaming JSONL import and atomic split-manifest finalization | `read_jsonl` streams capped lines; CLI reads cap bundle size and split CLI syncs a unique temporary file before rename | Pass (JSON bundle path remains bounded whole-file input) |
+| Synthetic non-CodeGG validation | In-memory generated Binary dataset and focused JSONL/duplicate audit unit tests; no frozen four-semantics qualification corpus | Partial |
 
 ## Verification and limitations
 
-Workspace tests and Clippy pass. No legacy cases or artifacts were rewritten. Provenance records evidence supplied by the dataset owner; the library does not manufacture or verify consent. The dataset schema does not yet carry temporal boundaries or a complete label-source reference graph. Similarity detection and streaming JSONL import remain corrective work; no generalization claim is made from the synthetic smoke set.
+`rtk cargo test --workspace --all-features --locked` and strict all-target Clippy pass. No legacy cases or artifacts were rewritten. Provenance records evidence supplied by the dataset owner; the library does not manufacture or verify consent. The dataset schema does not yet carry temporal boundaries or a complete label-source reference graph. Similarity detection is a text-level advisory audit, not semantic/family/pair leakage proof; no generalization claim is made from the synthetic smoke set.
 
 Disposition: conditional because leakage analyses required by the plan are not complete. See M006 follow-up registration in the active registry.

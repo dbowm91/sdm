@@ -1,6 +1,6 @@
 # General Decision-Model Framework and First Consumer Roadmap
 
-Status: implementation outcomes recorded; conditional engineering and evidence follow-ups remain
+Status: M001-M006 outcomes recorded; M007 generic qualification work ready
 Audit baseline: dbowm91/sdm@8139b064bdcf3212e8f6fd912e801a479b55751c (2026-10-05)
 Planning date: 2026-10-10
 Primary architectural decision: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md
@@ -68,12 +68,18 @@ Class: capability. Status: blocked (hard M002). Plan: plans/implementation/gener
 Introduce independent sdm-eval with task-specific metrics, no-candidate/abstention and calibration reporting, artifact/split binding, frozen protocol and negative-valid verdicts. Test data cannot influence model or threshold.
 
 ### M004 — Second trained architecture and portable inference
-Class: capability. Status: blocked (hard M003; interface M001). Plan: plans/implementation/general-decision-model-framework/004-nonlinear-architecture-and-rust-training.md.
+Class: capability. Status: conditionally closed (runtime path and local resource benchmark implemented; trained ablations and hosted results remain). Plan: plans/implementation/general-decision-model-framework/004-nonlinear-architecture-and-rust-training.md.
 Keep linear model as an honest baseline, add a demonstrably nonlinear pairwise feature-interaction model with local Rust training and bounded native CPU inference; include trainer feasibility spike and host footprint measurements. No assertion of contextual generalization or 5–25M parameters by size alone.
 
 ### M005 — CodeGG first-target offline qualification
-Class: capability/evidence. Status: blocked (hard M004; interface frozen CodeGG consumer contract). Plan: plans/implementation/general-decision-model-framework/005-codegg-first-consumer-qualification.md.
+Class: capability/evidence. Status: conditionally closed — indeterminate without approved independent corpus (hard M004; interface frozen CodeGG consumer contract). Plan: plans/implementation/general-decision-model-framework/005-codegg-first-consumer-qualification.md.
 Explicitly import sanitized, provenance-approved fixtures and compare locked candidate sets across deterministic, linear and nonlinear models with frozen preregistration, counterfactual/family-excluded and no-tool slices. Close positive or negative with accurate evidence. Any CodeGG dependency change or active deployment requires separate CodeGG ownership and approval.
+
+### M006 — Qualification and portability corrective
+Class: corrective infrastructure/capability. Status: conditionally closed; residual generic evidence work is M007. Plan: plans/implementation/general-decision-model-framework/006-qualification-and-portability-corrective.md.
+
+### M007 — Qualification depth and trained ablations
+Class: capability/evidence. Status: ready. Plan: plans/implementation/general-decision-model-framework/007-qualification-depth-and-trained-ablations.md. It requires no CodeGG material; M005 remains indeterminate pending CodeGG approval.
 
 ## 7. Cross-cutting requirements
 
@@ -102,4 +108,4 @@ Create plans/closure/general-decision-model-framework/NNN-status.md for each mil
 
 ## 10. Readiness
 
-M001-M005 implementation outcomes are recorded under plans/closure/general-decision-model-framework/. M005 is indeterminate because no new approved independent CodeGG labels were available. The v1 consumer contract remains unchanged; no trained model is promoted or registered in runtime dispatch.
+M001-M006 outcomes are recorded under plans/closure/general-decision-model-framework/. M005 is indeterminate because no new approved independent CodeGG labels were available. The v1 consumer contract remains unchanged; nonlinear v2 mechanics are registered, but no trained model is promoted.

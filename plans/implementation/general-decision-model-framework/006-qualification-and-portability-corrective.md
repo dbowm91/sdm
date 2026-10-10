@@ -1,6 +1,6 @@
 # SDM General Framework M006 — Qualification and Portability Corrective
 
-Status: blocked (operational evidence and consumer-data prerequisites)  
+Status: conditionally closed (generic infrastructure delivered; further qualification work registered)
 Primary class: corrective infrastructure/capability  
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md  
 Related closures: M002, M003, M004, M005
@@ -10,38 +10,36 @@ Related closures: M002, M003, M004, M005
 Close the evidence gaps explicitly retained by M002-M005 without weakening their
 acceptance criteria or rewriting historical results.
 
-## Hard start conditions
+## External gate for the CodeGG work package
 
 - An explicitly approved, sanitized, independently held-out CodeGG dataset with
   provenance, redistribution/retention scope, and an owner-approved candidate adapter.
-- A reproducible Linux ARM64 CPU runner (plus x86_64 and Apple Silicon host records)
-  for the required runtime and resource matrix.
-- A stable typed feature projection from the M001 contract for nonlinear trainer to
-  standalone inference parity.
 
-No CodeGG corpus is available in the current workspace and the current host does not
-provide the full platform matrix. Until those conditions are met, this plan is not
-eligible to start; existing fixture evidence remains compatibility-only.
+This gate applies only to work package 5. It does not block generic correctness,
+synthetic qualification, runtime integration, or hosted platform CI. The repository
+already has GitHub-hosted Linux ARM64 and Apple Silicon runners available through CI.
+The stable nonlinear feature projection is now implemented as an ordered, fingerprinted
+coordinate schema tied to artifact identity.
 
-## Work packages after unblock
+## Work packages and disposition
 
-1. Add explicit duplicate/near-duplicate leakage audits and bounded streaming JSONL
-   import; record temporal/family/pair limitations.
-2. Add grouped uncertainty intervals, per-slice calibration, and a frozen synthetic
-   multi-semantic qualification bundle with test-label access-order checks.
-3. Register the nonlinear architecture behind a runtime-only inference path with
-   validated tensor/schema identity, fixed trainer/runtime parity vectors, atomic
-   checkpoint finalization, and resume identity checks.
-4. Measure two trained capacity points, context-masked/permuted ablations, CPU latency,
-   load behavior and RSS on each available target without substituting host results.
-5. On the approved CodeGG export, preregister a fresh family-excluded holdout, compare
-   deterministic/linear/nonlinear systems on identical candidate sets, and close with
-   a positive, negative, or indeterminate verdict. Do not change CodeGG.
+1. Exact/near duplicate advisory audit and bounded JSONL streaming import implemented.
+2. Grouped Rank MRR/recall@k/NDCG intervals implemented. Per-slice calibration and a
+   frozen four-semantic synthetic qualification bundle remain in M007.
+3. Runtime-only nonlinear v2 dispatch, schema/feature/calibration identity validation,
+   scorer parity vector, and atomic fingerprint-bound checkpoints implemented. Resume
+   identity is tested; optimizer state persistence is not implemented.
+4. Reproducible benchmark and hosted x86_64 Linux, Linux ARM64 and Apple Silicon CI
+   jobs implemented. Local benchmark is Rosetta x86_64; hosted results are pending.
+   Trained capacity-point and context ablation studies remain in M007.
+5. CodeGG qualification remains indeterminate pending the approved independent corpus
+   and CodeGG-owned adapter. No CodeGG files or pin changed.
 
 ## Acceptance and closure
 
-Close only when all prior conditional requirements are evidenced, CodeGG offline
-qualification is defensible or correctly indeterminate, and compatibility remains
-green. Record exact source/data/split/protocol/model digests, commands, host limitations,
+Conditionally close this corrective when the delivered generic safeguards and runtime
+mechanics pass local verification, the CodeGG disposition remains correctly indeterminate,
+and residual engineering/evidence work is registered without weakening prior criteria.
+Record exact source/data/split/protocol/model digests, commands, host limitations,
 privacy review, negative results and follow-up owner in
 `plans/closure/general-decision-model-framework/006-status.md`.

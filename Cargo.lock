@@ -149,7 +149,6 @@ name = "sdm-nonlinear"
 version = "0.1.0"
 dependencies = [
  "sdm-core",
- "sdm-runtime",
  "serde",
  "serde_json",
  "sha2",
@@ -162,6 +161,7 @@ version = "0.1.0"
 dependencies = [
  "libc",
  "sdm-core",
+ "sdm-nonlinear",
  "serde",
  "serde_json",
  "sha2",

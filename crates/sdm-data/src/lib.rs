@@ -2,6 +2,7 @@
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
+use std::io::BufRead;
 use thiserror::Error;
 
 pub const DATASET_VERSION: u16 = 2;
@@ -69,6 +70,204 @@ pub enum DataError {
     Invalid(String),
     #[error("dataset encoding: {0}")]
     Encoding(#[from] serde_json::Error),
+    #[error("dataset input: {0}")]
+    Input(#[from] std::io::Error),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct DuplicateAuditEntry {
+    pub request_sha256: String,
+    pub case_ids: Vec<String>,
+    pub labels_conflict: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct NearDuplicatePair {
+    pub left_case_id: String,
+    pub right_case_id: String,
+    pub left_group: String,
+    pub right_group: String,
+    pub jaccard_similarity: f64,
+}
+
+/// Reads one JSON-encoded example per line while enforcing byte and row limits.
+pub fn read_jsonl<R: BufRead>(
+    reader: R,
+    provenance: &Provenance,
+) -> Result<Vec<DatasetExample>, DataError> {
+    let mut reader = reader.take((MAX_DATASET_BYTES + 1) as u64);
+    let mut examples = Vec::new();
+    let mut total_bytes = 0usize;
+    let mut line = Vec::new();
+    loop {
+        line.clear();
+        let read = reader.read_until(b'\n', &mut line)?;
+        if read == 0 {
+            break;
+        }
+        total_bytes = total_bytes
+            .checked_add(read)
+            .ok_or_else(|| DataError::Invalid("dataset byte count overflow".into()))?;
+        if total_bytes > MAX_DATASET_BYTES {
+            return Err(DataError::Invalid("dataset byte limit exceeded".into()));
+        }
+        if line.iter().all(u8::is_ascii_whitespace) {
+            continue;
+        }
+        if examples.len() >= MAX_CASES {
+            return Err(DataError::Invalid("case count limit exceeded".into()));
+        }
+        let example = serde_json::from_slice::<DatasetExample>(&line)?;
+        examples.push(example);
+    }
+    validate_dataset(&examples, provenance)?;
+    Ok(examples)
+}
+
+/// Finds exact canonical request duplicates and flags disagreements in labels.
+/// Similarity is deliberately not inferred here; callers can add reviewed
+/// near-duplicate relations to `leakage_group`/`counterfactual_pair` metadata.
+pub fn audit_exact_duplicates(
+    examples: &[DatasetExample],
+) -> Result<Vec<DuplicateAuditEntry>, DataError> {
+    let mut buckets = BTreeMap::<String, Vec<(&str, Vec<u8>)>>::new();
+    for example in examples {
+        let mut request = example.request.clone();
+        request.request_id = "canonical-duplicate-audit".into();
+        let request_sha256 = request
+            .canonical_fingerprint()
+            .map_err(|e| DataError::Invalid(e.to_string()))?;
+        let label = serde_json::to_vec(&example.label)?;
+        buckets
+            .entry(request_sha256)
+            .or_default()
+            .push((&example.case_id, label));
+    }
+    Ok(buckets
+        .into_iter()
+        .filter_map(|(request_sha256, rows)| {
+            if rows.len() < 2 {
+                return None;
+            }
+            let labels_conflict = rows.iter().skip(1).any(|(_, label)| label != &rows[0].1);
+            Some(DuplicateAuditEntry {
+                request_sha256,
+                case_ids: rows.into_iter().map(|(id, _)| id.to_owned()).collect(),
+                labels_conflict,
+            })
+        })
+        .collect())
+}
+
+/// Bounded MinHash/LSH candidate audit over normalized request text. This is
+/// advisory lexical evidence, not a semantic proof; confirmed pairs should be
+/// assigned to one leakage group before a split is frozen.
+pub fn audit_near_duplicates(
+    examples: &[DatasetExample],
+    minimum_jaccard: f64,
+    max_comparisons: usize,
+) -> Result<Vec<NearDuplicatePair>, DataError> {
+    if !minimum_jaccard.is_finite()
+        || !(0.5..=1.0).contains(&minimum_jaccard)
+        || max_comparisons == 0
+    {
+        return Err(DataError::Invalid(
+            "invalid near-duplicate audit bounds".into(),
+        ));
+    }
+    const HASHES: usize = 64;
+    const BAND: usize = 8;
+    let token_sets: Vec<BTreeSet<String>> = examples
+        .iter()
+        .map(|e| {
+            let mut text = String::new();
+            for field in &e.request.state {
+                text.push_str(&field.key);
+                text.push(' ');
+                text.push_str(&field.value);
+                text.push(' ');
+            }
+            match &e.request.spec {
+                sdm_core::DecisionSpec::Binary { question }
+                | sdm_core::DecisionSpec::Choice { question, .. } => text.push_str(question),
+                sdm_core::DecisionSpec::Score { rubric, .. } => text.push_str(rubric),
+                sdm_core::DecisionSpec::Rank {
+                    instruction,
+                    candidates,
+                    ..
+                } => {
+                    text.push_str(instruction);
+                    for candidate in candidates {
+                        text.push(' ');
+                        text.push_str(&candidate.label);
+                        text.push(' ');
+                        text.push_str(&candidate.description);
+                    }
+                }
+            }
+            sdm_core::tokens(&text).collect()
+        })
+        .collect();
+    let mut buckets = BTreeMap::<Vec<u64>, Vec<usize>>::new();
+    for (index, tokens) in token_sets.iter().enumerate() {
+        if tokens.is_empty() {
+            continue;
+        }
+        let mut signature = [u64::MAX; HASHES];
+        for token in tokens {
+            let digest = Sha256::digest(token.as_bytes());
+            let base = u64::from_be_bytes(digest[..8].try_into().unwrap());
+            for (seed, slot) in signature.iter_mut().enumerate() {
+                let mut mixed = base ^ (seed as u64).wrapping_mul(0x9e3779b97f4a7c15);
+                mixed = (mixed ^ (mixed >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
+                mixed = (mixed ^ (mixed >> 27)).wrapping_mul(0x94d049bb133111eb);
+                mixed ^= mixed >> 31;
+                *slot = (*slot).min(mixed);
+            }
+        }
+        for band in 0..HASHES / BAND {
+            let key = signature[band * BAND..(band + 1) * BAND].to_vec();
+            buckets.entry(key).or_default().push(index);
+        }
+    }
+    let mut candidates = BTreeSet::<(usize, usize)>::new();
+    for members in buckets.values() {
+        if members.len() > 512 {
+            return Err(DataError::Invalid(
+                "near-duplicate bucket exceeds bound".into(),
+            ));
+        }
+        for a in 0..members.len() {
+            for b in a + 1..members.len() {
+                candidates.insert((members[a], members[b]));
+                if candidates.len() > max_comparisons {
+                    return Err(DataError::Invalid(
+                        "near-duplicate comparison bound exceeded".into(),
+                    ));
+                }
+            }
+        }
+    }
+    let mut result = Vec::new();
+    for (left, right) in candidates {
+        let a = &token_sets[left];
+        let b = &token_sets[right];
+        let union = a.union(b).count();
+        if union == 0 {
+            continue;
+        }
+        let similarity = a.intersection(b).count() as f64 / union as f64;
+        if similarity >= minimum_jaccard {
+            result.push(NearDuplicatePair {
+                left_case_id: examples[left].case_id.clone(),
+                right_case_id: examples[right].case_id.clone(),
+                left_group: examples[left].leakage_group.clone(),
+                right_group: examples[right].leakage_group.clone(),
+                jaccard_similarity: similarity,
+            });
+        }
+    }
+    Ok(result)
 }
 
 pub fn validate_dataset(
@@ -328,5 +527,33 @@ mod tests {
             }
         )
         .is_err());
+    }
+
+    #[test]
+    fn streaming_jsonl_and_duplicate_audit_ignore_request_ids() {
+        let provenance = Provenance {
+            source: "synthetic".into(),
+            license: "MIT".into(),
+            consent_scope: "synthetic-only".into(),
+            label_lineage: "generated".into(),
+            redistributable: true,
+        };
+        let first = row(1);
+        let mut second = first.clone();
+        second.case_id = "case-copy".into();
+        second.leakage_group = "group-copy".into();
+        second.request.request_id = "different-request-id".into();
+        let mut input = serde_json::to_vec(&first).unwrap();
+        input.push(b'\n');
+        input.extend(serde_json::to_vec(&second).unwrap());
+        let parsed = read_jsonl(std::io::Cursor::new(input), &provenance).unwrap();
+        assert_eq!(parsed.len(), 2);
+        let audit = audit_exact_duplicates(&parsed).unwrap();
+        assert_eq!(audit.len(), 1);
+        assert!(!audit[0].labels_conflict);
+        assert_eq!(audit_near_duplicates(&parsed, 0.8, 100).unwrap().len(), 1);
+        let mut conflicting = parsed;
+        conflicting[1].label = TargetLabel::Binary(true);
+        assert!(audit_exact_duplicates(&conflicting).unwrap()[0].labels_conflict);
     }
 }

@@ -28,12 +28,55 @@ pub struct ArtifactEnvelopeV2 {
     pub parameter_count: usize,
     pub tensor_payload_sha256: String,
     pub calibration_sha256: String,
+    pub calibration_payload: Vec<u8>,
     pub license: String,
     pub source: String,
     pub payload: Vec<u8>,
 }
 
 impl ArtifactEnvelopeV2 {
+    pub fn for_nonlinear(
+        model: &sdm_nonlinear::PairwiseModel,
+        model_id: impl Into<String>,
+        max_candidates: usize,
+        threshold: f64,
+        license: impl Into<String>,
+        source: impl Into<String>,
+    ) -> Result<Self, RuntimeError> {
+        validate_nonlinear_rank_schema(model)?;
+        if !threshold.is_finite() || !(0.0..=1.0).contains(&threshold) {
+            return Err(RuntimeError::InvalidArtifact(
+                "invalid nonlinear threshold".into(),
+            ));
+        }
+        let payload = model
+            .to_bytes()
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let calibration_payload = serde_json::to_vec(&RankCalibration { threshold })
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let envelope = Self {
+            schema_version: ARTIFACT_ENVELOPE_V2,
+            architecture: sdm_nonlinear::ARCHITECTURE.into(),
+            model_id: model_id.into(),
+            required_feature_schema_sha256: model
+                .feature_schema_sha256()
+                .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?,
+            capabilities: vec!["rank".into()],
+            max_candidates,
+            parameter_count: model
+                .parameter_count()
+                .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?,
+            tensor_payload_sha256: format!("sha256:{:x}", Sha256::digest(&payload)),
+            calibration_sha256: format!("sha256:{:x}", Sha256::digest(&calibration_payload)),
+            calibration_payload,
+            license: license.into(),
+            source: source.into(),
+            payload,
+        };
+        envelope.validate()?;
+        Ok(envelope)
+    }
+
     pub fn from_bytes(bytes: &[u8]) -> Result<Self, RuntimeError> {
         if bytes.len() > V2_MAX_ARTIFACT_BYTES {
             return Err(RuntimeError::InvalidArtifact(
@@ -84,6 +127,14 @@ impl ArtifactEnvelopeV2 {
         if self.tensor_payload_sha256 != actual {
             return Err(RuntimeError::InvalidArtifact(
                 "payload digest mismatch".into(),
+            ));
+        }
+        if self.calibration_payload.len() > 4096
+            || self.calibration_sha256
+                != format!("sha256:{:x}", Sha256::digest(&self.calibration_payload))
+        {
+            return Err(RuntimeError::InvalidArtifact(
+                "calibration payload digest mismatch or size limit".into(),
             ));
         }
         for digest in [
@@ -144,7 +195,163 @@ pub struct Runtime {
 #[derive(Debug, Clone)]
 pub enum LoadedArtifact {
     LinearV1(Runtime),
+    NonlinearV2(NonlinearRuntime),
     UnsupportedV2(ArtifactEnvelopeV2),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct RankCalibration {
+    threshold: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct NonlinearRuntime {
+    model: sdm_nonlinear::PairwiseModel,
+    model_id: String,
+    max_candidates: usize,
+    threshold: f64,
+    digest: String,
+}
+
+impl NonlinearRuntime {
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self, RuntimeError> {
+        let envelope = ArtifactEnvelopeV2::from_bytes(bytes)?;
+        if envelope.architecture != sdm_nonlinear::ARCHITECTURE {
+            return Err(RuntimeError::InvalidArtifact(
+                "unsupported nonlinear architecture".into(),
+            ));
+        }
+        if envelope.capabilities != ["rank"] {
+            return Err(RuntimeError::InvalidArtifact(
+                "nonlinear engine supports Rank only".into(),
+            ));
+        }
+        let model = sdm_nonlinear::PairwiseModel::from_bytes(&envelope.payload)
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        validate_nonlinear_rank_schema(&model)?;
+        if model
+            .feature_schema_sha256()
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?
+            != envelope.required_feature_schema_sha256
+            || model
+                .parameter_count()
+                .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?
+                != envelope.parameter_count
+        {
+            return Err(RuntimeError::InvalidArtifact(
+                "model schema or parameter count mismatch".into(),
+            ));
+        }
+        let calibration: RankCalibration = serde_json::from_slice(&envelope.calibration_payload)
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        if !calibration.threshold.is_finite() || !(0.0..=1.0).contains(&calibration.threshold) {
+            return Err(RuntimeError::InvalidArtifact(
+                "invalid Rank calibration".into(),
+            ));
+        }
+        Ok(Self {
+            model,
+            model_id: envelope.model_id,
+            max_candidates: envelope.max_candidates,
+            threshold: calibration.threshold,
+            digest: format!("sha256:{:x}", Sha256::digest(bytes)),
+        })
+    }
+
+    pub fn digest(&self) -> &str {
+        &self.digest
+    }
+
+    pub fn decide(&self, request: &DecisionRequest) -> Result<DecisionResponse, DecisionError> {
+        request.validate()?;
+        let (status, answer) = match &request.spec {
+            DecisionSpec::Rank { candidates, .. } if candidates.len() <= self.max_candidates => {
+                let context = request
+                    .state
+                    .iter()
+                    .map(|f| f.value.as_str())
+                    .collect::<Vec<_>>()
+                    .join(" ");
+                let mut ranked = Vec::with_capacity(candidates.len());
+                for candidate in candidates {
+                    let text = format!("{} {}", candidate.label, candidate.description);
+                    let features = self
+                        .model
+                        .rank_features(&context, &text)
+                        .map_err(|e| DecisionError::InvalidRequest(e.to_string()))?;
+                    let score = self
+                        .model
+                        .score(&features)
+                        .map_err(|e| DecisionError::InvalidRequest(e.to_string()))?;
+                    ranked.push(RankedDecisionCandidate {
+                        candidate_id: candidate.id.clone(),
+                        relevance: 1.0 / (1.0 + (-score).exp()),
+                        ranking_score: score,
+                    });
+                }
+                if ranked.iter().any(|c| c.relevance >= self.threshold) {
+                    (
+                        DecisionStatus::Answered,
+                        Some(DecisionAnswer::Rank { candidates: ranked }),
+                    )
+                } else {
+                    (
+                        DecisionStatus::Abstained {
+                            reason: Some("no candidate met nonlinear threshold".into()),
+                        },
+                        None,
+                    )
+                }
+            }
+            DecisionSpec::Rank { .. } => (
+                DecisionStatus::Unsupported {
+                    reason: "candidate limit exceeded".into(),
+                },
+                None,
+            ),
+            _ => (
+                DecisionStatus::Unsupported {
+                    reason: "nonlinear artifact supports Rank only".into(),
+                },
+                None,
+            ),
+        };
+        let response = DecisionResponse {
+            request_id: request.request_id.clone(),
+            schema_version: request.schema_version,
+            status,
+            answer,
+            provenance: DecisionProvenance {
+                backend: "sdm-local-nonlinear".into(),
+                model: Some(self.model_id.clone()),
+                runtime_version: Some(RUNTIME_VERSION.into()),
+                latency_micros: 0,
+            },
+        };
+        response.validate_for(request)?;
+        Ok(response)
+    }
+}
+
+fn validate_nonlinear_rank_schema(
+    model: &sdm_nonlinear::PairwiseModel,
+) -> Result<(), RuntimeError> {
+    for id in &model.feature_ids {
+        let Some((kind, token)) = id.split_once(':') else {
+            return Err(RuntimeError::InvalidArtifact(
+                "nonlinear Rank feature ID lacks kind prefix".into(),
+            ));
+        };
+        if token.is_empty() || !matches!(kind, "ctx" | "cand" | "both") {
+            return Err(RuntimeError::InvalidArtifact(
+                "unsupported nonlinear Rank feature ID".into(),
+            ));
+        }
+    }
+    model
+        .rank_features("", "")
+        .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+    Ok(())
 }
 
 /// Version-aware loader. V2 envelopes are validated but remain Unsupported
@@ -163,7 +370,13 @@ pub fn load_artifact(bytes: &[u8]) -> Result<LoadedArtifact, RuntimeError> {
         == Some(u64::from(ARTIFACT_ENVELOPE_V2))
     {
         let envelope = ArtifactEnvelopeV2::from_bytes(bytes)?;
-        Ok(LoadedArtifact::UnsupportedV2(envelope))
+        if envelope.architecture == sdm_nonlinear::ARCHITECTURE {
+            Ok(LoadedArtifact::NonlinearV2(NonlinearRuntime::from_bytes(
+                bytes,
+            )?))
+        } else {
+            Ok(LoadedArtifact::UnsupportedV2(envelope))
+        }
     } else {
         Ok(LoadedArtifact::LinearV1(Runtime::from_bytes(bytes)?))
     }
@@ -357,7 +570,8 @@ mod tests {
             max_candidates: 16,
             parameter_count: 2,
             tensor_payload_sha256: format!("sha256:{:x}", Sha256::digest(&payload)),
-            calibration_sha256: format!("sha256:{}", "b".repeat(64)),
+            calibration_sha256: format!("sha256:{:x}", Sha256::digest(b"none")),
+            calibration_payload: b"none".to_vec(),
             license: "MIT".into(),
             source: "test".into(),
             payload,
@@ -370,6 +584,56 @@ mod tests {
         let mut bad = env;
         bad.payload.push(4);
         assert!(bad.validate().is_err());
+    }
+
+    #[test]
+    fn nonlinear_v2_roundtrips_through_bounded_runtime_dispatch() {
+        let model = sdm_nonlinear::initialize(
+            vec![
+                "ctx:inspect".into(),
+                "cand:source".into(),
+                "both:inspect".into(),
+            ],
+            4,
+            77,
+        )
+        .unwrap();
+        let envelope =
+            ArtifactEnvelopeV2::for_nonlinear(&model, "test-model", 16, 0.0, "MIT", "unit-test")
+                .unwrap();
+        let bytes = serde_json::to_vec(&envelope).unwrap();
+        let LoadedArtifact::NonlinearV2(engine) = load_artifact(&bytes).unwrap() else {
+            panic!("nonlinear engine was not selected")
+        };
+        let request = DecisionRequest {
+            request_id: "r".into(),
+            schema_version: 1,
+            state: vec![sdm_core::StateField {
+                key: "task".into(),
+                value: "inspect source".into(),
+            }],
+            spec: DecisionSpec::Rank {
+                instruction: "rank".into(),
+                candidates: vec![DecisionCandidate {
+                    id: "c1".into(),
+                    label: "source".into(),
+                    description: "read source".into(),
+                }],
+                multi_relevance: true,
+            },
+        };
+        let response = engine.decide(&request).unwrap();
+        response.validate_for(&request).unwrap();
+        let expected_features = model
+            .rank_features("inspect source", "source read source")
+            .unwrap();
+        let expected_score = model.score(&expected_features).unwrap();
+        let Some(DecisionAnswer::Rank { candidates }) = &response.answer else {
+            panic!("expected ranked output")
+        };
+        assert!((candidates[0].ranking_score - expected_score).abs() < 1e-12);
+        assert_eq!(response.provenance.model, Some("test-model".into()));
+        assert_eq!(response.provenance.backend, "sdm-local-nonlinear");
     }
     #[test]
     fn manifest_rejects_invalid_limits() {

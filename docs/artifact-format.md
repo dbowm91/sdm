@@ -28,8 +28,10 @@ limits, payload digest, license and source. The v2 payload is capped at 16 MiB a
 1,000,000 declared parameters; candidate count remains at most 256. These hashes
 detect byte changes but do not authenticate a publisher. `load_artifact` preserves v1
 loading and returns a validated `UnsupportedV2` for an architecture without a
-registered runtime. The first nonlinear CPU implementation currently lives in
-`sdm-nonlinear`; it is not yet registered in runtime dispatch.
+registered runtime. `sdm-pairwise-tanh-v2` is registered as a bounded CPU Rank engine;
+its ordered feature-coordinate fingerprint, model payload digest, parameter count,
+and calibration payload digest are checked before inference. Its training API remains
+feature-gated and is not compiled into the runtime dependency graph.
 
 Typed `FeatureSchemaV2` and `FeatureProjectionV2` live in `sdm-core`. Schema
 fingerprints use canonical JSON ordering by feature ID and category. Missing required

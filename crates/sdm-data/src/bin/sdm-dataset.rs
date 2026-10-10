@@ -1,5 +1,10 @@
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeSet, env, fs, io::Write, path::Path};
+use std::{
+    collections::BTreeSet,
+    env, fs,
+    io::{Read, Write},
+    path::Path,
+};
 
 #[derive(Serialize, Deserialize)]
 struct Bundle {
@@ -8,7 +13,12 @@ struct Bundle {
 }
 
 fn read_bundle(path: &str) -> Result<Bundle, String> {
-    let bytes = fs::read(path).map_err(|e| e.to_string())?;
+    let mut bytes = Vec::new();
+    fs::File::open(path)
+        .map_err(|e| e.to_string())?
+        .take((sdm_data::MAX_DATASET_BYTES + 1) as u64)
+        .read_to_end(&mut bytes)
+        .map_err(|e| e.to_string())?;
     if bytes.len() > sdm_data::MAX_DATASET_BYTES {
         return Err("dataset exceeds byte limit".into());
     }
@@ -18,7 +28,11 @@ fn atomic_write(path: &str, bytes: &[u8]) -> Result<(), String> {
     let target = Path::new(path);
     let parent = target.parent().unwrap_or(Path::new("."));
     let tmp = parent.join(format!(".sdm-dataset-{}.tmp", std::process::id()));
-    let mut f = fs::File::create(&tmp).map_err(|e| e.to_string())?;
+    let mut f = fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&tmp)
+        .map_err(|e| e.to_string())?;
     f.write_all(bytes).map_err(|e| e.to_string())?;
     f.sync_all().map_err(|e| e.to_string())?;
     fs::rename(&tmp, target).map_err(|e| e.to_string())

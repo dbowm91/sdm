@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::{env, fs};
+use std::{env, fs, io::Read};
 
 #[derive(Deserialize)]
 struct Input {
@@ -32,7 +32,12 @@ fn run() -> Result<(), String> {
     if args.len() != 2 {
         return Err("usage: sdm-qualify <frozen-input.json>".into());
     }
-    let bytes = fs::read(&args[1]).map_err(|e| e.to_string())?;
+    let mut bytes = Vec::new();
+    fs::File::open(&args[1])
+        .map_err(|e| e.to_string())?
+        .take((64 * 1024 * 1024 + 1) as u64)
+        .read_to_end(&mut bytes)
+        .map_err(|e| e.to_string())?;
     if bytes.len() > 64 * 1024 * 1024 {
         return Err("input exceeds 64 MiB".into());
     }

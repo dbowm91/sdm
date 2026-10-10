@@ -41,6 +41,7 @@ pass/fail/indeterminate outcomes. Unsupported gate names are indeterminate. It n
 promotes a model. Binary, Choice and bounded Score metric functions are available to
 other adapters; the CLI report currently covers Rank predictions only.
 
-The CPU nonlinear prototype is `sdm-nonlinear`; enable its `training` feature for
-deterministic bounded SGD helpers. Runtime v2 dispatch remains unsupported for this
-architecture pending a separately validated engine adapter.
+The CPU nonlinear architecture is `sdm-nonlinear`; enable its `training` feature for
+deterministic bounded SGD and fingerprint-bound atomic checkpoints. Default runtime
+dispatch supports its bounded Rank inference path and validates trainer artifact
+identity before use. The training feature is not enabled by `sdm-runtime`.

@@ -17,6 +17,76 @@ pub struct QualificationProtocol {
     pub fingerprint: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct ConfidenceInterval {
+    pub lower: f64,
+    pub upper: f64,
+    pub confidence: f64,
+    pub groups: usize,
+    pub replicates: usize,
+}
+
+/// Cluster bootstrap over leakage groups; cases within a group are sampled together.
+pub fn grouped_bootstrap_mean(
+    observations: &[(String, f64)],
+    seed: u64,
+    replicates: usize,
+    confidence: f64,
+) -> Result<Option<ConfidenceInterval>, EvalError> {
+    if !(100..=100_000).contains(&replicates)
+        || !confidence.is_finite()
+        || !(0.5..1.0).contains(&confidence)
+        || observations
+            .iter()
+            .any(|(g, v)| g.is_empty() || !v.is_finite())
+    {
+        return Err(EvalError::Invalid(
+            "invalid grouped bootstrap inputs".into(),
+        ));
+    }
+    let mut groups = std::collections::BTreeMap::<&str, (f64, usize)>::new();
+    for (g, v) in observations {
+        let entry = groups.entry(g).or_default();
+        entry.0 += v;
+        entry.1 += 1;
+    }
+    if groups.is_empty() {
+        return Ok(None);
+    }
+    let values: Vec<(f64, usize)> = groups.values().copied().collect();
+    let mut state = seed;
+    let mut means = Vec::with_capacity(replicates);
+    for _ in 0..replicates {
+        let (mut sum, mut count) = (0.0, 0usize);
+        for _ in 0..values.len() {
+            state = state.wrapping_add(0x9e3779b97f4a7c15);
+            let mut z = state;
+            z = (z ^ (z >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
+            z = (z ^ (z >> 27)).wrapping_mul(0x94d049bb133111eb);
+            z ^= z >> 31;
+            let (group_sum, group_count) = values[(z as usize) % values.len()];
+            sum += group_sum;
+            count += group_count;
+        }
+        means.push(sum / count as f64);
+    }
+    means.sort_by(f64::total_cmp);
+    let alpha = (1.0 - confidence) / 2.0;
+    let at = |p: f64| {
+        let x = p * (means.len() - 1) as f64;
+        let lo = x.floor() as usize;
+        let hi = x.ceil() as usize;
+        means[lo] + (means[hi] - means[lo]) * (x - lo as f64)
+    };
+    Ok(Some(ConfidenceInterval {
+        lower: at(alpha),
+        upper: at(1.0 - alpha),
+        confidence,
+        groups: values.len(),
+        replicates,
+    }))
+}
+
 impl QualificationProtocol {
     pub fn freeze(&mut self) -> Result<(), EvalError> {
         self.validate_fields()?;
@@ -302,7 +372,10 @@ pub struct RankMetrics {
     pub precision: Option<f64>,
     pub recall: Option<f64>,
     pub f1: Option<f64>,
-    pub candidate_coverage: f64,
+    pub candidate_universe_coverage: f64,
+    pub mrr_confidence_interval: Option<ConfidenceInterval>,
+    pub recall_at_k_confidence_interval: Option<ConfidenceInterval>,
+    pub ndcg_confidence_interval: Option<ConfidenceInterval>,
 }
 #[derive(Debug, Error)]
 pub enum EvalError {
@@ -327,7 +400,10 @@ pub fn evaluate_rank(
     let mut fp = 0usize;
     let mut fn_ = 0usize;
     let mut eligible = 0usize;
-    let mut coverage = 0usize;
+    let mut rank_examples = 0usize;
+    let mut reciprocal_by_group = Vec::new();
+    let mut recall_by_group = Vec::new();
+    let mut ndcg_by_group = Vec::new();
     for (e, p) in examples.iter().zip(predictions) {
         if e.case_id != p.case_id {
             return Err(EvalError::Invalid(
@@ -337,6 +413,7 @@ pub fn evaluate_rank(
         let sdm_data::TargetLabel::Rank { relevance, .. } = &e.label else {
             continue;
         };
+        rank_examples += 1;
         let sdm_core::DecisionSpec::Rank { candidates, .. } = &e.request.spec else {
             return Err(EvalError::Invalid("rank label without rank request".into()));
         };
@@ -368,19 +445,23 @@ pub fn evaluate_rank(
             .collect();
         if !positives.is_empty() {
             eligible += 1;
-            coverage += candidates.len();
             if let Some(i) = ranked
                 .iter()
                 .position(|x| positives.contains(x.candidate_id.as_str()))
             {
                 reciprocal += 1.0 / (i + 1) as f64;
+                reciprocal_by_group.push((e.leakage_group.clone(), 1.0 / (i + 1) as f64));
+            } else {
+                reciprocal_by_group.push((e.leakage_group.clone(), 0.0));
             }
             let hit = ranked
                 .iter()
                 .take(k)
                 .filter(|x| positives.contains(x.candidate_id.as_str()))
                 .count();
-            recall_k += hit as f64 / positives.len() as f64;
+            let case_recall = hit as f64 / positives.len() as f64;
+            recall_k += case_recall;
+            recall_by_group.push((e.leakage_group.clone(), case_recall));
             let dcg: f64 = ranked
                 .iter()
                 .take(k)
@@ -398,7 +479,11 @@ pub fn evaluate_rank(
                 .map(|(i, v)| v / ((i + 2) as f64).log2())
                 .sum();
             if idcg > 0.0 {
-                ndcg += dcg / idcg;
+                let case_ndcg = dcg / idcg;
+                ndcg += case_ndcg;
+                ndcg_by_group.push((e.leakage_group.clone(), case_ndcg));
+            } else {
+                ndcg_by_group.push((e.leakage_group.clone(), 0.0));
             }
         }
         let predicted: std::collections::BTreeSet<_> = ranked
@@ -433,11 +518,20 @@ pub fn evaluate_rank(
         precision,
         recall,
         f1,
-        candidate_coverage: if examples.is_empty() {
-            0.0
-        } else {
-            coverage as f64 / examples.len() as f64
-        },
+        candidate_universe_coverage: f64::from(rank_examples > 0),
+        mrr_confidence_interval: grouped_bootstrap_mean(
+            &reciprocal_by_group,
+            0x53444d,
+            2000,
+            0.95,
+        )?,
+        recall_at_k_confidence_interval: grouped_bootstrap_mean(
+            &recall_by_group,
+            0x524543,
+            2000,
+            0.95,
+        )?,
+        ndcg_confidence_interval: grouped_bootstrap_mean(&ndcg_by_group, 0x4e4443, 2000, 0.95)?,
     })
 }
 
@@ -490,5 +584,24 @@ mod tests {
                 &p.calibration_sha256
             )
             .is_err());
+    }
+
+    #[test]
+    fn grouped_bootstrap_is_deterministic_and_samples_clusters() {
+        let obs = vec![
+            ("g1".into(), 1.0),
+            ("g1".into(), 0.0),
+            ("g2".into(), 0.5),
+            ("g3".into(), 0.25),
+        ];
+        let a = grouped_bootstrap_mean(&obs, 44, 500, 0.95)
+            .unwrap()
+            .unwrap();
+        let b = grouped_bootstrap_mean(&obs, 44, 500, 0.95)
+            .unwrap()
+            .unwrap();
+        assert_eq!(a, b);
+        assert_eq!(a.groups, 3);
+        assert!(a.lower <= a.upper);
     }
 }
