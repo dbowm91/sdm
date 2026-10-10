@@ -1,0 +1,1677 @@
+{
+  "provenance": {
+    "source": "SDM generated synthetic mechanics corpus v1",
+    "license": "MIT",
+    "consent_scope": "synthetic-only; no human or application data",
+    "label_lineage": "deterministically generated labels from fixed lexical rule",
+    "redistributable": true
+  },
+  "examples": [
+    {
+      "case_id": "rank-001",
+      "leakage_group": "synthetic-group-0",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-001",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-002",
+      "leakage_group": "synthetic-group-1",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-002",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-003",
+      "leakage_group": "synthetic-group-2",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-003",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "unrelated action",
+              "description": "open calendar"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {},
+          "no_relevant": true
+        }
+      }
+    },
+    {
+      "case_id": "rank-004",
+      "leakage_group": "synthetic-group-3",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-004",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-005",
+      "leakage_group": "synthetic-group-4",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-005",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-006",
+      "leakage_group": "synthetic-group-5",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-006",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "unrelated action",
+              "description": "open calendar"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {},
+          "no_relevant": true
+        }
+      }
+    },
+    {
+      "case_id": "rank-007",
+      "leakage_group": "synthetic-group-6",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-007",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-008",
+      "leakage_group": "synthetic-group-7",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-008",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-009",
+      "leakage_group": "synthetic-group-8",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-009",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "unrelated action",
+              "description": "open calendar"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {},
+          "no_relevant": true
+        }
+      }
+    },
+    {
+      "case_id": "rank-010",
+      "leakage_group": "synthetic-group-9",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-010",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-011",
+      "leakage_group": "synthetic-group-10",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-011",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-012",
+      "leakage_group": "synthetic-group-11",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-012",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "unrelated action",
+              "description": "open calendar"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {},
+          "no_relevant": true
+        }
+      }
+    },
+    {
+      "case_id": "rank-013",
+      "leakage_group": "synthetic-group-12",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-013",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-014",
+      "leakage_group": "synthetic-group-13",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-014",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-015",
+      "leakage_group": "synthetic-group-14",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-015",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "unrelated action",
+              "description": "open calendar"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {},
+          "no_relevant": true
+        }
+      }
+    },
+    {
+      "case_id": "rank-016",
+      "leakage_group": "synthetic-group-15",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-016",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-017",
+      "leakage_group": "synthetic-group-16",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-017",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-018",
+      "leakage_group": "synthetic-group-17",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-018",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "unrelated action",
+              "description": "open calendar"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {},
+          "no_relevant": true
+        }
+      }
+    },
+    {
+      "case_id": "rank-021",
+      "leakage_group": "synthetic-group-20",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-021",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "unrelated action",
+              "description": "open calendar"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {},
+          "no_relevant": true
+        }
+      }
+    },
+    {
+      "case_id": "rank-025",
+      "leakage_group": "synthetic-group-24",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-025",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-026",
+      "leakage_group": "synthetic-group-25",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-026",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-033",
+      "leakage_group": "synthetic-group-32",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-033",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "unrelated action",
+              "description": "open calendar"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {},
+          "no_relevant": true
+        }
+      }
+    },
+    {
+      "case_id": "rank-037",
+      "leakage_group": "synthetic-group-36",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-037",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-039",
+      "leakage_group": "synthetic-group-38",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-039",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "unrelated action",
+              "description": "open calendar"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {},
+          "no_relevant": true
+        }
+      }
+    },
+    {
+      "case_id": "rank-044",
+      "leakage_group": "synthetic-group-43",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-044",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-052",
+      "leakage_group": "synthetic-group-51",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-052",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-054",
+      "leakage_group": "synthetic-group-53",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-054",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "unrelated action",
+              "description": "open calendar"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {},
+          "no_relevant": true
+        }
+      }
+    },
+    {
+      "case_id": "rank-060",
+      "leakage_group": "synthetic-group-59",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-060",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "unrelated action",
+              "description": "open calendar"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {},
+          "no_relevant": true
+        }
+      }
+    },
+    {
+      "case_id": "rank-062",
+      "leakage_group": "synthetic-group-61",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-062",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-065",
+      "leakage_group": "synthetic-group-64",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-065",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-066",
+      "leakage_group": "synthetic-group-65",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-066",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "unrelated action",
+              "description": "open calendar"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {},
+          "no_relevant": true
+        }
+      }
+    },
+    {
+      "case_id": "rank-070",
+      "leakage_group": "synthetic-group-69",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-070",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-071",
+      "leakage_group": "synthetic-group-70",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-071",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-076",
+      "leakage_group": "synthetic-group-75",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-076",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    },
+    {
+      "case_id": "rank-078",
+      "leakage_group": "synthetic-group-77",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-078",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "unrelated action",
+              "description": "open calendar"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {},
+          "no_relevant": true
+        }
+      }
+    },
+    {
+      "case_id": "rank-085",
+      "leakage_group": "synthetic-group-84",
+      "family": "synthetic-basic",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "req-085",
+        "schema_version": 1,
+        "state": [
+          {
+            "key": "task",
+            "value": "inspect source"
+          }
+        ],
+        "spec": {
+          "kind": "rank",
+          "instruction": "rank candidates for task relevance",
+          "candidates": [
+            {
+              "id": "relevant",
+              "label": "inspect source",
+              "description": "read source file"
+            },
+            {
+              "id": "hard-negative",
+              "label": "inspect metadata",
+              "description": "read source summary"
+            },
+            {
+              "id": "counter-control",
+              "label": "schedule meeting",
+              "description": "create calendar event"
+            }
+          ],
+          "multi_relevance": true
+        }
+      },
+      "label": {
+        "kind": "rank",
+        "value": {
+          "relevance": {
+            "relevant": 1.0
+          },
+          "no_relevant": false
+        }
+      }
+    }
+  ]
+}

@@ -5,7 +5,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::io::BufRead;
 use thiserror::Error;
 
-pub const DATASET_VERSION: u16 = 2;
+pub const DATASET_VERSION: u16 = 3;
+pub const LEGACY_DATASET_VERSION: u16 = 2;
 pub const MAX_DATASET_BYTES: usize = 64 * 1024 * 1024;
 pub const MAX_CASES: usize = 100_000;
 
@@ -29,7 +30,12 @@ pub struct DatasetExample {
     pub counterfactual_pair: Option<String>,
     pub request: sdm_core::DecisionRequest,
     pub label: TargetLabel,
+    /// Optional schema-bound typed context/candidate values; absent for legacy rows.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub typed_rank_features: Option<TypedRankFeatures>,
 }
+
+pub type TypedRankFeatures = sdm_core::TypedRankProjectionV2;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Provenance {
@@ -295,6 +301,33 @@ pub fn validate_dataset(
         e.request
             .validate()
             .map_err(|x| DataError::Invalid(x.to_string()))?;
+        if let Some(typed) = &e.typed_rank_features {
+            let sdm_core::DecisionSpec::Rank { candidates, .. } = &e.request.spec else {
+                return Err(DataError::Invalid(
+                    "typed Rank features attached to non-Rank request".into(),
+                ));
+            };
+            typed
+                .schema
+                .validate()
+                .map_err(|x| DataError::Invalid(x.to_string()))?;
+            typed
+                .context
+                .validate_for(&typed.schema)
+                .map_err(|x| DataError::Invalid(x.to_string()))?;
+            let expected: BTreeSet<_> = candidates.iter().map(|c| c.id.as_str()).collect();
+            let supplied: BTreeSet<_> = typed.candidates.keys().map(String::as_str).collect();
+            if expected != supplied {
+                return Err(DataError::Invalid(
+                    "typed candidate features must exactly match candidate identities".into(),
+                ));
+            }
+            for projection in typed.candidates.values() {
+                projection
+                    .validate_for(&typed.schema)
+                    .map_err(|x| DataError::Invalid(x.to_string()))?;
+            }
+        }
         match &e.label {
             TargetLabel::Binary(_) => {
                 if !matches!(e.request.spec, sdm_core::DecisionSpec::Binary { .. }) {
@@ -401,8 +434,13 @@ pub fn freeze_splits(
             "seed does not produce non-empty train/dev/test".into(),
         ));
     }
+    let typed = examples.iter().any(|e| e.typed_rank_features.is_some());
     let mut manifest = SplitManifest {
-        version: DATASET_VERSION,
+        version: if typed {
+            DATASET_VERSION
+        } else {
+            LEGACY_DATASET_VERSION
+        },
         dataset_sha256: dataset_sha256.into(),
         seed,
         train,
@@ -421,7 +459,12 @@ pub fn validate_split(
     manifest: &SplitManifest,
     dataset_sha256: &str,
 ) -> Result<(), DataError> {
-    if manifest.version != DATASET_VERSION || manifest.dataset_sha256 != dataset_sha256 {
+    let expected_version = if examples.iter().any(|e| e.typed_rank_features.is_some()) {
+        DATASET_VERSION
+    } else {
+        LEGACY_DATASET_VERSION
+    };
+    if manifest.version != expected_version || manifest.dataset_sha256 != dataset_sha256 {
         return Err(DataError::Invalid("split dataset identity drift".into()));
     }
     let expected: BTreeSet<_> = examples.iter().map(|e| e.case_id.as_str()).collect();
@@ -528,6 +571,7 @@ mod tests {
                 },
             },
             label: TargetLabel::Binary(i.is_multiple_of(2)),
+            typed_rank_features: None,
         }
     }
     #[test]
@@ -582,5 +626,26 @@ mod tests {
         let mut conflicting = parsed;
         conflicting[1].label = TargetLabel::Binary(true);
         assert!(audit_exact_duplicates(&conflicting).unwrap()[0].labels_conflict);
+    }
+
+    #[test]
+    fn typed_rank_binding_must_preserve_candidate_identity_set() {
+        let mut bundle: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../fixtures/standalone-typed-rank-v1.json"
+        ))
+        .unwrap();
+        let provenance: Provenance = serde_json::from_value(bundle["provenance"].clone()).unwrap();
+        let examples: Vec<DatasetExample> =
+            serde_json::from_value(bundle["examples"].clone()).unwrap();
+        validate_dataset(&examples, &provenance).unwrap();
+        let candidates = bundle["examples"][0]["typed_rank_features"]["candidates"]
+            .as_object_mut()
+            .unwrap();
+        let valid_projection = candidates["relevant"].clone();
+        candidates.remove("counter-control");
+        candidates.insert("injected-id".into(), valid_projection);
+        let changed: Vec<DatasetExample> =
+            serde_json::from_value(bundle["examples"].take()).unwrap();
+        assert!(validate_dataset(&changed, &provenance).is_err());
     }
 }

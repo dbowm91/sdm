@@ -3,7 +3,10 @@
 //! This module deliberately contains no tool authority, model, transport, or
 //! artifact concepts. Callers own policy and decide whether a response is usable.
 
-use std::{collections::BTreeSet, time::Instant};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    time::Instant,
+};
 
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
@@ -95,6 +98,13 @@ pub struct FeatureProjectionV2 {
     pub fields: Vec<FeatureField>,
 }
 
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct TypedRankProjectionV2 {
+    pub schema: FeatureSchemaV2,
+    pub context: FeatureProjectionV2,
+    pub candidates: BTreeMap<String, FeatureProjectionV2>,
+}
+
 impl FeatureSchemaV2 {
     pub fn validate(&self) -> Result<(), DecisionError> {
         if self.version != FEATURE_SCHEMA_VERSION || self.fields.len() > MAX_FEATURES {
@@ -122,6 +132,7 @@ impl FeatureSchemaV2 {
                 .categories
                 .iter()
                 .any(|v| v.is_empty() || v.len() > MAX_LABEL_BYTES || !categories.insert(v))
+                || field.categories.len() > MAX_FEATURES
             {
                 return Err(DecisionError::InvalidRequest(
                     "invalid or duplicate category".into(),
@@ -218,6 +229,236 @@ impl FeatureProjectionV2 {
             ));
         }
         Ok(())
+    }
+}
+
+/// Train-only preprocessing state shared verbatim by model fitting and local inference.
+/// Coordinate order is canonicalized by feature ID; numeric values are centered and
+/// scaled by the largest absolute training value, then clipped to [-5, 5].
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct FittedFeatureEncoderV2 {
+    pub schema: FeatureSchemaV2,
+    pub numeric_center: BTreeMap<String, f64>,
+    pub numeric_scale: BTreeMap<String, f64>,
+    pub text_vocabulary: BTreeMap<String, Vec<String>>,
+    pub fingerprint: String,
+}
+
+impl FittedFeatureEncoderV2 {
+    pub const MAX_TEXT_VOCABULARY: usize = 4096;
+    pub const MAX_TRAINING_PROJECTIONS: usize = 100_000;
+
+    pub fn fit(
+        schema: &FeatureSchemaV2,
+        training: &[FeatureProjectionV2],
+    ) -> Result<Self, DecisionError> {
+        schema.validate()?;
+        if training.is_empty() || training.len() > Self::MAX_TRAINING_PROJECTIONS {
+            return Err(DecisionError::InvalidRequest(
+                "encoder requires training projections".into(),
+            ));
+        }
+        let mut canonical = schema.clone();
+        canonical.fields.sort_by(|a, b| a.id.cmp(&b.id));
+        for field in &mut canonical.fields {
+            field.categories.sort();
+        }
+        let mut values = BTreeMap::<String, Vec<f64>>::new();
+        let mut words = BTreeMap::<String, BTreeSet<String>>::new();
+        for projection in training {
+            projection.validate_for(schema)?;
+            for field in &projection.fields {
+                if let Some(value) = &field.value {
+                    match value {
+                        FeatureValue::Number(v) => {
+                            values.entry(field.id.clone()).or_default().push(*v)
+                        }
+                        FeatureValue::Text(text) => {
+                            let vocabulary = words.entry(field.id.clone()).or_default();
+                            for token in tokens(text) {
+                                vocabulary.insert(token);
+                                if vocabulary.len() > Self::MAX_TEXT_VOCABULARY {
+                                    return Err(DecisionError::InvalidRequest(
+                                        "text vocabulary exceeds encoder bound".into(),
+                                    ));
+                                }
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        }
+        let mut numeric_center = BTreeMap::new();
+        let mut numeric_scale = BTreeMap::new();
+        let mut text_vocabulary = BTreeMap::new();
+        for field in &canonical.fields {
+            match field.value_type {
+                FeatureType::Number => {
+                    let xs = values.remove(&field.id).unwrap_or_default();
+                    let mut center = 0.0;
+                    let mut count = 0.0;
+                    let mut scale = 0.0_f64;
+                    for x in xs {
+                        count += 1.0;
+                        center = center * ((count - 1.0) / count) + x / count;
+                        scale = scale.max(x.abs());
+                    }
+                    if count == 0.0 {
+                        center = 0.0;
+                    }
+                    numeric_center.insert(field.id.clone(), center);
+                    numeric_scale.insert(field.id.clone(), if scale == 0.0 { 1.0 } else { scale });
+                }
+                FeatureType::Text => {
+                    let vocab = words.remove(&field.id).unwrap_or_default();
+                    if vocab.len() > Self::MAX_TEXT_VOCABULARY {
+                        return Err(DecisionError::InvalidRequest(
+                            "text vocabulary exceeds encoder bound".into(),
+                        ));
+                    }
+                    text_vocabulary.insert(field.id.clone(), vocab.into_iter().collect());
+                }
+                _ => {}
+            }
+        }
+        let mut encoder = Self {
+            schema: canonical,
+            numeric_center,
+            numeric_scale,
+            text_vocabulary,
+            fingerprint: String::new(),
+        };
+        encoder.fingerprint = encoder.compute_fingerprint()?;
+        if encoder.dimension()? > MAX_FEATURES * 8 {
+            return Err(DecisionError::InvalidRequest(
+                "encoded feature dimension exceeds bound".into(),
+            ));
+        }
+        Ok(encoder)
+    }
+
+    fn compute_fingerprint(&self) -> Result<String, DecisionError> {
+        let bytes = serde_json::to_vec(&(
+            &self.schema,
+            &self.numeric_center,
+            &self.numeric_scale,
+            &self.text_vocabulary,
+        ))
+        .map_err(|e| DecisionError::InvalidRequest(e.to_string()))?;
+        Ok(format!("sha256:{:x}", Sha256::digest(bytes)))
+    }
+
+    pub fn dimension(&self) -> Result<usize, DecisionError> {
+        self.schema.fields.iter().try_fold(0usize, |n, f| {
+            let width = match f.value_type {
+                FeatureType::Number | FeatureType::Boolean => 1,
+                FeatureType::Category => f.categories.len(),
+                FeatureType::Text => self.text_vocabulary.get(&f.id).map_or(0, Vec::len),
+            };
+            n.checked_add(width)
+                .ok_or_else(|| DecisionError::InvalidRequest("encoded dimension overflow".into()))
+        })
+    }
+
+    pub fn validate(&self) -> Result<(), DecisionError> {
+        self.schema.validate()?;
+        let numeric: BTreeSet<_> = self
+            .schema
+            .fields
+            .iter()
+            .filter(|f| f.value_type == FeatureType::Number)
+            .map(|f| f.id.as_str())
+            .collect();
+        let text: BTreeSet<_> = self
+            .schema
+            .fields
+            .iter()
+            .filter(|f| f.value_type == FeatureType::Text)
+            .map(|f| f.id.as_str())
+            .collect();
+        if self
+            .numeric_center
+            .keys()
+            .map(String::as_str)
+            .collect::<BTreeSet<_>>()
+            != numeric
+            || self
+                .numeric_scale
+                .keys()
+                .map(String::as_str)
+                .collect::<BTreeSet<_>>()
+                != numeric
+            || self
+                .text_vocabulary
+                .keys()
+                .map(String::as_str)
+                .collect::<BTreeSet<_>>()
+                != text
+            || self.numeric_center.values().any(|v| !v.is_finite())
+            || self
+                .numeric_scale
+                .values()
+                .any(|v| !v.is_finite() || *v <= 0.0)
+            || self
+                .text_vocabulary
+                .values()
+                .any(|v| v.len() > Self::MAX_TEXT_VOCABULARY || v.windows(2).any(|w| w[0] >= w[1]))
+            || self.fingerprint != self.compute_fingerprint()?
+            || self.dimension()? > MAX_FEATURES * 8
+        {
+            return Err(DecisionError::InvalidRequest(
+                "malformed fitted feature encoder".into(),
+            ));
+        }
+        Ok(())
+    }
+
+    pub fn encode(&self, projection: &FeatureProjectionV2) -> Result<Vec<f64>, DecisionError> {
+        self.validate()?;
+        projection.validate_for(&self.schema)?;
+        let values: BTreeMap<_, _> = projection
+            .fields
+            .iter()
+            .map(|f| (f.id.as_str(), f.value.as_ref()))
+            .collect();
+        let mut output = Vec::with_capacity(self.dimension()?);
+        for spec in &self.schema.fields {
+            let value = values.get(spec.id.as_str()).copied().flatten();
+            match spec.value_type {
+                FeatureType::Number => {
+                    let encoded = match value {
+                        Some(FeatureValue::Number(v)) => {
+                            let center = self.numeric_center[&spec.id];
+                            let scale = self.numeric_scale[&spec.id];
+                            ((v / scale) - (center / scale)).clamp(-5.0, 5.0)
+                        }
+                        _ => 0.0,
+                    };
+                    output.push(encoded);
+                }
+                FeatureType::Boolean => output.push(f64::from(matches!(
+                    value,
+                    Some(FeatureValue::Boolean(true))
+                ))),
+                FeatureType::Category => {
+                    for category in &spec.categories {
+                        output.push(f64::from(matches!(value,Some(FeatureValue::Category(v)) if v.as_str()==category.as_str())));
+                    }
+                }
+                FeatureType::Text => {
+                    let vocab = &self.text_vocabulary[&spec.id];
+                    let tokens: BTreeSet<_> = match value {
+                        Some(FeatureValue::Text(text)) => tokens(text).collect(),
+                        _ => BTreeSet::new(),
+                    };
+                    for token in vocab {
+                        output.push(f64::from(tokens.contains(token)));
+                    }
+                }
+            }
+        }
+        Ok(output)
     }
 }
 
@@ -718,6 +959,84 @@ mod tests {
         let mut bad = projection;
         bad.fields[0].value = Some(FeatureValue::Number(f64::NAN));
         assert!(bad.validate_for(&schema).is_err());
+    }
+
+    #[test]
+    fn fitted_encoder_is_deterministic_typed_and_train_bounded() {
+        let schema = FeatureSchemaV2 {
+            version: FEATURE_SCHEMA_VERSION,
+            fields: vec![
+                FeatureSchemaField {
+                    id: "amount".into(),
+                    value_type: FeatureType::Number,
+                    required: true,
+                    categories: vec![],
+                },
+                FeatureSchemaField {
+                    id: "enabled".into(),
+                    value_type: FeatureType::Boolean,
+                    required: true,
+                    categories: vec![],
+                },
+                FeatureSchemaField {
+                    id: "group".into(),
+                    value_type: FeatureType::Category,
+                    required: true,
+                    categories: vec!["a".into(), "b".into()],
+                },
+                FeatureSchemaField {
+                    id: "note".into(),
+                    value_type: FeatureType::Text,
+                    required: false,
+                    categories: vec![],
+                },
+            ],
+        };
+        let projection = |amount, note: &str| FeatureProjectionV2 {
+            schema_version: FEATURE_SCHEMA_VERSION,
+            schema_sha256: schema.fingerprint().unwrap(),
+            fields: vec![
+                FeatureField {
+                    id: "note".into(),
+                    required: false,
+                    value: Some(FeatureValue::Text(note.into())),
+                },
+                FeatureField {
+                    id: "group".into(),
+                    required: true,
+                    value: Some(FeatureValue::Category("a".into())),
+                },
+                FeatureField {
+                    id: "enabled".into(),
+                    required: true,
+                    value: Some(FeatureValue::Boolean(true)),
+                },
+                FeatureField {
+                    id: "amount".into(),
+                    required: true,
+                    value: Some(FeatureValue::Number(amount)),
+                },
+            ],
+        };
+        let fit = [
+            projection(0.0, "red sample"),
+            projection(10.0, "blue sample"),
+        ];
+        let encoder = FittedFeatureEncoderV2::fit(&schema, &fit).unwrap();
+        let vector = encoder.encode(&projection(10.0, "red")).unwrap();
+        encoder.validate().unwrap();
+        let mut corrupted = encoder.clone();
+        corrupted.numeric_scale.remove("amount");
+        assert!(corrupted.encode(&projection(10.0, "red")).is_err());
+        assert_eq!(encoder.dimension().unwrap(), vector.len());
+        assert_eq!(vector[0], 0.5); // amount is first after canonical feature ordering
+        assert_eq!(encoder.encode(&projection(10.0, "red")).unwrap(), vector);
+        assert!(encoder
+            .encode(&projection(1e308, "unseen-token"))
+            .unwrap()
+            .iter()
+            .all(|x| x.is_finite()));
+        assert!(!encoder.text_vocabulary["note"].contains(&"unseen-token".into()));
     }
 
     fn rank_request() -> DecisionRequest {

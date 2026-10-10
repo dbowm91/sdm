@@ -1,6 +1,6 @@
 # SDM M009 — Task-Neutral Typed Feature Ingress
 
-Status: blocked (hard M008)
+Status: closed; see plans/closure/general-decision-model-framework/009-status.md
 Class: infrastructure/capability
 Planning baseline: 319a05805f3a8383574d0d0712ca5975d16546ff; refresh at start
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md

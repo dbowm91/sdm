@@ -1,0 +1,17 @@
+{
+  "dataset_path": "fixtures/standalone-typed-rank-v1.json",
+  "split_path": "fixtures/standalone-typed-rank-v1.split.json",
+  "architecture": "typed-linear",
+  "seed": 42,
+  "epochs": 40,
+  "learning_rate": 0.1,
+  "artifact_path": "target/experiments/typed-linear.artifact.json",
+  "report_path": "target/experiments/typed-linear.report.json",
+  "provenance": {
+    "source": "SDM generated typed Rank mechanics corpus v1",
+    "license": "MIT",
+    "consent_scope": "synthetic-only; no human or application data",
+    "label_lineage": "deterministically generated task-to-candidate rule",
+    "redistributable": true
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "version": 3,
+  "dataset_sha256": "sha256:a845b778f7dc6a1a51af1dc1b8b04e8fdf9be46d3fca727e0aa9480ee8af5cd0",
+  "seed": 42,
+  "train": [
+    "rank-001",
+    "rank-003",
+    "rank-007",
+    "rank-008",
+    "rank-009",
+    "rank-010",
+    "rank-013",
+    "rank-015",
+    "rank-016",
+    "rank-017",
+    "rank-021",
+    "rank-025",
+    "rank-026",
+    "rank-037",
+    "rank-044",
+    "rank-052",
+    "rank-054",
+    "rank-060",
+    "rank-071",
+    "rank-076",
+    "rank-078",
+    "rank-085"
+  ],
+  "dev": [
+    "rank-011",
+    "rank-039",
+    "rank-062",
+    "rank-065",
+    "rank-066"
+  ],
+  "test": [
+    "rank-002",
+    "rank-004",
+    "rank-005",
+    "rank-006",
+    "rank-012",
+    "rank-014",
+    "rank-018",
+    "rank-033",
+    "rank-070"
+  ],
+  "excluded": [],
+  "fingerprint": "sha256:d4c6345ab3a536705f81a9cadf119cb108ee6823a574b971af9246b3e4f0dbd3"
+}

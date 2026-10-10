@@ -23,6 +23,8 @@ projection, disclosure, capture consent, and causal-frontier behavior stay in Co
 - `sdm-data`: provenance-bearing labels and frozen leakage-aware group splits.
 - `sdm-eval`: algorithm-neutral semantic metrics and preregistered offline reports.
 - `sdm-nonlinear`: optional bounded nonlinear CPU scorer and deterministic local SGD.
+- `sdm-experiment`: explicit-input Rank orchestration, frozen-split training,
+  dev-only threshold selection, runtime reload and held-out reporting.
 
 Initial runtime architecture is a sparse binary relevance model applied independently
 to Rank candidates. The semantic core supports Binary, Choice, Score, and Rank; the
@@ -87,8 +89,20 @@ and [M011 standalone held-out release qualification](plans/implementation/genera
 defers CodeGG-specific effectiveness (M005) until an approved independent corpus exists;
 **M008-M011 do not require CodeGG data or a CodeGG checkout**.
 
-Current single-purpose commands include `sdm-dataset validate`, `sdm-dataset split`,
-legacy `sdm-train` (linear Rank), and `sdm-qualify` (precomputed Rank predictions).
-A unified experiment runner, generalized typed inference and non-Rank trained
-model heads are planned, **not implemented yet**. The working v2 nonlinear Rank
-engine is an unqualified mechanics prototype; no CodeGG model is promoted.
+Run the reproducible standalone Rank examples with:
+
+```sh
+mkdir -p target/experiments
+cargo run -p sdm-experiment --locked -- experiment run --config fixtures/standalone-rank-linear.experiment.json
+cargo run -p sdm-experiment --locked -- experiment run --config fixtures/standalone-rank-nonlinear.experiment.json
+cargo run -p sdm-experiment --locked -- experiment run --config fixtures/standalone-typed-rank.experiment.json
+```
+
+Both configs use the redistributable 36-example synthetic corpus and its frozen
+group split. The result is mechanics evidence only and makes no real-world quality
+claim. The CLI reads only the paths named in the config and refuses to overwrite
+artifact/report outputs. Legacy `sdm-train`, `sdm-dataset`, and `sdm-qualify`
+commands remain available. The typed Rank path demonstrates train-only numeric
+scaling and text vocabulary, declared categories, boolean inputs, and runtime
+schema checks. Learned Binary/Choice/Score heads remain subsequent work; no CodeGG
+model is promoted.

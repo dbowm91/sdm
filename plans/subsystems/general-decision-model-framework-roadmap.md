@@ -1,6 +1,6 @@
 # General Decision-Model Framework and First Consumer Roadmap
 
-Status: M001-M007 historical results retained; M008 ready, M009-M011 dependency-blocked; M005 deferred
+Status: M001-M009 evidence retained; M010 ready, M011 dependency-blocked; M005 deferred
 Audit baseline: dbowm91/sdm@8139b064bdcf3212e8f6fd912e801a479b55751c (2026-10-05)
 Planning date: 2026-10-10
 Primary decisions: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md; plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md
@@ -85,18 +85,18 @@ Class: capability/evidence. Status: closed. Plan: plans/implementation/general-d
 
 Decision: ADR-0002. This workstream is independent of CodeGG and has no requirement for an application-specific corpus. M005 remains deferred/indeterminate, retains its historical closure, and is not a prerequisite for M008-M011. No generated synthetic example is represented as real CodeGG effectiveness evidence.
 
-Current implemented state at 319a05805f3a8383574d0d0712ca5975d16546ff: six crates exist (sdm-core, sdm-data, sdm-eval, sdm-training, sdm-nonlinear, sdm-runtime). M007 recorded slice calibration, trained synthetic interaction smoke, and Linux x86_64/ARM64 plus Apple Silicon CPU inference benchmark artifacts. However its 16 trained examples are evaluated in-sample, and hosted benchmarks use initialized weights. The old CLI paths are disconnected; typed feature projections do not yet reach the nonlinear model directly; non-Rank model heads are absent.
+M008 adds `sdm-experiment`, its frozen synthetic Rank corpus, and `sdm experiment run --config PATH`; closure evidence is in plans/closure/general-decision-model-framework/008-status.md. M007's trained 16-example ablation remains in-sample and its hosted benchmarks use initialized weights. M008 demonstrates held-out synthetic mechanics for both Rank architectures. Typed feature projections do not yet reach learned model ingress directly; non-Rank model heads are absent.
 
 ### M008 — End-to-end standalone Rank experiment
-Class: capability/infrastructure. **Status: ready.** Plan: plans/implementation/general-decision-model-framework/008-standalone-experiment-pipeline.md.
+Class: capability/infrastructure. Status: closed. Plan: plans/implementation/general-decision-model-framework/008-standalone-experiment-pipeline.md. Evidence: plans/closure/general-decision-model-framework/008-status.md.
 Provide a reusable library + one CLI path to validate explicit local data, use frozen splits, train linear/nonlinear Rank, tune on dev only, package and reload verified artifacts, predict exact candidates and evaluate a genuinely held-out synthetic partition.
 
 ### M009 — Typed feature model ingress
-Class: infrastructure/capability. Status: blocked on accepted M008 closure. Plan: plans/implementation/general-decision-model-framework/009-typed-feature-model-ingress.md.
+Class: infrastructure/capability. Status: closed. Plan: plans/implementation/general-decision-model-framework/009-typed-feature-model-ingress.md. Evidence: plans/closure/general-decision-model-framework/009-status.md.
 Implement one canonical bounded typed feature encoder for train/infer with real numerical, categorical and boolean inputs, frozen preprocessing and a versioned runtime contract; retain legacy lexical v1 behavior.
 
 ### M010 — Learned Binary, Choice and Score heads
-Class: capability. Status: blocked on accepted M009 closure. Plan: plans/implementation/general-decision-model-framework/010-generic-decision-task-heads.md.
+Class: capability. **Status: ready.** Plan: plans/implementation/general-decision-model-framework/010-generic-decision-task-heads.md.
 Complete train/package/infer/evaluate paths for every declared semantic family using small bounded models, correct abstention and option/score semantics, and independent datasets. Existing Rank continues working.
 
 ### M011 — Held-out standalone qualification and release review
@@ -132,4 +132,4 @@ Create plans/closure/general-decision-model-framework/NNN-status.md for each mil
 
 ## 10. Readiness
 
-M001-M007 outcomes are retained under plans/closure/general-decision-model-framework/. M008 is ready; M009-M011 are blocked only on predecessor closures. M005 stays indeterminate because no approved independent CodeGG corpus or consumer adapter exists. The v1 consumer contract remains unchanged and no CodeGG model is promoted.
+M001-M009 outcomes are retained under plans/closure/general-decision-model-framework/. M010 is ready; M011 is blocked on M010. M005 stays indeterminate because no approved independent CodeGG corpus or consumer adapter exists. The v1 consumer contract remains unchanged and no CodeGG model is promoted.

@@ -145,6 +145,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "sdm-experiment"
+version = "0.1.0"
+dependencies = [
+ "sdm-core",
+ "sdm-data",
+ "sdm-eval",
+ "sdm-nonlinear",
+ "sdm-runtime",
+ "sdm-training",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror",
+]
+
+[[package]]
 name = "sdm-nonlinear"
 version = "0.1.0"
 dependencies = [

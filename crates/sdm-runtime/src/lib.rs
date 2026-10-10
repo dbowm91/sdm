@@ -35,6 +35,61 @@ pub struct ArtifactEnvelopeV2 {
 }
 
 impl ArtifactEnvelopeV2 {
+    pub fn for_typed_rank(
+        encoder: &sdm_core::FittedFeatureEncoderV2,
+        weights: Vec<f64>,
+        bias: f64,
+        threshold: f64,
+        training_fingerprint: impl Into<String>,
+        model_id: impl Into<String>,
+        max_candidates: usize,
+    ) -> Result<Self, RuntimeError> {
+        encoder
+            .validate()
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        if !bias.is_finite() || !threshold.is_finite() || !(0.0..=1.0).contains(&threshold) {
+            return Err(RuntimeError::InvalidArtifact(
+                "invalid typed Rank parameters".into(),
+            ));
+        }
+        let dim = encoder
+            .dimension()
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        if weights.len() != dim.saturating_mul(2) || weights.iter().any(|x| !x.is_finite()) {
+            return Err(RuntimeError::InvalidArtifact(
+                "typed Rank weight shape or value mismatch".into(),
+            ));
+        }
+        let payload = serde_json::to_vec(&TypedRankPayload {
+            encoder: encoder.clone(),
+            weights,
+            bias,
+            training_fingerprint: training_fingerprint.into(),
+        })
+        .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let calibration_payload = serde_json::to_vec(&RankCalibration { threshold })
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let envelope = Self {
+            schema_version: ARTIFACT_ENVELOPE_V2,
+            architecture: "sdm-typed-linear-rank-v1".into(),
+            model_id: model_id.into(),
+            required_feature_schema_sha256: encoder
+                .schema
+                .fingerprint()
+                .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?,
+            capabilities: vec!["rank".into()],
+            max_candidates,
+            parameter_count: payload.len(),
+            tensor_payload_sha256: format!("sha256:{:x}", Sha256::digest(&payload)),
+            calibration_sha256: format!("sha256:{:x}", Sha256::digest(&calibration_payload)),
+            calibration_payload,
+            license: "MIT".into(),
+            source: "sdm-experiment".into(),
+            payload,
+        };
+        envelope.validate()?;
+        Ok(envelope)
+    }
     pub fn for_nonlinear(
         model: &sdm_nonlinear::PairwiseModel,
         model_id: impl Into<String>,
@@ -196,12 +251,165 @@ pub struct Runtime {
 pub enum LoadedArtifact {
     LinearV1(Runtime),
     NonlinearV2(NonlinearRuntime),
+    TypedRankV2(TypedRankRuntime),
     UnsupportedV2(ArtifactEnvelopeV2),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct RankCalibration {
     threshold: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct TypedRankPayload {
+    encoder: sdm_core::FittedFeatureEncoderV2,
+    weights: Vec<f64>,
+    bias: f64,
+    training_fingerprint: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct TypedRankRuntime {
+    payload: TypedRankPayload,
+    model_id: String,
+    max_candidates: usize,
+    threshold: f64,
+    digest: String,
+}
+
+impl TypedRankRuntime {
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self, RuntimeError> {
+        let envelope = ArtifactEnvelopeV2::from_bytes(bytes)?;
+        if envelope.architecture != "sdm-typed-linear-rank-v1" {
+            return Err(RuntimeError::InvalidArtifact(
+                "unsupported typed architecture".into(),
+            ));
+        }
+        let payload: TypedRankPayload = serde_json::from_slice(&envelope.payload)
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        payload
+            .encoder
+            .validate()
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let dim = payload
+            .encoder
+            .dimension()
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        if payload.weights.len() != dim.saturating_mul(2)
+            || payload
+                .weights
+                .iter()
+                .any(|x| !x.is_finite() || x.abs() > 1_000_000.0)
+            || !payload.bias.is_finite()
+            || payload.bias.abs() > 1_000_000.0
+            || payload.training_fingerprint.is_empty()
+            || payload
+                .encoder
+                .schema
+                .fingerprint()
+                .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?
+                != envelope.required_feature_schema_sha256
+        {
+            return Err(RuntimeError::InvalidArtifact(
+                "invalid typed Rank payload".into(),
+            ));
+        }
+        let calibration: RankCalibration = serde_json::from_slice(&envelope.calibration_payload)
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        if !calibration.threshold.is_finite() || !(0.0..=1.0).contains(&calibration.threshold) {
+            return Err(RuntimeError::InvalidArtifact(
+                "invalid typed Rank threshold".into(),
+            ));
+        }
+        Ok(Self {
+            payload,
+            model_id: envelope.model_id,
+            max_candidates: envelope.max_candidates,
+            threshold: calibration.threshold,
+            digest: format!("sha256:{:x}", Sha256::digest(bytes)),
+        })
+    }
+    pub fn digest(&self) -> &str {
+        &self.digest
+    }
+    pub fn decide_typed(
+        &self,
+        request: &DecisionRequest,
+        features: &sdm_core::TypedRankProjectionV2,
+    ) -> Result<DecisionResponse, DecisionError> {
+        request.validate()?;
+        let sdm_core::DecisionSpec::Rank { candidates, .. } = &request.spec else {
+            return Err(DecisionError::InvalidRequest(
+                "typed Rank artifact requires Rank request".into(),
+            ));
+        };
+        if candidates.len() > self.max_candidates {
+            return Err(DecisionError::InvalidRequest(
+                "typed Rank candidate limit exceeded".into(),
+            ));
+        }
+        features.context.validate_for(&features.schema)?;
+        if features.schema.fingerprint()? != self.payload.encoder.schema.fingerprint()? {
+            return Err(DecisionError::InvalidRequest(
+                "typed schema differs from artifact".into(),
+            ));
+        }
+        let expected: std::collections::BTreeSet<_> =
+            candidates.iter().map(|c| c.id.as_str()).collect();
+        let supplied: std::collections::BTreeSet<_> =
+            features.candidates.keys().map(String::as_str).collect();
+        if expected != supplied {
+            return Err(DecisionError::InvalidRequest(
+                "typed candidate IDs differ from request".into(),
+            ));
+        }
+        let context = self.payload.encoder.encode(&features.context)?;
+        let mut ranked = Vec::with_capacity(candidates.len());
+        for candidate in candidates {
+            let projection = &features.candidates[&candidate.id];
+            let mut vector = context.clone();
+            vector.extend(self.payload.encoder.encode(projection)?);
+            let score = vector
+                .iter()
+                .zip(&self.payload.weights)
+                .map(|(x, w)| x * w)
+                .sum::<f64>()
+                + self.payload.bias;
+            let relevance = 1.0 / (1.0 + (-score).exp());
+            ranked.push(RankedDecisionCandidate {
+                candidate_id: candidate.id.clone(),
+                relevance,
+                ranking_score: score,
+            });
+        }
+        let (status, answer) = if ranked.iter().any(|c| c.relevance >= self.threshold) {
+            (
+                DecisionStatus::Answered,
+                Some(DecisionAnswer::Rank { candidates: ranked }),
+            )
+        } else {
+            (
+                DecisionStatus::Abstained {
+                    reason: Some("no typed candidate met threshold".into()),
+                },
+                None,
+            )
+        };
+        let response = DecisionResponse {
+            request_id: request.request_id.clone(),
+            schema_version: request.schema_version,
+            status,
+            answer,
+            provenance: DecisionProvenance {
+                backend: "sdm-local-typed-rank".into(),
+                model: Some(self.model_id.clone()),
+                runtime_version: Some(RUNTIME_VERSION.into()),
+                latency_micros: 0,
+            },
+        };
+        response.validate_for(request)?;
+        Ok(response)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -372,6 +580,10 @@ pub fn load_artifact(bytes: &[u8]) -> Result<LoadedArtifact, RuntimeError> {
         let envelope = ArtifactEnvelopeV2::from_bytes(bytes)?;
         if envelope.architecture == sdm_nonlinear::ARCHITECTURE {
             Ok(LoadedArtifact::NonlinearV2(NonlinearRuntime::from_bytes(
+                bytes,
+            )?))
+        } else if envelope.architecture == "sdm-typed-linear-rank-v1" {
+            Ok(LoadedArtifact::TypedRankV2(TypedRankRuntime::from_bytes(
                 bytes,
             )?))
         } else {
@@ -634,6 +846,76 @@ mod tests {
         assert!((candidates[0].ranking_score - expected_score).abs() < 1e-12);
         assert_eq!(response.provenance.model, Some("test-model".into()));
         assert_eq!(response.provenance.backend, "sdm-local-nonlinear");
+    }
+
+    #[test]
+    fn typed_rank_artifact_uses_same_fitted_encoder_and_rejects_identity_injection() {
+        let schema = sdm_core::FeatureSchemaV2 {
+            version: 2,
+            fields: vec![sdm_core::FeatureSchemaField {
+                id: "kind".into(),
+                value_type: sdm_core::FeatureType::Category,
+                required: true,
+                categories: vec!["candidate".into(), "task".into()],
+            }],
+        };
+        let projection = |value: &str| sdm_core::FeatureProjectionV2 {
+            schema_version: 2,
+            schema_sha256: schema.fingerprint().unwrap(),
+            fields: vec![sdm_core::FeatureField {
+                id: "kind".into(),
+                required: true,
+                value: Some(sdm_core::FeatureValue::Category(value.into())),
+            }],
+        };
+        let encoder = sdm_core::FittedFeatureEncoderV2::fit(
+            &schema,
+            &[projection("task"), projection("candidate")],
+        )
+        .unwrap();
+        let envelope = ArtifactEnvelopeV2::for_typed_rank(
+            &encoder,
+            vec![0.0, 0.0, 5.0, 0.0],
+            0.0,
+            0.5,
+            "train-sha",
+            "typed-model",
+            8,
+        )
+        .unwrap();
+        let bytes = serde_json::to_vec(&envelope).unwrap();
+        let LoadedArtifact::TypedRankV2(engine) = load_artifact(&bytes).unwrap() else {
+            panic!("typed runtime not dispatched")
+        };
+        let request = DecisionRequest {
+            request_id: "typed".into(),
+            schema_version: 1,
+            state: vec![],
+            spec: DecisionSpec::Rank {
+                instruction: "rank".into(),
+                multi_relevance: true,
+                candidates: vec![DecisionCandidate {
+                    id: "c".into(),
+                    label: "c".into(),
+                    description: "candidate".into(),
+                }],
+            },
+        };
+        let features = sdm_core::TypedRankProjectionV2 {
+            schema: schema.clone(),
+            context: projection("task"),
+            candidates: std::collections::BTreeMap::from([("c".into(), projection("candidate"))]),
+        };
+        let response = engine.decide_typed(&request, &features).unwrap();
+        let Some(DecisionAnswer::Rank { candidates }) = response.answer else {
+            panic!("expected typed Rank answer")
+        };
+        assert!((candidates[0].ranking_score - 5.0).abs() < 1e-12);
+        let mut injected = features;
+        injected
+            .candidates
+            .insert("injected".into(), projection("candidate"));
+        assert!(engine.decide_typed(&request, &injected).is_err());
     }
     #[test]
     fn manifest_rejects_invalid_limits() {

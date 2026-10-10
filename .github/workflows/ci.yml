@@ -26,6 +26,12 @@ jobs:
       - run: cargo check -p sdm-runtime --locked
       - run: cargo check -p sdm-runtime --examples --locked
       - run: cargo tree -p sdm-runtime --locked
+      - name: Run standalone Rank experiments end to end
+        run: |
+          mkdir -p target/experiments
+          cargo run -p sdm-experiment --locked -- experiment run --config fixtures/standalone-rank-linear.experiment.json
+          cargo run -p sdm-experiment --locked -- experiment run --config fixtures/standalone-rank-nonlinear.experiment.json
+          cargo run -p sdm-experiment --locked -- experiment run --config fixtures/standalone-typed-rank.experiment.json
       - name: Capture runtime benchmark
         run: cargo run -p sdm-runtime --example benchmark -- fixtures/benchmark-rank-request.json artifacts/compatibility-rank-v1.json > benchmark-${{ matrix.name }}.json
       - name: Capture nonlinear runtime benchmark
