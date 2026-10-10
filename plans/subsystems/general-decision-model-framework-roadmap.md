@@ -1,6 +1,6 @@
 # General Decision-Model Framework and First Consumer Roadmap
 
-Status: ready (M001); subsequent milestones blocked by explicit dependencies
+Status: implementation outcomes recorded; conditional engineering and evidence follow-ups remain
 Audit baseline: dbowm91/sdm@8139b064bdcf3212e8f6fd912e801a479b55751c (2026-10-05)
 Planning date: 2026-10-10
 Primary architectural decision: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md
@@ -102,4 +102,4 @@ Create plans/closure/general-decision-model-framework/NNN-status.md for each mil
 
 ## 10. Readiness
 
-M001 ready against known baseline. M002–M005 blocked by named hard prerequisites. The five plans are planning artifacts only; no implementation, trained model release, or new qualification has landed.
+M001-M005 implementation outcomes are recorded under plans/closure/general-decision-model-framework/. M005 is indeterminate because no new approved independent CodeGG labels were available. The v1 consumer contract remains unchanged; no trained model is promoted or registered in runtime dispatch.

@@ -1,6 +1,6 @@
 # SDM General Framework M001 — Versioned Feature, Artifact and Runtime Contracts
 
-Status: ready
+Status: closed
 Primary class: infrastructure
 Repository baseline: dbowm91/sdm@8139b064bdcf3212e8f6fd912e801a479b55751c
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md#m001--versioned-featureartifactruntime-contracts

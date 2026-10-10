@@ -1,6 +1,6 @@
 # SDM General Framework M002 — Dataset Provenance and Split Integrity
 
-Status: blocked (hard M001)
+Status: conditionally closed (group/split contract implemented; similarity audit and streaming parser remain follow-up)
 Primary class: infrastructure
 Repository baseline at planning: dbowm91/sdm@8139b064bdcf3212e8f6fd912e801a479b55751c; re-audit when unblocked
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md#m002--generic-dataset-provenance-and-frozen-splits

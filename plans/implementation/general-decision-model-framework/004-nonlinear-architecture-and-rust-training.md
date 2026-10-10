@@ -1,6 +1,6 @@
 # SDM General Framework M004 — Nonlinear Architecture and Rust Training/Inference
 
-Status: blocked (hard M003)
+Status: conditionally closed (CPU nonlinear scorer and SGD prototype implemented; runtime registration and multi-platform qualification remain follow-up)
 Primary class: capability
 Repository baseline at planning: dbowm91/sdm@8139b064bdcf3212e8f6fd912e801a479b55751c; re-audit when unblocked
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md#m004--second-trained-architecture-and-portable-inference

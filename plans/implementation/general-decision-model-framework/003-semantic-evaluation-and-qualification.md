@@ -1,6 +1,6 @@
 # SDM General Framework M003 — Semantic Evaluation and Preregistered Qualification
 
-Status: blocked (hard M002)
+Status: conditionally closed (semantic metrics and frozen identity protocol implemented; confidence intervals and calibration reporting remain follow-up)
 Primary class: capability
 Repository baseline at planning: dbowm91/sdm@8139b064bdcf3212e8f6fd912e801a479b55751c; re-audit when ready
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md#m003--semantic-evaluation-and-preregistered-qualification

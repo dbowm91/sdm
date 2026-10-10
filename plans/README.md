@@ -2,18 +2,13 @@
 
 This directory follows the CodeGG planning and handoff convention as adapted in [003-planning-process.md](003-planning-process.md).
 
-**Start here:** [Active registry](registry.md) -> [General decision-model framework roadmap](subsystems/general-decision-model-framework-roadmap.md) -> the first ready implementation milestone. The [framework boundary ADR](adrs/ADR-0001-general-framework-and-model-boundaries.md) governs all five.
+**Start here:** [Registry](registry.md) -> [General decision-model framework roadmap](subsystems/general-decision-model-framework-roadmap.md) -> [closure evidence](closure/general-decision-model-framework/). The [framework boundary ADR](adrs/ADR-0001-general-framework-and-model-boundaries.md) governs all five.
 
-## Ready handoff
+## Completed handoffs
 
-- [M001 — Versioned features, artifact envelope, and runtime contracts](implementation/general-decision-model-framework/001-versioned-feature-artifact-runtime-contracts.md) — ready against SDM main 8139b064bdcf3212e8f6fd912e801a479b55751c.
+M001 through M005 have implementation outcomes and requirement-to-evidence records in [closure](closure/general-decision-model-framework/). M002-M004 are conditionally closed with limitations recorded; M005 is indeterminate because an approved independent CodeGG corpus was unavailable.
 
-## Registered downstream (blocked by earlier closures)
-
-- [M002 — Dataset provenance and split integrity](implementation/general-decision-model-framework/002-dataset-provenance-and-split-integrity.md) — blocked on M001.
-- [M003 — Semantic evaluation and qualification](implementation/general-decision-model-framework/003-semantic-evaluation-and-qualification.md) — blocked on M002.
-- [M004 — Nonlinear model and portable Rust train/inference](implementation/general-decision-model-framework/004-nonlinear-architecture-and-rust-training.md) — blocked on M003.
-- [M005 — CodeGG first-target offline qualification](implementation/general-decision-model-framework/005-codegg-first-consumer-qualification.md) — blocked on M004 and CodeGG fixture contract evidence.
+M006 is a blocked corrective for those retained limitations. Its approved corpus, Linux ARM64 runner, and projection/parity prerequisites are not available in this workspace.
 
 Research and predecessor evidence are recorded in [docs/general-framework-research-2026-10.md](../docs/general-framework-research-2026-10.md).
 

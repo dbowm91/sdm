@@ -1,6 +1,6 @@
 # SDM General Framework M005 — CodeGG First-Consumer Offline Qualification
 
-Status: blocked (hard M004)
+Status: conditionally closed (indeterminate: no newly approved independent CodeGG corpus was available)
 Primary class: capability/evidence
 Repository baseline at planning: dbowm91/sdm@8139b064bdcf3212e8f6fd912e801a479b55751c; refresh CodeGG and SDM heads when ready
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md#m005--codegg-first-target-offline-qualification
