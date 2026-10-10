@@ -80,10 +80,10 @@ SDM M001-M007 historical implementation and qualification outcomes are available
 The next implementation workstream focuses on making SDM a complete independent
 training, typed-feature inference, and qualification framework.
 
-Completed milestones: [M008](plans/closure/general-decision-model-framework/008-status.md) and
-[M009](plans/closure/general-decision-model-framework/009-status.md). Active handoff:
-[M010 Binary/Choice/Score trainable model heads](plans/implementation/general-decision-model-framework/010-generic-decision-task-heads.md),
-followed by [M011 standalone held-out release qualification](plans/implementation/general-decision-model-framework/011-standalone-release-qualification.md).
+Completed milestones: [M008](plans/closure/general-decision-model-framework/008-status.md),
+[M009](plans/closure/general-decision-model-framework/009-status.md), and
+[M010 Binary/Choice/Score trainable model heads](plans/closure/general-decision-model-framework/010-status.md).
+Active handoff: [M011 standalone held-out release qualification](plans/implementation/general-decision-model-framework/011-standalone-release-qualification.md).
 [ADR-0002](plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md)
 defers CodeGG-specific effectiveness (M005) until an approved independent corpus exists;
 **M008-M011 do not require CodeGG data or a CodeGG checkout**.

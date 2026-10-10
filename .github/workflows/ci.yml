@@ -4,6 +4,13 @@ on:
   pull_request:
   workflow_dispatch:
 jobs:
+  msrv:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.89.0
+      - name: Verify declared MSRV
+        run: rustc -Vv && cargo fmt --all -- --check && cargo test --workspace --all-features --locked && cargo clippy --workspace --all-targets --all-features --locked -- -D warnings && cargo check -p sdm-runtime --locked
   verify:
     strategy:
       matrix:
@@ -26,6 +33,8 @@ jobs:
       - run: cargo check -p sdm-runtime --locked
       - run: cargo check -p sdm-runtime --examples --locked
       - run: cargo tree -p sdm-runtime --locked
+      - name: Check frozen v1 consumer compatibility
+        run: cargo run -q -p sdm-training --bin sdm-check-compat --locked -- fixtures/codegg-compatibility-v1.jsonl artifacts/compatibility-rank-v1.json
       - name: Run standalone Rank experiments end to end
         run: |
           mkdir -p target/experiments
@@ -35,13 +44,24 @@ jobs:
           cargo run -p sdm-experiment --locked -- experiment run --config fixtures/synthetic-binary-typed-v1.experiment.json
           cargo run -p sdm-experiment --locked -- experiment run --config fixtures/synthetic-choice-typed-v1.experiment.json
           cargo run -p sdm-experiment --locked -- experiment run --config fixtures/synthetic-score-typed-v1.experiment.json
+      - name: Run M011 generated held-out suites
+        run: |
+          mkdir -p target/m011
+          cargo run -p sdm-experiment --locked -- experiment run --config fixtures/m011-binary-v1.experiment.json
+          cargo run -p sdm-experiment --locked -- experiment run --config fixtures/m011-choice-v1.experiment.json
+          cargo run -p sdm-experiment --locked -- experiment run --config fixtures/m011-score-v1.experiment.json
+          cargo run -p sdm-experiment --locked -- experiment run --config fixtures/m011-rank-v1.experiment.json
       - name: Capture runtime benchmark
         run: cargo run -p sdm-runtime --example benchmark -- fixtures/benchmark-rank-request.json artifacts/compatibility-rank-v1.json > benchmark-${{ matrix.name }}.json
       - name: Capture nonlinear runtime benchmark
-        run: cargo run -p sdm-runtime --example benchmark_nonlinear -- > nonlinear-benchmark-${{ matrix.name }}.json
+        run: cargo run -p sdm-runtime --example benchmark_nonlinear -- target/experiments/nonlinear.artifact.json > nonlinear-benchmark-${{ matrix.name }}.json
+      - name: Compile public standalone library consumer
+        run: cargo check -p sdm-experiment --example standalone_consumer --locked
       - uses: actions/upload-artifact@v4
         with:
           name: benchmark-${{ matrix.name }}
           path: |
             benchmark-${{ matrix.name }}.json
             nonlinear-benchmark-${{ matrix.name }}.json
+            target/experiments/
+            target/m011/

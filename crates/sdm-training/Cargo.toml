@@ -6,8 +6,8 @@ license.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-sdm-core = { path = "../sdm-core" }
-sdm-runtime = { path = "../sdm-runtime" }
+sdm-core = { path = "../sdm-core", version = "0.1.0" }
+sdm-runtime = { path = "../sdm-runtime", version = "0.1.0" }
 serde.workspace = true
 serde_json.workspace = true
 sha2.workspace = true

@@ -2,7 +2,7 @@
 use sdm_core::{DecisionCandidate, DecisionRequest, DecisionSpec, StateField};
 use sdm_nonlinear::initialize;
 use sdm_runtime::{ArtifactEnvelopeV2, NonlinearRuntime};
-use std::time::Instant;
+use std::{env, fs, time::Instant};
 
 #[cfg(unix)]
 fn peak_rss_bytes() -> Option<u64> {
@@ -30,30 +30,45 @@ fn percentile(samples: &[u128], numerator: usize, denominator: usize) -> u128 {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let model = initialize(
-        vec![
-            "ctx:inspect".into(),
-            "ctx:source".into(),
-            "cand:read".into(),
-            "cand:write".into(),
-            "both:inspect".into(),
-            "both:source".into(),
-        ],
-        16,
-        20261010,
-    )?;
-    let envelope = ArtifactEnvelopeV2::for_nonlinear(
-        &model,
-        "benchmark-pairwise-v2",
-        256,
-        0.5,
-        "MIT",
-        "sdm benchmark",
-    )?;
-    let bytes = serde_json::to_vec(&envelope)?;
-    let start = Instant::now();
-    let runtime = NonlinearRuntime::from_bytes(&bytes)?;
-    let cold_load_micros = start.elapsed().as_micros();
+    let args: Vec<_> = env::args().skip(1).collect();
+    if args.len() > 1 {
+        return Err("usage: benchmark_nonlinear [trained-artifact.json]".into());
+    }
+    let (runtime, model_sha, artifact_bytes) = if let Some(path) = args.first() {
+        let bytes = fs::read(path)?;
+        let start = Instant::now();
+        let runtime = NonlinearRuntime::from_bytes(&bytes)?;
+        let load_micros = start.elapsed().as_micros();
+        let env: ArtifactEnvelopeV2 = serde_json::from_slice(&bytes)?;
+        (runtime, env.tensor_payload_sha256, (bytes, load_micros))
+    } else {
+        let model = initialize(
+            vec![
+                "ctx:inspect".into(),
+                "ctx:source".into(),
+                "cand:read".into(),
+                "cand:write".into(),
+                "both:inspect".into(),
+                "both:source".into(),
+            ],
+            16,
+            20261010,
+        )?;
+        let envelope = ArtifactEnvelopeV2::for_nonlinear(
+            &model,
+            "benchmark-pairwise-v2",
+            256,
+            0.5,
+            "MIT",
+            "sdm benchmark",
+        )?;
+        let bytes = serde_json::to_vec(&envelope)?;
+        let start = Instant::now();
+        let runtime = NonlinearRuntime::from_bytes(&bytes)?;
+        let load_micros = start.elapsed().as_micros();
+        (runtime, model.digest()?, (bytes, load_micros))
+    };
+    let (bytes, cold_load_micros) = artifact_bytes;
     let mut rows = Vec::new();
     for count in [1usize, 16, 64, 128, 256] {
         let candidates = (0..count)
@@ -92,7 +107,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!(
         "{}",
         serde_json::to_string_pretty(
-            &serde_json::json!({"architecture":sdm_nonlinear::ARCHITECTURE,"model_sha256":model.digest()? ,"artifact_sha256":runtime.digest(),"artifact_bytes":bytes.len(),"cold_load_micros":cold_load_micros,"peak_rss_bytes":peak_rss_bytes(),"invalid_artifact_rejected":rejected,"rank_latency":rows})
+            &serde_json::json!({"architecture":sdm_nonlinear::ARCHITECTURE,"model_sha256":model_sha,"artifact_sha256":runtime.digest(),"artifact_bytes":bytes.len(),"cold_load_micros":cold_load_micros,"peak_rss_bytes":peak_rss_bytes(),"invalid_artifact_rejected":rejected,"rank_latency":rows})
         )?
     );
     Ok(())
