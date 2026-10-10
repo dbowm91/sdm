@@ -658,7 +658,7 @@ fn train_typed_task(
                 let p = sigmoid(x.iter().zip(&weights).map(|(a, b)| a * b).sum::<f64>() + bias);
                 obs.push((p.max(1.0 - p), (p >= 0.5) == *y));
             }
-            (TargetLabel::Choice(target), sdm_core::DecisionSpec::Choice { options, .. })
+            (TargetLabel::Choice(target), sdm_core::DecisionSpec::Choice { .. })
                 if task == "choice" =>
             {
                 let context = encoder

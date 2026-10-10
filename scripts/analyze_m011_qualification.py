@@ -36,12 +36,14 @@ def bootstrap(group_deltas, seed):
 
 
 def ndcg(relevance, ordered_ids):
+    if not any(value > 0 for value in relevance.values()):
+        return None
     def dcg(ids):
-        return sum((2 ** relevance.get(cid, 0.0) - 1.0) / math.log2(i + 2)
+        return sum(relevance.get(cid, 0.0) / math.log2(i + 2)
                    for i, cid in enumerate(ids[:5]))
     ideal = sorted(relevance, key=lambda cid: relevance[cid], reverse=True)
     denominator = dcg(ideal)
-    return dcg(ordered_ids) / denominator if denominator else 1.0
+    return dcg(ordered_ids) / denominator if denominator else 0.0
 
 
 def main():
@@ -97,10 +99,13 @@ def main():
         else:
             for row in outcomes:
                 relevance = row["relevance"]
-                model_order = [item["candidate_id"] for item in sorted(row["prediction"], key=lambda x: -x["score"])]
+                model_order = [item["candidate_id"] for item in sorted(row["prediction"], key=lambda x: (-x["score"], x["candidate_id"]))]
                 example = by_id[row["case_id"]]
                 input_order = [item["id"] for item in example["request"]["spec"]["candidates"]]
-                delta = ndcg(relevance, model_order) - ndcg(relevance, input_order)
+                model_ndcg, baseline_ndcg = ndcg(relevance, model_order), ndcg(relevance, input_order)
+                if model_ndcg is None or baseline_ndcg is None:
+                    continue
+                delta = model_ndcg - baseline_ndcg
                 group_values[row["leakage_group"]].append(delta)
                 if "-ood-v2" in by_id[row["case_id"]]["family"]:
                     ood_group_values[row["leakage_group"]].append(delta)
@@ -130,6 +135,7 @@ def main():
             "calibration_sha256": report["calibration_sha256"],
             "artifact_sha256": report["artifact_sha256"],
             "report_sha256": report["report_sha256"],
+            "metrics": report["metrics"],
             "test_cases": len(outcomes), "baseline": baseline,
             "paired_group_bootstrap": interval, "disposition": disposition,
             "ood_slice": {
@@ -169,10 +175,12 @@ def main():
                 arch_deltas = defaultdict(list)
                 for row in arch_report["outcomes"]:
                     relevance = row["relevance"]
-                    model_order = [item["candidate_id"] for item in sorted(row["prediction"], key=lambda x: -x["score"])]
+                    model_order = [item["candidate_id"] for item in sorted(row["prediction"], key=lambda x: (-x["score"], x["candidate_id"]))]
                     example = by_id[row["case_id"]]
                     input_order = [item["id"] for item in example["request"]["spec"]["candidates"]]
-                    arch_deltas[row["leakage_group"]].append(ndcg(relevance, model_order) - ndcg(relevance, input_order))
+                    model_ndcg, baseline_ndcg = ndcg(relevance, model_order), ndcg(relevance, input_order)
+                    if model_ndcg is not None and baseline_ndcg is not None:
+                        arch_deltas[row["leakage_group"]].append(model_ndcg - baseline_ndcg)
                 interval = bootstrap(
                     {group: sum(values) / len(values) for group, values in arch_deltas.items()},
                     12011 + (0 if architecture == "linear" else 1),
