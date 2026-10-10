@@ -230,9 +230,12 @@ pub fn train(
         best.1
     };
     let model_hash = parameter_digest(bias, &weights);
+    // Bind learned parameters to the training partition only. The complete
+    // dataset digest is retained separately for reproducibility, but held-out
+    // labels must not influence the model artifact identity.
     let source_fingerprint = format!(
         "sha256:{:x}",
-        Sha256::digest(serde_json::to_vec(cases).unwrap())
+        Sha256::digest(serde_json::to_vec(&train_cases).unwrap())
     );
     let artifact = LinearArtifact {
         manifest: ArtifactManifest {
@@ -432,6 +435,14 @@ mod tests {
         assert_eq!(baseline.bias, changed.bias);
         assert_eq!(baseline.weights, changed.weights);
         assert_eq!(baseline.threshold, changed.threshold);
+        assert_eq!(
+            baseline.manifest.training_fingerprint,
+            changed.manifest.training_fingerprint
+        );
+        assert_eq!(
+            baseline.manifest.model_sha256,
+            changed.manifest.model_sha256
+        );
         assert_eq!(baseline_report.threshold, changed_report.threshold);
     }
 
