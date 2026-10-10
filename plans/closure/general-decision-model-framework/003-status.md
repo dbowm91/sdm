@@ -21,3 +21,5 @@ Implementation commit: `ee0f613`
 Golden unit checks cover numerical Binary/Choice/Score behavior, protocol fingerprint tampering, grouped rank intervals, and existing workspace regressions. Rank ties are deterministic by candidate ID; invalid/duplicate/unknown candidates fail. `candidate_universe_coverage` means coverage of the submitted candidate universe; it is not upstream shortlist recall. Undefined metrics remain `None`, and unsupported gates are reported indeterminate. No test-label isolation guarantee can be enforced for arbitrary caller-owned in-memory data.
 
 Disposition: conditional pending uncertainty reporting, broader report coverage, and independent fixture qualification. No model promotion or deployment approval is represented.
+
+Follow-up: M007 later delivered the slice-calibration API, test-partition rejection and frozen four-semantics fixture; see `007-status.md`. The M003 historical gaps remain recorded as of its implementation commit. The M007 tests demonstrate that supported training outputs do not change when test labels are changed, but arbitrary caller-owned data provenance is still the caller's responsibility.

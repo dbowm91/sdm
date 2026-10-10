@@ -1,6 +1,6 @@
 # SDM General Framework M007 — Qualification depth and trained ablations
 
-Status: ready
+Status: closed
 Primary class: capability/evidence
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md
 Dependencies: M006 conditional closure; no CodeGG corpus required for synthetic work
@@ -47,7 +47,9 @@ qualification results.
 
 ## Closure record
 
-Write `plans/closure/general-decision-model-framework/007-status.md` with source SHA,
-commands/results, fixture/model/report digests, resource observations, limitations and
-registry transition. M005 remains indeterminate until CodeGG supplies an approved
-independent corpus and consumer-owned adapter.
+Evidence: `plans/closure/general-decision-model-framework/007-status.md`.
+Implementation commits: `39c7af1c6baebfde8ac720ee35e6105fdca86a4c`,
+`699d972c6f80b027517a4ab68c521e718181d102`.
+All generic work packages are complete. M005 remains indeterminate until CodeGG supplies
+an approved independent corpus and consumer-owned adapter; that external gate does not
+block M007 closure.

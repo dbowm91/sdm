@@ -1,6 +1,6 @@
 # General Decision-Model Framework and First Consumer Roadmap
 
-Status: M001-M006 outcomes recorded; M007 generic qualification work ready
+Status: M001-M007 outcomes recorded; generic framework work complete, M005 external evidence gate remains
 Audit baseline: dbowm91/sdm@8139b064bdcf3212e8f6fd912e801a479b55751c (2026-10-05)
 Planning date: 2026-10-10
 Primary architectural decision: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md
@@ -79,7 +79,7 @@ Explicitly import sanitized, provenance-approved fixtures and compare locked can
 Class: corrective infrastructure/capability. Status: conditionally closed; residual generic evidence work is M007. Plan: plans/implementation/general-decision-model-framework/006-qualification-and-portability-corrective.md.
 
 ### M007 — Qualification depth and trained ablations
-Class: capability/evidence. Status: ready. Plan: plans/implementation/general-decision-model-framework/007-qualification-depth-and-trained-ablations.md. It requires no CodeGG material; M005 remains indeterminate pending CodeGG approval.
+Class: capability/evidence. Status: closed. Plan: plans/implementation/general-decision-model-framework/007-qualification-depth-and-trained-ablations.md. Generic evidence is recorded in plans/closure/general-decision-model-framework/007-status.md. M005 remains indeterminate pending CodeGG approval.
 
 ## 7. Cross-cutting requirements
 
