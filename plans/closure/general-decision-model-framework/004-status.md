@@ -15,7 +15,7 @@ Implementation commit: `ee0f613`
 | v2 runtime dispatch/parity and trainer-runtime artifact envelope | `load_artifact` registers nonlinear v2 dispatch; feature/model/calibration hashes are checked; runtime output agrees with model scorer in a fixed test vector | Pass (mechanics only) |
 | Atomic resumable checkpoint and identity | Feature-gated save/load verifies schema fingerprint and seed identity; interrupted writes use temp+rename | Pass (optimizer state is not persisted) |
 | Independent interaction task, ablations, trained-parameter utilization | Not measured; no model quality verdict | Gap |
-| Apple Silicon/x86_64/Linux ARM64 resource matrix | Nonlinear benchmark example captures cold load, p50/p95 at 1/16/64/128/256 candidates, artifact bytes, rejection and RSS; hosted matrix now schedules x86_64 Linux, Linux ARM64 and Apple Silicon. Local result is Rosetta x86_64, not native ARM64; remote results pending CI | Partial |
+| Apple Silicon/x86_64/Linux ARM64 resource matrix | Same nonlinear artifact benchmarked in GitHub Actions run 38076997293 on all three targets; per-target timings and host caveats in M006 closure | Pass (synthetic initialized model only) |
 
 ## Verification and limitations
 
