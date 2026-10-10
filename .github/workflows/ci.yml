@@ -82,3 +82,28 @@ jobs:
             nonlinear-benchmark-${{ matrix.name }}.json
             target/experiments/
             target/m011-v2/
+  portability:
+    needs: verify
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            name: linux-x64
+          - os: ubuntu-24.04-arm
+            name: linux-arm64
+          - os: macos-15
+            name: macos-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/download-artifact@v4
+        with:
+          name: benchmark-linux-x64
+          path: shared-trained-artifact
+      - name: Benchmark the identical Linux-trained artifact
+        run: cargo run -p sdm-runtime --example benchmark_nonlinear -- shared-trained-artifact/target/experiments/nonlinear.artifact.json > trained-artifact-portability-${{ matrix.name }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: trained-artifact-portability-${{ matrix.name }}
+          path: trained-artifact-portability-${{ matrix.name }}.json
