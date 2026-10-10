@@ -7,7 +7,7 @@ projection, disclosure, capture consent, and causal-frontier behavior stay in Co
 ## Repository policy
 
 - License: MIT, preserving the Anomalyco copyright notice from the CodeGG source.
-- Initial visibility: private.
+- Visibility: public; immutable full-SHA downstream consumption remains the release policy.
 - Consumption/release policy: downstream projects pin an immutable full Git commit
   SHA. Branch names and floating tags are not runtime dependencies. A source revision
   is usable only after CI and the CodeGG compatibility fixture command pass.
@@ -65,3 +65,18 @@ See [`docs/extraction-inventory.md`](docs/extraction-inventory.md),
 [`docs/artifact-format.md`](docs/artifact-format.md), and
 [`docs/reproducibility.md`](docs/reproducibility.md), plus the
 [`docs/benchmark-baseline.md`](docs/benchmark-baseline.md) runtime snapshot.
+
+
+## Active development planning
+
+The next framework workstream is registered under [plans/](plans/README.md).
+Its [roadmap](plans/subsystems/general-decision-model-framework-roadmap.md) separates
+versioned contracts (M001), generic data and split provenance (M002),
+independent evaluation/qualification (M003), a second trainable architecture
+(M004), and CodeGG as the first application-level experiment (M005).
+
+[M001 is ready for implementation](plans/implementation/general-decision-model-framework/001-versioned-feature-artifact-runtime-contracts.md);
+M002-M005 have explicit dependency blockers in the [active registry](plans/registry.md).
+This planning work does not qualify any new model or alter CodeGG's current
+pinned SDM runtime. Details and negative historical model evidence are preserved
+in [the research note](docs/general-framework-research-2026-10.md).
