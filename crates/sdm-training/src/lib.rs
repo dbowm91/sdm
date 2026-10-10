@@ -412,6 +412,30 @@ mod tests {
     }
 
     #[test]
+    fn changing_only_test_labels_does_not_change_fitted_parameters_or_dev_threshold() {
+        let mut cases: Vec<_> = (0..100)
+            .map(|i| case(i, &format!("group-{i}"), i % 2 == 0))
+            .collect();
+        let (baseline, baseline_report) = train(&cases, 42, 3).unwrap();
+        let mut changed_test_labels = 0;
+        for row in &mut cases {
+            if split(&row.leakage_group, 42) >= 85 {
+                if let Some(DecisionAnswer::Rank { candidates }) = &mut row.response.answer {
+                    candidates[0].relevance = 1.0 - candidates[0].relevance;
+                    candidates[0].ranking_score = candidates[0].relevance;
+                    changed_test_labels += 1;
+                }
+            }
+        }
+        assert!(changed_test_labels > 0);
+        let (changed, changed_report) = train(&cases, 42, 3).unwrap();
+        assert_eq!(baseline.bias, changed.bias);
+        assert_eq!(baseline.weights, changed.weights);
+        assert_eq!(baseline.threshold, changed.threshold);
+        assert_eq!(baseline_report.threshold, changed_report.threshold);
+    }
+
+    #[test]
     fn evaluator_uses_artifact_and_keeps_multiple_relevant_candidates() {
         let cases = vec![case(1, "group-a", true), case(2, "group-b", false)];
         let (artifact, _) = train(&cases, 12, 2).unwrap();

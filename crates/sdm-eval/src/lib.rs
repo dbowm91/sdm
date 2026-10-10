@@ -26,6 +26,127 @@ pub struct ConfidenceInterval {
     pub replicates: usize,
 }
 
+/// One labeled probability observation assigned to a predeclared slice.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum EvaluationPartition {
+    Development,
+    Test,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct CalibrationObservation {
+    pub partition: EvaluationPartition,
+    pub slice: String,
+    pub truth: bool,
+    pub probability_true: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct SliceCalibration {
+    pub slice: String,
+    pub count: usize,
+    pub brier: Option<f64>,
+    pub log_loss: Option<f64>,
+    pub ece: Option<f64>,
+    pub defined: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct CalibrationReport {
+    pub protocol_fingerprint: String,
+    pub dataset_sha256: String,
+    pub split_fingerprint: String,
+    pub artifact_sha256: String,
+    pub calibration_sha256: String,
+    pub minimum_support: usize,
+    pub bins: usize,
+    pub slices: Vec<SliceCalibration>,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct QualificationIdentity<'a> {
+    pub dataset_sha256: &'a str,
+    pub split_fingerprint: &'a str,
+    pub artifact_sha256: &'a str,
+    pub calibration_sha256: &'a str,
+}
+
+/// Identity-bound per-slice calibration. Slice names are sorted and output is
+/// deterministic. Slices below `minimum_support` are retained with undefined
+/// metrics so callers cannot mistake missing evidence for a passing score.
+pub fn calibration_by_slice(
+    observations: &[CalibrationObservation],
+    protocol: &QualificationProtocol,
+    identity: QualificationIdentity<'_>,
+    minimum_support: usize,
+    bins: usize,
+) -> Result<CalibrationReport, EvalError> {
+    if minimum_support == 0 || bins == 0 {
+        return Err(EvalError::Invalid(
+            "invalid slice calibration bounds".into(),
+        ));
+    }
+    protocol.validate(
+        identity.dataset_sha256,
+        identity.split_fingerprint,
+        identity.artifact_sha256,
+        identity.calibration_sha256,
+    )?;
+    let mut slices = std::collections::BTreeMap::<&str, (Vec<bool>, Vec<f64>)>::new();
+    for row in observations {
+        if row.partition != EvaluationPartition::Development
+            || row.slice.trim().is_empty()
+            || !row.probability_true.is_finite()
+            || !(0.0..=1.0).contains(&row.probability_true)
+        {
+            return Err(EvalError::Invalid(
+                "invalid slice calibration observation".into(),
+            ));
+        }
+        let entry = slices.entry(&row.slice).or_default();
+        entry.0.push(row.truth);
+        entry.1.push(row.probability_true);
+    }
+    let slices = slices
+        .into_iter()
+        .map(|(slice, (truth, probs))| {
+            let count = truth.len();
+            if count < minimum_support {
+                return SliceCalibration {
+                    slice: slice.into(),
+                    count,
+                    brier: None,
+                    log_loss: None,
+                    ece: None,
+                    defined: false,
+                };
+            }
+            let metrics = evaluate_binary(&truth, &probs, 0.5).expect("validated observations");
+            let ece =
+                expected_calibration_error(&truth, &probs, bins).expect("validated observations");
+            SliceCalibration {
+                slice: slice.into(),
+                count,
+                brier: metrics.brier,
+                log_loss: metrics.log_loss,
+                ece,
+                defined: true,
+            }
+        })
+        .collect();
+    Ok(CalibrationReport {
+        protocol_fingerprint: protocol.fingerprint.clone(),
+        dataset_sha256: identity.dataset_sha256.into(),
+        split_fingerprint: identity.split_fingerprint.into(),
+        artifact_sha256: identity.artifact_sha256.into(),
+        calibration_sha256: identity.calibration_sha256.into(),
+        minimum_support,
+        bins,
+        slices,
+    })
+}
+
 /// Cluster bootstrap over leakage groups; cases within a group are sampled together.
 pub fn grouped_bootstrap_mean(
     observations: &[(String, f64)],
@@ -603,5 +724,156 @@ mod tests {
         assert_eq!(a, b);
         assert_eq!(a.groups, 3);
         assert!(a.lower <= a.upper);
+    }
+
+    #[test]
+    fn slice_calibration_is_deterministic_minimum_supported_and_identity_bound() {
+        let mut protocol = QualificationProtocol {
+            version: 1,
+            dataset_sha256: format!("sha256:{}", "a".repeat(64)),
+            split_fingerprint: format!("sha256:{}", "b".repeat(64)),
+            artifact_sha256: format!("sha256:{}", "c".repeat(64)),
+            calibration_sha256: format!("sha256:{}", "d".repeat(64)),
+            source_revision: "synthetic-v1".into(),
+            rank_k: 1,
+            minimum_cases: 2,
+            gates: Default::default(),
+            fingerprint: String::new(),
+        };
+        protocol.freeze().unwrap();
+        let observations = vec![
+            CalibrationObservation {
+                partition: EvaluationPartition::Development,
+                slice: "supported".into(),
+                truth: true,
+                probability_true: 0.8,
+            },
+            CalibrationObservation {
+                partition: EvaluationPartition::Development,
+                slice: "supported".into(),
+                truth: false,
+                probability_true: 0.2,
+            },
+            CalibrationObservation {
+                partition: EvaluationPartition::Development,
+                slice: "small".into(),
+                truth: true,
+                probability_true: 0.7,
+            },
+        ];
+        let identity = QualificationIdentity {
+            dataset_sha256: &protocol.dataset_sha256,
+            split_fingerprint: &protocol.split_fingerprint,
+            artifact_sha256: &protocol.artifact_sha256,
+            calibration_sha256: &protocol.calibration_sha256,
+        };
+        let report = calibration_by_slice(&observations, &protocol, identity, 2, 5).unwrap();
+        assert_eq!(
+            report
+                .slices
+                .iter()
+                .map(|x| x.slice.as_str())
+                .collect::<Vec<_>>(),
+            ["small", "supported"]
+        );
+        assert!(!report.slices[0].defined);
+        assert_eq!(report.slices[0].brier, None);
+        assert!(report.slices[1].defined);
+        assert_eq!(report.artifact_sha256, protocol.artifact_sha256);
+        assert_eq!(
+            report,
+            calibration_by_slice(&observations, &protocol, identity, 2, 5).unwrap()
+        );
+        assert!(calibration_by_slice(
+            &observations,
+            &protocol,
+            QualificationIdentity {
+                artifact_sha256:
+                    "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                ..identity
+            },
+            2,
+            5
+        )
+        .is_err());
+        let mut test_observations = observations.clone();
+        test_observations[0].partition = EvaluationPartition::Test;
+        assert!(calibration_by_slice(&test_observations, &protocol, identity, 2, 5).is_err());
+    }
+
+    #[test]
+    fn frozen_synthetic_bundle_has_expected_metrics_for_every_semantic() {
+        #[derive(Deserialize)]
+        struct Bundle {
+            provenance: sdm_data::Provenance,
+            examples: Vec<sdm_data::DatasetExample>,
+        }
+        let bundle: Bundle = serde_json::from_str(include_str!(
+            "../../../fixtures/synthetic-qualification-v1.json"
+        ))
+        .unwrap();
+        let digest = sdm_data::validate_dataset(&bundle.examples, &bundle.provenance).unwrap();
+        assert_eq!(
+            digest,
+            "sha256:8a396c848873025e796833db4f3c20ba470a0ac98db6bb9e5dd7d94d58b62284"
+        );
+        let binary = match bundle.examples[0].label {
+            sdm_data::TargetLabel::Binary(y) => y,
+            _ => panic!("fixture order drift"),
+        };
+        assert_eq!(
+            evaluate_binary(&[binary], &[0.9], 0.5).unwrap().accuracy,
+            Some(1.0)
+        );
+        let choice = match &bundle.examples[1].label {
+            sdm_data::TargetLabel::Choice(Some(id)) => id.as_str(),
+            _ => panic!("fixture order drift"),
+        };
+        let choice_index = match &bundle.examples[1].request.spec {
+            sdm_core::DecisionSpec::Choice { options, .. } => {
+                options.iter().position(|o| o.id == choice).unwrap()
+            }
+            _ => panic!("fixture spec drift"),
+        };
+        assert_eq!(
+            evaluate_choice(&[choice_index], &[vec![0.1, 0.9]])
+                .unwrap()
+                .accuracy,
+            Some(1.0)
+        );
+        let score = match bundle.examples[2].label {
+            sdm_data::TargetLabel::Score(y) => y,
+            _ => panic!("fixture order drift"),
+        };
+        assert_eq!(
+            evaluate_score(&[score], &[score], 0.0, 5.0).unwrap().mae,
+            Some(0.0)
+        );
+        let prediction = RankPrediction {
+            case_id: "rank-001".into(),
+            candidates: vec![
+                CandidatePrediction {
+                    candidate_id: "x".into(),
+                    score: 1.0,
+                },
+                CandidatePrediction {
+                    candidate_id: "y".into(),
+                    score: 0.0,
+                },
+            ],
+        };
+        let rank = evaluate_rank(&bundle.examples[3..], &[prediction], 1).unwrap();
+        assert_eq!(
+            (rank.mrr, rank.recall_at_k, rank.ndcg),
+            (Some(1.0), Some(1.0), Some(1.0))
+        );
+        assert_eq!(
+            bundle
+                .examples
+                .iter()
+                .map(|e| e.case_id.as_str())
+                .collect::<Vec<_>>(),
+            ["binary-001", "choice-001", "score-001", "rank-001"]
+        );
     }
 }

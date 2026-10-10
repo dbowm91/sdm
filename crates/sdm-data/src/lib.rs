@@ -486,6 +486,33 @@ pub fn validate_split(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn frozen_synthetic_qualification_bundle_preserves_order_and_identity() {
+        #[derive(Deserialize)]
+        struct Bundle {
+            provenance: Provenance,
+            examples: Vec<DatasetExample>,
+        }
+        let bundle: Bundle = serde_json::from_str(include_str!(
+            "../../../fixtures/synthetic-qualification-v1.json"
+        ))
+        .unwrap();
+        let digest = validate_dataset(&bundle.examples, &bundle.provenance).unwrap();
+        assert_eq!(
+            digest,
+            "sha256:8a396c848873025e796833db4f3c20ba470a0ac98db6bb9e5dd7d94d58b62284"
+        );
+        assert_eq!(
+            bundle
+                .examples
+                .iter()
+                .map(|e| e.case_id.as_str())
+                .collect::<Vec<_>>(),
+            ["binary-001", "choice-001", "score-001", "rank-001"]
+        );
+        assert!(bundle.provenance.redistributable);
+        assert!(bundle.provenance.consent_scope.contains("synthetic-only"));
+    }
     fn row(i: usize) -> DatasetExample {
         DatasetExample {
             case_id: format!("case-{i}"),

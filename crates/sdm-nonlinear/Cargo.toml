@@ -15,3 +15,7 @@ thiserror.workspace = true
 [features]
 default = []
 training = []
+
+[[example]]
+name = "interaction_ablation"
+required-features = ["training"]

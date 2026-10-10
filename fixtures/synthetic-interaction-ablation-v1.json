@@ -1,0 +1,17 @@
+{
+  "protocol": "sdm-interaction-ablation-v1",
+  "seed": 20261010,
+  "learning_rate": 0.04,
+  "training_examples": 16,
+  "evaluation_examples": 16,
+  "frozen_examples_sha256": "sha256:3d0ecefba761ee616574149218ff0e43ebac33ef61fd1af80f4ffa246e1ecceb",
+  "target": "1 iff context token equals candidate token",
+  "capacities": [
+    {"hidden_units":4,"parameter_count":57,"updated_parameter_count":57,"utilization_fraction":1.0,"epochs":1200,"training_mse":1.1510172016834982e-10,"model_sha256":"sha256:7113aaad4e7d6c531b7b4ff710afdd2f95db7a7c7bb205fb1028030de98d13a4","frozen_examples":16,"accuracy_full_context":1.0,"accuracy_masked_context":0.75,"accuracy_permuted_context":0.625},
+    {"hidden_units":8,"parameter_count":113,"updated_parameter_count":113,"utilization_fraction":1.0,"epochs":1200,"training_mse":6.009754456778443e-11,"model_sha256":"sha256:b28ea1c07ed303cdccb56ebbba0ac01bfb3e77c27dbc1c6f30772ef5a032a585","frozen_examples":16,"accuracy_full_context":1.0,"accuracy_masked_context":0.75,"accuracy_permuted_context":0.625}
+  ],
+  "limitations": [
+    "synthetic mechanics only",
+    "same frozen examples used for SGD and ablation scoring; not held-out effectiveness evidence"
+  ]
+}

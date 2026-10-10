@@ -1,0 +1,17 @@
+{
+  "bundle_version": 1,
+  "dataset_id": "sdm-synthetic-qualification-v1",
+  "provenance": {
+    "source": "SDM hand-authored synthetic examples",
+    "license": "MIT",
+    "consent_scope": "synthetic-only; contains no user or provider data",
+    "label_lineage": "deterministic authored labels; not model-generated",
+    "redistributable": true
+  },
+  "examples": [
+    {"case_id":"binary-001","leakage_group":"binary-001","family":"binary","counterfactual_pair":null,"request":{"request_id":"r-binary-001","schema_version":1,"state":[],"spec":{"kind":"binary","question":"Is the synthetic flag enabled?"}},"label":{"kind":"binary","value":true}},
+    {"case_id":"choice-001","leakage_group":"choice-001","family":"choice","counterfactual_pair":null,"request":{"request_id":"r-choice-001","schema_version":1,"state":[],"spec":{"kind":"choice","question":"Select the authored answer","options":[{"id":"a","label":"Alpha"},{"id":"b","label":"Beta"}]}},"label":{"kind":"choice","value":"b"}},
+    {"case_id":"score-001","leakage_group":"score-001","family":"score","counterfactual_pair":null,"request":{"request_id":"r-score-001","schema_version":1,"state":[],"spec":{"kind":"score","rubric":"Synthetic bounded rating","minimum":0.0,"maximum":5.0}},"label":{"kind":"score","value":4.0}},
+    {"case_id":"rank-001","leakage_group":"rank-001","family":"rank","counterfactual_pair":null,"request":{"request_id":"r-rank-001","schema_version":1,"state":[],"spec":{"kind":"rank","instruction":"Rank synthetic candidates","multi_relevance":true,"candidates":[{"id":"x","label":"X","description":"first synthetic candidate"},{"id":"y","label":"Y","description":"second synthetic candidate"}]}},"label":{"kind":"rank","value":{"relevance":{"x":2.0,"y":0.0},"no_relevant":false}}}
+  ]
+}
