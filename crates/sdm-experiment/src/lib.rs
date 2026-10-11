@@ -832,7 +832,12 @@ fn train_typed_task(
                     bias += lr * error;
                     for (j, (w, x)) in weights.iter_mut().zip(x).enumerate() {
                         if !masked_coordinates.contains(&j) {
-                            *w += lr * (error * x - binary_l2_weight_decay * *w);
+                            if binary_l2_weight_decay == 0.0 {
+                                // Preserve the exact legacy update arithmetic for old configs.
+                                *w += lr * error * x;
+                            } else {
+                                *w += lr * (error * x - binary_l2_weight_decay * *w);
+                            }
                         }
                     }
                 }
