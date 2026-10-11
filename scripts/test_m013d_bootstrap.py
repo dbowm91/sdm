@@ -8,13 +8,16 @@ import json
 import math
 import random
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from m013b_evaluator import M013bInvalid, group_bootstrap, quantile  # noqa: E402
 from m013c_evaluator import grouped_bootstrap  # noqa: E402
+from m013d_provenance_audit import atomic_write_json  # noqa: E402
 
 
 def _statistic(rows):
@@ -173,6 +176,16 @@ class M013dQuantileTests(unittest.TestCase):
 
 
 class M013dProvenanceTests(unittest.TestCase):
+    def test_interrupted_audit_write_preserves_previous_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "audit.json"
+            path.write_text('{"accepted": "old"}\n')
+            with patch("m013d_provenance_audit.os.replace", side_effect=KeyboardInterrupt):
+                with self.assertRaises(KeyboardInterrupt):
+                    atomic_write_json(path, {"accepted": "new"})
+            self.assertEqual(path.read_text(), '{"accepted": "old"}\n')
+            self.assertEqual(list(path.parent.glob(".audit.json.*.tmp")), [])
+
     @unittest.skipUnless(
         (Path(__file__).resolve().parents[1] / "target/m013c/m013c-decision-audit.json").is_file(),
         "generated M013a/M013b/M013c sidecars are not present",
