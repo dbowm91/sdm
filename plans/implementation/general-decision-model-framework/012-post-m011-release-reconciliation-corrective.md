@@ -1,6 +1,6 @@
 # SDM M012 — Post-M011 Release and Branch Reconciliation Corrective
 
-Status: active (implementation and review handoff in progress; no merge, tag or publication)
+Status: conditionally closed (source/PR handoff complete; publication blocked pending human/legal sign-off)
 Class: corrective infrastructure / release readiness
 Baseline: dbowm91/sdm@f9ce89765a1cb07ce23100177d8f56c30e52777d
 Parent work line: work/plans-sdm-standalone-framework-m008-m011

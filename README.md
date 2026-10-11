@@ -92,7 +92,7 @@ Completed milestones: [M008](plans/closure/general-decision-model-framework/008-
 [M009](plans/closure/general-decision-model-framework/009-status.md),
 [M010 Binary/Choice/Score trainable model heads](plans/closure/general-decision-model-framework/010-status.md), and
 [M011 standalone held-out release qualification](plans/closure/general-decision-model-framework/011-status.md).
-**Next ready SDM handoff:** [M012 post-M011 release reconciliation](plans/implementation/general-decision-model-framework/012-post-m011-release-reconciliation-corrective.md) addresses package metadata, dependency-license documentation, source-branch/PR reconciliation and release review. The M001-M011 implementation remains on a work branch, not merged or published. M005 remains externally deferred until an approved CodeGG corpus and consumer-owned evidence exist.
+**M012 source/review handoff:** [M012 post-M011 release reconciliation](plans/closure/general-decision-model-framework/012-status.md) is conditionally closed with [PR #1](https://github.com/dbowm91/sdm/pull/1) open for review. The source integration remains unmerged and unpublished; crates.io publication is blocked pending human/legal license sign-off. M005 remains externally deferred until an approved CodeGG corpus and consumer-owned evidence exist.
 [ADR-0002](plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md)
 defers CodeGG-specific effectiveness (M005) until an approved independent corpus exists;
 **M008-M011 do not require CodeGG data or a CodeGG checkout**.

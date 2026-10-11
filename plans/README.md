@@ -2,7 +2,7 @@
 
 This directory follows the CodeGG planning and handoff convention as adapted in [003-planning-process.md](003-planning-process.md).
 
-**Start here:** [Registry](registry.md) -> [General decision-model framework roadmap](subsystems/general-decision-model-framework-roadmap.md) -> **[M012 post-M011 release reconciliation corrective](implementation/general-decision-model-framework/012-post-m011-release-reconciliation-corrective.md) (ready)**. CodeGG M005 remains externally deferred. The [framework boundary ADR](adrs/ADR-0001-general-framework-and-model-boundaries.md) governs the milestone plans.
+**Start here:** [Registry](registry.md) -> [General decision-model framework roadmap](subsystems/general-decision-model-framework-roadmap.md) -> **[M012 post-M011 release reconciliation corrective](implementation/general-decision-model-framework/012-post-m011-release-reconciliation-corrective.md) (conditionally closed)**. CodeGG M005 remains externally deferred. The [framework boundary ADR](adrs/ADR-0001-general-framework-and-model-boundaries.md) governs the milestone plans.
 
 ## Completed handoffs
 
@@ -23,7 +23,7 @@ All four milestones are SDM-owned, use explicitly provided synthetic data, prese
 
 ## Current corrective handoff
 
-**[M012 — post-M011 release reconciliation](implementation/general-decision-model-framework/012-post-m011-release-reconciliation-corrective.md)** is active. This plan is limited to reviewing the M001-M011 branch ancestry, source/PR integration, complete Cargo package metadata and package contents, dependency license/legal review gates, documentation/API compatibility, CI/MSRV/portability and a reviewed merge handoff. Publication, tagging, merging, model quality promotion and CodeGG pin updates require separate decisions. M012 closure evidence belongs in closure/general-decision-model-framework/012-status.md.
+**[M012 — post-M011 release reconciliation](implementation/general-decision-model-framework/012-post-m011-release-reconciliation-corrective.md)** is conditionally closed. The source and review handoff is complete; crates.io publication is blocked pending human/legal license review, and PR merge is pending human review. M012 closure evidence is in [closure/general-decision-model-framework/012-status.md](closure/general-decision-model-framework/012-status.md). No further implementation plan is currently eligible; M005 remains deferred on its independent CodeGG evidence gate.
 
 Research and predecessor evidence are recorded in [docs/general-framework-research-2026-10.md](../docs/general-framework-research-2026-10.md).
 

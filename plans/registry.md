@@ -1,6 +1,6 @@
 # SDM Planning Registry
 
-Status: M001-M011 evidence retained; M012 post-M011 release reconciliation corrective active (2026-10-11)
+Status: M001-M012 source evidence retained; M012 conditionally closed (2026-10-11); registry publication blocked pending human/legal sign-off
 Governance: plans/003-planning-process.md
 Current code baseline: main@8139b064bdcf3212e8f6fd912e801a479b55751c
 Accepted architecture: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md
@@ -12,7 +12,7 @@ States: proposed, ready, active, blocked, closing, closed, conditionally closed,
 
 | Subsystem | Status | Next handoff | Blockers |
 | --- | --- | --- | --- |
-| Standalone general decision-model framework | M001-M011 complete for mechanics; **M012 active** | M012 release reconciliation, packaging, license evidence and review PR | No CodeGG corpus required; release/publish/merge still requires independent review |
+| Standalone general decision-model framework | M001-M012 source/review handoff complete; **M012 conditionally closed** | No further eligible SDM implementation plan registered | Crates.io publication blocked pending human/legal license review; PR merge is pending human review |
 | CodeGG consumer-specific effectiveness (M005) | deferred / indeterminate | independent CodeGG-owned evidence, unscheduled | No approved corpus; does not block M008-M011 |
 
 ## Registered milestone plans
@@ -30,7 +30,7 @@ States: proposed, ready, active, blocked, closing, closed, conditionally closed,
 | M009 | closed | infrastructure/capability | plans/implementation/general-decision-model-framework/009-typed-feature-model-ingress.md | M008 accepted closure |
 | M010 | closed | capability | plans/implementation/general-decision-model-framework/010-generic-decision-task-heads.md | none; mechanics closure in plans/closure/general-decision-model-framework/010-status.md |
 | M011 | closed | capability/release infrastructure | plans/implementation/general-decision-model-framework/011-standalone-release-qualification.md | M008-M010 accepted closures; evidence in plans/closure/general-decision-model-framework/011-status.md |
-| M012 | **active** | corrective release infrastructure | plans/implementation/general-decision-model-framework/012-post-m011-release-reconciliation-corrective.md | M011 closure complete; legal review and merge/publish decisions are operational gates, not planning blockers |
+| M012 | **conditionally closed** | corrective release infrastructure | plans/implementation/general-decision-model-framework/012-post-m011-release-reconciliation-corrective.md | Source handoff complete; crates.io publication blocked pending human/legal license review; PR merge pending human review |
 
 ## Interface and operational dependencies
 
@@ -38,7 +38,7 @@ CodeGG pins SDM commit 8139b064bdcf3212e8f6fd912e801a479b55751c. Do not retarget
 
 ## Standalone successor handoff
 
-Accepted boundary: plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md. M008-M011 are closed in plans/closure/general-decision-model-framework/. All four are SDM-only and independent of the unavailable CodeGG corpus; no change to CodeGG's immutable SDM pin or production policy is authorized. M011 provides a reviewable release candidate, not automatic merge, publication or deployment. **M012 is the active ready corrective handoff** for branch/packaging/license/documentation/release preparation; it does not rewrite M011's positive, negative, or indeterminate model evidence. M005 continues to await an approved independent CodeGG corpus and consumer-owned evidence.
+Accepted boundary: plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md. M008-M011 are closed in plans/closure/general-decision-model-framework/. All four are SDM-only and independent of the unavailable CodeGG corpus; no change to CodeGG's immutable SDM pin or production policy is authorized. M011 provides a reviewable release candidate, not automatic merge, publication or deployment. **M012 is conditionally closed** with a source review handoff; crates.io publication is blocked pending human/legal license review. It does not rewrite M011's positive, negative, or indeterminate model evidence. M005 continues to await an approved independent CodeGG corpus and consumer-owned evidence.
 
 ## M012 release-reconciliation handoff controls
 
