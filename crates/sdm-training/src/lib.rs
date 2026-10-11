@@ -230,9 +230,12 @@ pub fn train(
         best.1
     };
     let model_hash = parameter_digest(bias, &weights);
+    // Bind learned parameters to the training partition only. The complete
+    // dataset digest is retained separately for reproducibility, but held-out
+    // labels must not influence the model artifact identity.
     let source_fingerprint = format!(
         "sha256:{:x}",
-        Sha256::digest(serde_json::to_vec(cases).unwrap())
+        Sha256::digest(serde_json::to_vec(&train_cases).unwrap())
     );
     let artifact = LinearArtifact {
         manifest: ArtifactManifest {
@@ -409,6 +412,38 @@ mod tests {
                 split(&case.leakage_group, 42)
             );
         }
+    }
+
+    #[test]
+    fn changing_only_test_labels_does_not_change_fitted_parameters_or_dev_threshold() {
+        let mut cases: Vec<_> = (0..100)
+            .map(|i| case(i, &format!("group-{i}"), i % 2 == 0))
+            .collect();
+        let (baseline, baseline_report) = train(&cases, 42, 3).unwrap();
+        let mut changed_test_labels = 0;
+        for row in &mut cases {
+            if split(&row.leakage_group, 42) >= 85 {
+                if let Some(DecisionAnswer::Rank { candidates }) = &mut row.response.answer {
+                    candidates[0].relevance = 1.0 - candidates[0].relevance;
+                    candidates[0].ranking_score = candidates[0].relevance;
+                    changed_test_labels += 1;
+                }
+            }
+        }
+        assert!(changed_test_labels > 0);
+        let (changed, changed_report) = train(&cases, 42, 3).unwrap();
+        assert_eq!(baseline.bias, changed.bias);
+        assert_eq!(baseline.weights, changed.weights);
+        assert_eq!(baseline.threshold, changed.threshold);
+        assert_eq!(
+            baseline.manifest.training_fingerprint,
+            changed.manifest.training_fingerprint
+        );
+        assert_eq!(
+            baseline.manifest.model_sha256,
+            changed.manifest.model_sha256
+        );
+        assert_eq!(baseline_report.threshold, changed_report.threshold);
     }
 
     #[test]

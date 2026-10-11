@@ -1,0 +1,21 @@
+[package]
+name = "sdm-data"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+homepage.workspace = true
+repository.workspace = true
+documentation = "https://docs.rs/sdm-data"
+description = "Provenance-aware decision datasets and deterministic leakage-safe splits for SDM."
+
+[dependencies]
+sdm-core = { path = "../sdm-core", version = "0.1.0" }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+
+[[bin]]
+name = "sdm-dataset"
+path = "src/bin/sdm-dataset.rs"

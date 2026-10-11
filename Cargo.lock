@@ -122,11 +122,62 @@ dependencies = [
 ]
 
 [[package]]
+name = "sdm-data"
+version = "0.1.0"
+dependencies = [
+ "sdm-core",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror",
+]
+
+[[package]]
+name = "sdm-eval"
+version = "0.1.0"
+dependencies = [
+ "sdm-core",
+ "sdm-data",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror",
+]
+
+[[package]]
+name = "sdm-experiment"
+version = "0.1.0"
+dependencies = [
+ "sdm-core",
+ "sdm-data",
+ "sdm-eval",
+ "sdm-nonlinear",
+ "sdm-runtime",
+ "sdm-training",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror",
+]
+
+[[package]]
+name = "sdm-nonlinear"
+version = "0.1.0"
+dependencies = [
+ "sdm-core",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror",
+]
+
+[[package]]
 name = "sdm-runtime"
 version = "0.1.0"
 dependencies = [
  "libc",
  "sdm-core",
+ "sdm-nonlinear",
  "serde",
  "serde_json",
  "sha2",

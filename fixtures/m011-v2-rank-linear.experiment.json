@@ -1,0 +1,17 @@
+{
+  "dataset_path": "fixtures/m011-v2-rank.json",
+  "split_path": "fixtures/m011-v2-rank.split.json",
+  "architecture": "linear",
+  "seed": 11012,
+  "epochs": 120,
+  "learning_rate": 0.2,
+  "artifact_path": "target/m011-v2/rank-linear.artifact.json",
+  "report_path": "target/m011-v2/rank-linear.report.json",
+  "provenance": {
+    "source": "SDM M011 synthetic generated suite v2",
+    "license": "MIT",
+    "consent_scope": "synthetic-only; no human or application data",
+    "label_lineage": "generator scripts/generate_m011_synthetic_suite.py; seed 11012; deterministic rank rule",
+    "redistributable": true
+  }
+}

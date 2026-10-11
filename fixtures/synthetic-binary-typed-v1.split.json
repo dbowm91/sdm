@@ -1,0 +1,49 @@
+{
+  "version": 3,
+  "dataset_sha256": "sha256:96d255fc752bef3c3ccee074bce93f5d5f65408ebd8b2150da9047d946a8bf84",
+  "seed": 73,
+  "train": [
+    "binary-001",
+    "binary-002",
+    "binary-003",
+    "binary-004",
+    "binary-005",
+    "binary-007",
+    "binary-008",
+    "binary-009",
+    "binary-010",
+    "binary-011",
+    "binary-012",
+    "binary-014",
+    "binary-015",
+    "binary-017",
+    "binary-018",
+    "binary-028",
+    "binary-039",
+    "binary-041",
+    "binary-049",
+    "binary-052",
+    "binary-060",
+    "binary-066",
+    "binary-068",
+    "binary-080",
+    "binary-081"
+  ],
+  "dev": [
+    "binary-036",
+    "binary-044",
+    "binary-063",
+    "binary-064",
+    "binary-070"
+  ],
+  "test": [
+    "binary-006",
+    "binary-013",
+    "binary-016",
+    "binary-021",
+    "binary-033",
+    "binary-047"
+  ],
+  "excluded": [],
+  "fingerprint": "sha256:916d32d34c5d747720b8a2bdd9afa630bb4100be501ec56fb37e300776d949bc"
+}

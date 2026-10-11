@@ -1,0 +1,4007 @@
+{
+  "provenance": {
+    "source": "SDM generated independent synthetic task mechanics corpus v1",
+    "license": "MIT",
+    "consent_scope": "synthetic-only; no human or application data",
+    "label_lineage": "deterministic formulas over generated typed fields",
+    "redistributable": true
+  },
+  "examples": [
+    {
+      "case_id": "score-001",
+      "leakage_group": "score-group-0",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-1",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 3.8
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 7.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-002",
+      "leakage_group": "score-group-1",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-2",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 2.2
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 3.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-003",
+      "leakage_group": "score-group-2",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-3",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 5.0
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 10.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-004",
+      "leakage_group": "score-group-3",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-4",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 3.4
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 6.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-005",
+      "leakage_group": "score-group-4",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-5",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 1.8
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 2.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-006",
+      "leakage_group": "score-group-5",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-6",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 4.6
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 9.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-007",
+      "leakage_group": "score-group-6",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-7",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 3.0
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 5.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-008",
+      "leakage_group": "score-group-7",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-8",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 1.4
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 1.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-009",
+      "leakage_group": "score-group-8",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-9",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 4.2
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 8.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-010",
+      "leakage_group": "score-group-9",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-10",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 2.6
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 4.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-011",
+      "leakage_group": "score-group-10",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-11",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 1.0
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 0.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-012",
+      "leakage_group": "score-group-11",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-12",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 3.8
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 7.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-013",
+      "leakage_group": "score-group-12",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-13",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 2.2
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 3.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-014",
+      "leakage_group": "score-group-13",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-14",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 5.0
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 10.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-015",
+      "leakage_group": "score-group-14",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-15",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 3.4
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 6.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-016",
+      "leakage_group": "score-group-15",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-16",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 1.8
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 2.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-019",
+      "leakage_group": "score-group-18",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-19",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 1.4
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 1.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-020",
+      "leakage_group": "score-group-19",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-20",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 4.2
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 8.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-034",
+      "leakage_group": "score-group-33",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-34",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 3.8
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 7.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-041",
+      "leakage_group": "score-group-40",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-41",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 1.4
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 1.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-042",
+      "leakage_group": "score-group-41",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-42",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 4.2
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 8.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-043",
+      "leakage_group": "score-group-42",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-43",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 2.6
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 4.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-044",
+      "leakage_group": "score-group-43",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-44",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 1.0
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 0.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-046",
+      "leakage_group": "score-group-45",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-46",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 2.2
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 3.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-050",
+      "leakage_group": "score-group-49",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-50",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 4.6
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 9.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-051",
+      "leakage_group": "score-group-50",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-51",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 3.0
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 5.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-052",
+      "leakage_group": "score-group-51",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-52",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 1.4
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 1.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-058",
+      "leakage_group": "score-group-57",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-58",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 5.0
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 10.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-065",
+      "leakage_group": "score-group-64",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-65",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 2.6
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 4.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-066",
+      "leakage_group": "score-group-65",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-66",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 1.0
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 0.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-067",
+      "leakage_group": "score-group-66",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-67",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 3.8
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 7.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-068",
+      "leakage_group": "score-group-67",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-68",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 2.2
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 3.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-074",
+      "leakage_group": "score-group-73",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-74",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 1.4
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 1.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-091",
+      "leakage_group": "score-group-90",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-91",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 5.0
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 10.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-097",
+      "leakage_group": "score-group-96",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-97",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 4.2
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 8.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    },
+    {
+      "case_id": "score-102",
+      "leakage_group": "score-group-101",
+      "family": "synthetic-score",
+      "counterfactual_pair": null,
+      "request": {
+        "request_id": "score-102",
+        "schema_version": 1,
+        "state": [],
+        "spec": {
+          "kind": "score",
+          "rubric": "score capacity",
+          "minimum": 1.0,
+          "maximum": 5.0
+        }
+      },
+      "label": {
+        "kind": "score",
+        "value": 5.0
+      },
+      "typed_rank_features": {
+        "schema": {
+          "version": 2,
+          "fields": [
+            {
+              "id": "active",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "available",
+              "value_type": "boolean",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "load",
+              "value_type": "number",
+              "required": true,
+              "categories": []
+            },
+            {
+              "id": "note",
+              "value_type": "text",
+              "required": false,
+              "categories": []
+            },
+            {
+              "id": "task_kind",
+              "value_type": "category",
+              "required": true,
+              "categories": [
+                "binary",
+                "choice",
+                "no",
+                "score",
+                "yes"
+              ]
+            }
+          ]
+        },
+        "context": {
+          "schema_version": 2,
+          "schema_sha256": "sha256:59123e22e6204a039ab984e06ac2bb8f822dc6271f75bc4dc0cb5cb887a24457",
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 10.0
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "capacity record"
+              }
+            },
+            {
+              "id": "task_kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "score"
+              }
+            }
+          ]
+        },
+        "candidates": {}
+      }
+    }
+  ]
+}

@@ -7,7 +7,7 @@ projection, disclosure, capture consent, and causal-frontier behavior stay in Co
 ## Repository policy
 
 - License: MIT, preserving the Anomalyco copyright notice from the CodeGG source.
-- Initial visibility: private.
+- Visibility: public; immutable full-SHA downstream consumption remains the release policy.
 - Consumption/release policy: downstream projects pin an immutable full Git commit
   SHA. Branch names and floating tags are not runtime dependencies. A source revision
   is usable only after CI and the CodeGG compatibility fixture command pass.
@@ -20,11 +20,24 @@ projection, disclosure, capture consent, and causal-frontier behavior stay in Co
   dependency on `sdm-training`.
 - `sdm-training`: generic decision-case dataset validation, deterministic group
   splitting, model fitting, dev-only threshold selection, and test evaluation.
+- `sdm-data`: provenance-bearing labels and frozen leakage-aware group splits.
+- `sdm-eval`: algorithm-neutral semantic metrics and preregistered offline reports.
+- `sdm-nonlinear`: optional bounded nonlinear CPU scorer and deterministic local SGD.
+- `sdm-experiment`: explicit-input Rank orchestration, frozen-split training,
+  dev-only threshold selection, runtime reload and held-out reporting.
 
-Initial runtime architecture is a sparse binary relevance model applied independently
-to Rank candidates. The semantic core supports Binary, Choice, Score, and Rank; the
-first trainer/runtime artifact supports Rank and returns explicit Unsupported for the
-other semantics. Multiple relevant Rank candidates remain independent labels.
+Publication-facing package metadata is set per crate with the verified
+repository/homepage and crate-specific docs.rs destinations. The checked-in
+[standalone quickstart](docs/standalone-quickstart.md) covers the experiment,
+packaged consumer boundary, compatibility and quality limits. The locked
+[third-party inventory](docs/third-party-license-inventory.json) is metadata
+evidence only; see its [review status](docs/third-party-licenses.md) before any
+registry distribution.
+
+Legacy linear and pairwise Rank artifacts remain supported. Additive typed artifact
+versions also serve Binary, Choice, Score, and typed Rank heads. Multiple relevant
+Rank candidates remain independent labels. Applications still own policy, authority,
+and abstention handling.
 
 ## Build and qualify
 
@@ -65,3 +78,54 @@ See [`docs/extraction-inventory.md`](docs/extraction-inventory.md),
 [`docs/artifact-format.md`](docs/artifact-format.md), and
 [`docs/reproducibility.md`](docs/reproducibility.md), plus the
 [`docs/benchmark-baseline.md`](docs/benchmark-baseline.md) runtime snapshot.
+
+
+## Planning record (October 2026)
+
+SDM M001-M007 historical implementation and qualification outcomes are available in
+[the planning registry](plans/registry.md) and
+[closure records](plans/closure/general-decision-model-framework/).
+The standalone framework successor work completed M008 through M011. Historical
+conditional closures and the external M005 gate remain visible in the registry.
+
+Completed milestones: [M008](plans/closure/general-decision-model-framework/008-status.md),
+[M009](plans/closure/general-decision-model-framework/009-status.md),
+[M010 Binary/Choice/Score trainable model heads](plans/closure/general-decision-model-framework/010-status.md), and
+[M011 standalone held-out release qualification](plans/closure/general-decision-model-framework/011-status.md).
+**M012 source/review handoff:** [M012 post-M011 release reconciliation](plans/closure/general-decision-model-framework/012-status.md) is conditionally closed with [PR #1](https://github.com/dbowm91/sdm/pull/1) open for review. The source integration remains unmerged and unpublished; crates.io publication is blocked pending human/legal license sign-off. M005 remains externally deferred until an approved CodeGG corpus and consumer-owned evidence exist.
+[ADR-0002](plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md)
+defers CodeGG-specific effectiveness (M005) until an approved independent corpus exists;
+**M008-M011 do not require CodeGG data or a CodeGG checkout**.
+
+Run the reproducible standalone Rank examples with:
+
+```sh
+mkdir -p target/experiments
+cargo run -p sdm-experiment --locked -- experiment run --config fixtures/standalone-rank-linear.experiment.json
+cargo run -p sdm-experiment --locked -- experiment run --config fixtures/standalone-rank-nonlinear.experiment.json
+cargo run -p sdm-experiment --locked -- experiment run --config fixtures/standalone-typed-rank.experiment.json
+cargo run -p sdm-experiment --locked -- experiment run --config fixtures/synthetic-binary-typed-v1.experiment.json
+cargo run -p sdm-experiment --locked -- experiment run --config fixtures/synthetic-choice-typed-v1.experiment.json
+cargo run -p sdm-experiment --locked -- experiment run --config fixtures/synthetic-score-typed-v1.experiment.json
+```
+
+These configs use redistributable synthetic corpora and frozen group splits. The
+M008/M009 Rank corpus has 36 examples; M011 adds fresh 400-example-per-task suites
+with counterfactual pairs, held-out-family exclusions, and a test-only shifted family. Results establish mechanics
+only and make no real-world quality claim. The CLI reads only named paths and refuses to overwrite
+artifact/report outputs. Legacy `sdm-train`, `sdm-dataset`, and `sdm-qualify`
+commands remain available. The typed Rank path demonstrates train-only numeric
+scaling and text vocabulary, declared categories, boolean inputs, and runtime
+schema checks. Binary, Choice, and Score have separate bounded typed heads and
+task-specific metrics. Their synthetic runs establish pipeline mechanics only;
+no CodeGG model is promoted.
+
+Task feature, abstention, and artifact behavior is described in
+[`docs/typed-task-heads.md`](docs/typed-task-heads.md).
+M011's preregistered protocol is in
+[`docs/release-qualification-protocol.md`](docs/release-qualification-protocol.md),
+with local and hosted synthetic outcomes in [`docs/m011-local-results.md`](docs/m011-local-results.md)
+and the numbered closure record in
+[`plans/closure/general-decision-model-framework/011-status.md`](plans/closure/general-decision-model-framework/011-status.md).
+A separate consumer crate can be compiled with
+`cargo check --manifest-path examples/standalone-consumer/Cargo.toml --locked`.

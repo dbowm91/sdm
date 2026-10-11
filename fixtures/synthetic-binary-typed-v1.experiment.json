@@ -1,0 +1,17 @@
+{
+  "dataset_path": "fixtures/synthetic-binary-typed-v1.json",
+  "split_path": "fixtures/synthetic-binary-typed-v1.split.json",
+  "architecture": "typed-binary",
+  "seed": 73,
+  "epochs": 120,
+  "learning_rate": 0.2,
+  "artifact_path": "target/experiments/binary.artifact.json",
+  "report_path": "target/experiments/binary.report.json",
+  "provenance": {
+    "source": "SDM generated independent synthetic task mechanics corpus v1",
+    "license": "MIT",
+    "consent_scope": "synthetic-only; no human or application data",
+    "label_lineage": "deterministic formulas over generated typed fields",
+    "redistributable": true
+  }
+}

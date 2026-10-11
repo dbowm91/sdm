@@ -1,0 +1,49 @@
+{
+  "version": 3,
+  "dataset_sha256": "sha256:cca3bf5231db7042c735a642208444e8cbe9827d68c80aa6e9a69727ba78f8f1",
+  "seed": 73,
+  "train": [
+    "score-001",
+    "score-002",
+    "score-003",
+    "score-004",
+    "score-005",
+    "score-006",
+    "score-007",
+    "score-009",
+    "score-010",
+    "score-011",
+    "score-012",
+    "score-013",
+    "score-014",
+    "score-016",
+    "score-019",
+    "score-042",
+    "score-043",
+    "score-044",
+    "score-046",
+    "score-051",
+    "score-052",
+    "score-065",
+    "score-066",
+    "score-074",
+    "score-091",
+    "score-102"
+  ],
+  "dev": [
+    "score-008",
+    "score-034",
+    "score-050",
+    "score-058",
+    "score-067"
+  ],
+  "test": [
+    "score-015",
+    "score-020",
+    "score-041",
+    "score-068",
+    "score-097"
+  ],
+  "excluded": [],
+  "fingerprint": "sha256:60741f6182a206ee3b18c445c1b7a74c788d8773cdc100b1f0fec02ef7eff3ac"
+}

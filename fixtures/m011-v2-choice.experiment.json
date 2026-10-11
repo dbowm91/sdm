@@ -1,0 +1,17 @@
+{
+  "dataset_path": "fixtures/m011-v2-choice.json",
+  "split_path": "fixtures/m011-v2-choice.split.json",
+  "architecture": "typed-choice",
+  "seed": 11012,
+  "epochs": 120,
+  "learning_rate": 0.2,
+  "artifact_path": "target/m011-v2/choice.artifact.json",
+  "report_path": "target/m011-v2/choice.report.json",
+  "provenance": {
+    "source": "SDM M011 synthetic generated suite v2",
+    "license": "MIT",
+    "consent_scope": "synthetic-only; no human or application data",
+    "label_lineage": "generator scripts/generate_m011_synthetic_suite.py; seed 11012; deterministic choice rule",
+    "redistributable": true
+  }
+}

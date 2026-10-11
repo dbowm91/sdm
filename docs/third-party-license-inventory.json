@@ -1,0 +1,317 @@
+{
+  "limitations": [
+    "Does not inspect package source or license text.",
+    "Does not prove the declared SPDX expression is accurate.",
+    "Does not establish legal compatibility or satisfy notice obligations."
+  ],
+  "package_count": 34,
+  "packages": [
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "async-trait",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.1.92"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "block-buffer",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.10.4"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "cfg-if",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "1.0.5"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "cpufeatures",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.2.17"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "crypto-common",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.1.7"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "digest",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.10.7"
+    },
+    {
+      "license": "MIT",
+      "license_file": null,
+      "name": "generic-array",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.14.7"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "itoa",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "1.0.18"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "libc",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.2.190"
+    },
+    {
+      "license": "Unlicense OR MIT",
+      "license_file": null,
+      "name": "memchr",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "2.8.3"
+    },
+    {
+      "license": "Apache-2.0 OR MIT",
+      "license_file": null,
+      "name": "pin-project-lite",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.2.17"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "proc-macro2",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "1.0.107"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "quote",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "1.0.47"
+    },
+    {
+      "license": "MIT",
+      "license_file": null,
+      "name": "sdm-core",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "workspace",
+      "version": "0.1.0"
+    },
+    {
+      "license": "MIT",
+      "license_file": null,
+      "name": "sdm-data",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "workspace",
+      "version": "0.1.0"
+    },
+    {
+      "license": "MIT",
+      "license_file": null,
+      "name": "sdm-eval",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "workspace",
+      "version": "0.1.0"
+    },
+    {
+      "license": "MIT",
+      "license_file": null,
+      "name": "sdm-experiment",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "workspace",
+      "version": "0.1.0"
+    },
+    {
+      "license": "MIT",
+      "license_file": null,
+      "name": "sdm-nonlinear",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "workspace",
+      "version": "0.1.0"
+    },
+    {
+      "license": "MIT",
+      "license_file": null,
+      "name": "sdm-runtime",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "workspace",
+      "version": "0.1.0"
+    },
+    {
+      "license": "MIT",
+      "license_file": null,
+      "name": "sdm-training",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "workspace",
+      "version": "0.1.0"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "serde",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "1.0.229"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "serde_core",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "1.0.229"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "serde_derive",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "1.0.229"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "serde_json",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "1.0.151"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "sha2",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.10.9"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "syn",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "3.0.6"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "thiserror",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "2.0.21"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "thiserror-impl",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "2.0.21"
+    },
+    {
+      "license": "MIT",
+      "license_file": null,
+      "name": "tokio",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "1.53.2"
+    },
+    {
+      "license": "MIT",
+      "license_file": null,
+      "name": "tokio-macros",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "2.7.2"
+    },
+    {
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "name": "typenum",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "1.20.1"
+    },
+    {
+      "license": "(MIT OR Apache-2.0) AND Unicode-3.0",
+      "license_file": null,
+      "name": "unicode-ident",
+      "selected_branch": "MIT AND Unicode-3.0",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "1.0.26"
+    },
+    {
+      "license": "MIT/Apache-2.0",
+      "license_file": null,
+      "name": "version_check",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.9.5"
+    },
+    {
+      "license": "MIT",
+      "license_file": null,
+      "name": "zmij",
+      "selected_branch": "MIT",
+      "selection": "MIT branch selected by SDM policy",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "1.0.23"
+    }
+  ],
+  "policy": "SPDX metadata only; MIT is selected from OR expressions when offered. Human/legal review remains required before registry distribution."
+}
