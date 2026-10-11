@@ -1,8 +1,8 @@
 # SDM Planning Registry
 
-Status: M001-M012 evidence retained; M013 and M013a conditionally closed with invalid/negative/indeterminate quality evidence; registry publication blocked pending human/legal sign-off
+Status: M013b ready (planning only), M013/M013a conditionally closed with negative/indeterminate evidence; crates.io publication separately gated on human/legal sign-off
 Governance: plans/003-planning-process.md
-Current planning baseline: main@2bd0d5af16d143828dcbce77f411b8f3b675e7be
+Current planning baseline: work/plans-sdm-m013-predictive-quality-corrective@694da1a002cf29c62724be6ba881240f43aac9c2 (main remains 2bd0d5af16d143828dcbce77f411b8f3b675e7be)
 Accepted architecture: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md
 
@@ -12,7 +12,7 @@ States: proposed, ready, active, blocked, closing, closed, conditionally closed,
 
 | Subsystem | Status | Next handoff | Blockers |
 | --- | --- | --- | --- |
-| Standalone general decision-model framework | M012 source merged; **M013 and M013a conditionally closed** | no registered eligible implementation plan | M013 invalid suite; M013a Binary negative / Choice indeterminate; crates.io remains separately blocked on human/legal sign-off |
+| Standalone general decision-model framework | M013/M013a conditionally closed; **M013b ready** | M013b evaluation-gate integrity and failure diagnostics | Current unmerged M013 source, Binary negative/Choice indeterminate; crates.io publication remains a separate gate |
 | CodeGG consumer-specific effectiveness (M005) | deferred / indeterminate | independent CodeGG-owned evidence, unscheduled | No approved corpus; does not block M008-M011 |
 
 ## Registered milestone plans
@@ -32,7 +32,7 @@ States: proposed, ready, active, blocked, closing, closed, conditionally closed,
 | M011 | closed | capability/release infrastructure | plans/implementation/general-decision-model-framework/011-standalone-release-qualification.md | M008-M010 accepted closures; evidence in plans/closure/general-decision-model-framework/011-status.md |
 | M012 | **conditionally closed** (PR #1 merged) | corrective release infrastructure | plans/implementation/general-decision-model-framework/012-post-m011-release-reconciliation-corrective.md | Source merged; crates.io publication blocked pending human/legal license review |
 | M013 | **conditionally closed** | capability / evidence corrective | plans/implementation/general-decision-model-framework/013-predictive-quality-corrective-and-independent-qualification.md | Bounded Choice cross architecture implemented; original prospective corpus invalid; see 013-status.md |
-| M013a | **conditionally closed** | evidence corrective | plans/implementation/general-decision-model-framework/013a-independent-quality-suite-integrity-rerun.md | Valid independent suite; negative Binary result, indeterminate Choice and three under-supported Choice OOD accuracy slices in plans/closure/general-decision-model-framework/013a-status.md |
+| M013a | **conditionally closed** | evidence corrective | plans/implementation/general-decision-model-framework/013a-independent-quality-suite-integrity-rerun.md | Valid independent suite; negative Binary result, indeterminate Choice and three under-supported Choice OOD accuracy slices in plans/closure/general-decision-model-framework/013a-status.md |\n| M013b | **ready** | infrastructure / evaluation-integrity corrective | plans/implementation/general-decision-model-framework/013b-evaluation-gates-and-failure-diagnostics.md | M013/M013a conditionally closed on predecessor branch; no CodeGG corpus or new held-out data required |
 
 ## Interface and operational dependencies
 
@@ -42,7 +42,7 @@ CodeGG historically pins SDM commit 8139b064bdcf3212e8f6fd912e801a479b55751c per
 
 Accepted boundary: plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md. M008-M011 are closed in plans/closure/general-decision-model-framework/. All four are SDM-only and independent of the unavailable CodeGG corpus; no change to CodeGG's immutable SDM pin or production policy is authorized. M011 provides a reviewable release candidate, not automatic merge, publication or deployment. **M012 remains conditionally closed** for release/publication qualification, but its source PR #1 is now merged into main. Crates.io publication is blocked pending human/legal license review. **M013 and M013a are conditionally closed**; see their closure records for the invalid M013 suite and M013a's valid negative/indeterminate evidence. These milestones do not rewrite M011's positive, negative, or indeterminate model evidence. M005 continues to await an approved independent CodeGG corpus and consumer-owned evidence.
 
-## M013 quality-corrective handoff controls
+## M013b corrective handoff\n\nNext ready plan: plans/implementation/general-decision-model-framework/013b-evaluation-gates-and-failure-diagnostics.md. Planning branch: work/plans-sdm-m013b-quality-gates-diagnostics; source predecessor work/plans-sdm-m013-predictive-quality-corrective@694da1a002cf29c62724be6ba881240f43aac9c2. Scope: fix counterfactual fixed-option responsiveness and mandatory positive-quality gates, add old-report erratum and dev-only Binary/Choice diagnostics. No new qualifying held-out experiment is authorized in M013b. Source integration remains unmerged and requires a separately reviewed PR. Closure: plans/closure/general-decision-model-framework/013b-status.md.\n\n## M013 quality-corrective handoff controls
 
 M013 implementation and original corpus freeze are at `c56f442fae14ede38fd1cd6e0eccf61315df96da`; closure evidence is `plans/closure/general-decision-model-framework/013-status.md`. Preserve its reports only as invalid diagnostics. M013a froze new data and protocol at `4768716d97cc58ea338d8099bfe09a1e57d0d8f9` before one-time held-out inference; see `plans/closure/general-decision-model-framework/013a-status.md` for exact evidence. No M013 or M013a result promotes a model or lifts the crates.io legal gate.
 

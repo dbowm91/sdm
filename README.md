@@ -133,3 +133,7 @@ A separate consumer crate can be compiled with
 ## Predictive-quality corrective
 
 [M013 predictive-quality corrective](plans/implementation/general-decision-model-framework/013-predictive-quality-corrective-and-independent-qualification.md) added the bounded `sdm-typed-choice-cross-v1` architecture while preserving the legacy diagonal head. Its first prospective corpus failed paired integrity and OOD-split checks. A separately frozen [M013a integrity rerun](plans/implementation/general-decision-model-framework/013a-independent-quality-suite-integrity-rerun.md) found negative Binary text/combined-shift results and indeterminate Choice results; three OOD Choice accuracy slices also lacked preregistered answerable-group support. No learned model is qualified or promoted. CodeGG M005 remains deferred on an approved corpus.
+
+## M013b evaluator-integrity handoff (ready; not yet implemented)
+
+[M013b evaluation-gates and failure-diagnostics corrective](plans/implementation/general-decision-model-framework/013b-evaluation-gates-and-failure-diagnostics.md) is registered ready on a successor planning branch. It repairs counterfactual score-identity reporting and fail-closed positive-quality gates, and uses train/dev-only evidence to investigate Binary text-shift and Choice abstention/selection errors. The [audit](docs/m013b-evaluation-audit.md) preserves unchanged historical negative/indeterminate evidence; no new model is qualified. M013/M013a source is still outside main; publishing and CodeGG promotion remain separate decisions.
