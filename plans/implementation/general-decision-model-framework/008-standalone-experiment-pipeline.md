@@ -1,6 +1,6 @@
 # SDM M008 — Standalone Reproducible Rank Experiment Pipeline
 
-Status: ready
+Status: closed; see plans/closure/general-decision-model-framework/008-status.md
 Class: capability/infrastructure
 Baseline: 319a05805f3a8383574d0d0712ca5975d16546ff
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md
