@@ -130,6 +130,6 @@ and the numbered closure record in
 A separate consumer crate can be compiled with
 `cargo check --manifest-path examples/standalone-consumer/Cargo.toml --locked`.
 
-## Next implementation: M013 (planned, not landed)
+## Predictive-quality corrective
 
-[M013 predictive-quality corrective](plans/implementation/general-decision-model-framework/013-predictive-quality-corrective-and-independent-qualification.md) is registered ready on a planning work branch. It targets the known negative Binary OOD quality and Choice counterfactual/abstention failures with independent prospectively frozen synthetic evidence. No learned model is qualified or promoted by this planning-only registration. CodeGG M005 remains deferred on an approved corpus.
+[M013 predictive-quality corrective](plans/implementation/general-decision-model-framework/013-predictive-quality-corrective-and-independent-qualification.md) added the bounded `sdm-typed-choice-cross-v1` architecture while preserving the legacy diagonal head. Its first prospective corpus failed a one-factor counterfactual integrity check: paired members varied load as well as active. The M013 outputs are preserved only as invalid diagnostics. A separately frozen [M013a integrity rerun](plans/implementation/general-decision-model-framework/013a-independent-quality-suite-integrity-rerun.md) uses new groups and a new seed; no learned model is qualified or promoted. CodeGG M005 remains deferred on an approved corpus.

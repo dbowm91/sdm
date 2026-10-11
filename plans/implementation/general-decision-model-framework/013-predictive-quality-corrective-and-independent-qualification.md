@@ -1,6 +1,6 @@
 # SDM M013 — Predictive-Quality Corrective and Independent Qualification
 
-Status: ready (planning only; no implementation or model promotion performed)
+Status: conditionally closed (bounded architecture implemented; M013 quality evidence invalidated; fresh qualification delegated to M013a)
 Class: capability / evidence corrective
 Planning baseline: dbowm91/sdm@2bd0d5af16d143828dcbce77f411b8f3b675e7be; implementation agent must re-audit HEAD and main CI
 Work branch: work/plans-sdm-m013-predictive-quality-corrective

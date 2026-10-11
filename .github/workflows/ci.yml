@@ -68,6 +68,23 @@ jobs:
           cargo metadata --locked --format-version 1 > target/m011-v2/cargo-metadata.json
           python3 scripts/audit_cargo_licenses.py target/m011-v2/cargo-metadata.json target/m011-v2/license-audit.json
           python3 scripts/analyze_m011_qualification.py
+      - name: Preserve exact M011 report identities on Linux x86_64
+        if: matrix.name == 'linux-x64'
+        run: python3 scripts/check_m011_frozen_reports.py
+      - name: Freeze and qualify M013a independent quality suites
+        run: |
+          mkdir -p target/m013a
+          python3 scripts/generate_m013a_quality_suite.py
+          git diff --exit-code -- fixtures/m013a-binary-v1.json fixtures/m013a-choice-v1.json
+          cargo run -q -p sdm-data --bin sdm-dataset --locked -- split fixtures/m013a-binary-v1.json 14014 target/m013a/binary.split.json --test-family m013a-binary-load-shift-v1 --test-family m013a-binary-text-shift-v1 --test-family m013a-binary-combined-shift-v1
+          cargo run -q -p sdm-data --bin sdm-dataset --locked -- split fixtures/m013a-choice-v1.json 14014 target/m013a/choice.split.json --test-family m013a-choice-load-shift-v1 --test-family m013a-choice-text-shift-v1 --test-family m013a-choice-combined-shift-v1
+          cmp fixtures/m013a-binary-v1.split.json target/m013a/binary.split.json
+          cmp fixtures/m013a-choice-v1.split.json target/m013a/choice.split.json
+          python3 scripts/validate_m013a_freeze.py > target/m013a/freeze-validation.stdout.json
+          cargo run -q -p sdm-experiment --locked -- experiment run --config fixtures/m013a-binary-v1.experiment.json > target/m013a/binary.stdout.json
+          cargo run -q -p sdm-experiment --locked -- experiment run --config fixtures/m013a-choice-legacy-v1.experiment.json > target/m013a/choice-legacy.stdout.json
+          cargo run -q -p sdm-experiment --locked -- experiment run --config fixtures/m013a-choice-cross-v1.experiment.json > target/m013a/choice-cross.stdout.json
+          python3 scripts/analyze_m013a_quality.py > target/m013a/quality-analysis.stdout.json
       - name: Capture runtime benchmark
         run: cargo run -p sdm-runtime --example benchmark -- fixtures/benchmark-rank-request.json artifacts/compatibility-rank-v1.json > benchmark-${{ matrix.name }}.json
       - name: Capture nonlinear runtime benchmark
@@ -92,6 +109,7 @@ jobs:
             nonlinear-benchmark-${{ matrix.name }}.json
             target/experiments/
             target/m011-v2/
+            target/m013a/
   portability:
     needs: verify
     strategy:
@@ -117,3 +135,30 @@ jobs:
         with:
           name: trained-artifact-portability-${{ matrix.name }}
           path: trained-artifact-portability-${{ matrix.name }}.json
+  choice-portability:
+    needs: verify
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            name: linux-x64
+          - os: ubuntu-24.04-arm
+            name: linux-arm64
+          - os: macos-15
+            name: macos-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Record host and toolchain
+        run: uname -a && rustc -Vv
+      - uses: actions/download-artifact@v4
+        with:
+          name: benchmark-linux-x64
+          path: shared-trained-artifact
+      - name: Benchmark identical trained Choice cross artifact
+        run: cargo run -p sdm-runtime --example benchmark_typed_choice --locked -- shared-trained-artifact/target/m013a/choice-cross.artifact.json fixtures/m013a-choice-v1.json > typed-choice-portability-${{ matrix.name }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: typed-choice-portability-${{ matrix.name }}
+          path: typed-choice-portability-${{ matrix.name }}.json

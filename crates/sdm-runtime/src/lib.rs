@@ -467,7 +467,7 @@ struct TypedTaskPayload {
     #[serde(default)]
     answerability_bias: Option<f64>,
     training_fingerprint: String,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     choice_cross_pairs: Option<Vec<(usize, usize)>>,
 }
 #[derive(Debug, Clone)]
@@ -1175,11 +1175,9 @@ pub fn load_artifact(bytes: &[u8]) -> Result<LoadedArtifact, RuntimeError> {
             Ok(LoadedArtifact::TypedRankV2(TypedRankRuntime::from_bytes(
                 bytes,
             )?))
-        } else if envelope.architecture == "sdm-typed-task-v1" {
-            Ok(LoadedArtifact::TypedTaskV2(TypedTaskRuntime::from_bytes(
-                bytes,
-            )?))
-        } else if envelope.architecture == "sdm-typed-choice-cross-v1" {
+        } else if ["sdm-typed-task-v1", "sdm-typed-choice-cross-v1"]
+            .contains(&envelope.architecture.as_str())
+        {
             Ok(LoadedArtifact::TypedTaskV2(TypedTaskRuntime::from_bytes(
                 bytes,
             )?))
@@ -1367,6 +1365,214 @@ pub fn validate_artifact(a: &LinearArtifact) -> Result<(), RuntimeError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn choice_runtime_fixture() -> (
+        TypedTaskRuntime,
+        DecisionRequest,
+        sdm_core::TypedRankProjectionV2,
+    ) {
+        use sdm_core::{
+            FeatureField, FeatureProjectionV2, FeatureSchemaField, FeatureSchemaV2, FeatureType,
+            FeatureValue, TypedRankProjectionV2,
+        };
+        let schema = FeatureSchemaV2 {
+            version: 2,
+            fields: vec![
+                FeatureSchemaField {
+                    id: "active".into(),
+                    value_type: FeatureType::Boolean,
+                    required: true,
+                    categories: vec![],
+                },
+                FeatureSchemaField {
+                    id: "role".into(),
+                    value_type: FeatureType::Category,
+                    required: true,
+                    categories: vec!["no".into(), "yes".into()],
+                },
+            ],
+        };
+        let projection = |active, role: &str| FeatureProjectionV2 {
+            schema_version: 2,
+            schema_sha256: schema.fingerprint().unwrap(),
+            fields: vec![
+                FeatureField {
+                    id: "active".into(),
+                    required: true,
+                    value: Some(FeatureValue::Boolean(active)),
+                },
+                FeatureField {
+                    id: "role".into(),
+                    required: true,
+                    value: Some(FeatureValue::Category(role.into())),
+                },
+            ],
+        };
+        let encoder = sdm_core::FittedFeatureEncoderV2::fit(
+            &schema,
+            &[projection(true, "yes"), projection(true, "no")],
+        )
+        .unwrap();
+        let request = DecisionRequest {
+            request_id: "cross-test".into(),
+            schema_version: 1,
+            state: vec![],
+            spec: DecisionSpec::Choice {
+                question: "select".into(),
+                options: vec![
+                    sdm_core::DecisionOption {
+                        id: "alpha".into(),
+                        label: "first".into(),
+                    },
+                    sdm_core::DecisionOption {
+                        id: "beta".into(),
+                        label: "second".into(),
+                    },
+                ],
+            },
+        };
+        let features = TypedRankProjectionV2 {
+            schema: schema.clone(),
+            context: projection(true, "no"),
+            candidates: BTreeMap::from([
+                ("alpha".into(), projection(true, "no")),
+                ("beta".into(), projection(true, "yes")),
+            ]),
+        };
+        let env = ArtifactEnvelopeV2::for_typed_choice_cross(
+            &encoder,
+            vec![0., 0., 0., 0., 0., 0., -1., 1.],
+            0.,
+            vec![0., 0., 0.],
+            10.,
+            vec![(0, 1), (0, 2)],
+            0.,
+            "sha256:test",
+            "train",
+            "cross-test",
+            2,
+        )
+        .unwrap();
+        let runtime = TypedTaskRuntime::from_bytes(&serde_json::to_vec(&env).unwrap()).unwrap();
+        (runtime, request, features)
+    }
+
+    #[test]
+    fn bounded_choice_cross_roundtrips_reorders_and_preserves_candidate_ids() {
+        let (runtime, request, features) = choice_runtime_fixture();
+        let logits = runtime.choice_logits(&request, &features).unwrap();
+        assert!(logits[1] > logits[0]);
+        let probs = runtime.choice_probabilities(&request, &features).unwrap();
+        assert!(probs[1] > probs[0]);
+        let response = runtime.decide_typed(&request, &features).unwrap();
+        assert!(
+            matches!(response.answer,Some(DecisionAnswer::Choice{option_id,..}) if option_id=="beta")
+        );
+        let mut reversed = request.clone();
+        if let DecisionSpec::Choice { options, .. } = &mut reversed.spec {
+            options.reverse();
+        }
+        let reordered = runtime.choice_probabilities(&reversed, &features).unwrap();
+        assert_eq!(reordered[0], probs[1]);
+        assert_eq!(reordered[1], probs[0]);
+        let mut relabeled = features.clone();
+        let alpha = relabeled.candidates.remove("alpha").unwrap();
+        let beta = relabeled.candidates.remove("beta").unwrap();
+        relabeled.candidates.insert("option-x".into(), alpha);
+        relabeled.candidates.insert("option-y".into(), beta);
+        if let DecisionSpec::Choice { options, .. } = &mut reversed.spec {
+            options[0].id = "option-y".into();
+            options[1].id = "option-x".into();
+        }
+        assert_eq!(
+            runtime.choice_probabilities(&reversed, &relabeled).unwrap(),
+            reordered
+        );
+        assert!(
+            runtime
+                .choice_answerability_probability(&request, &features)
+                .unwrap()
+                > 0.99
+        );
+    }
+
+    #[test]
+    fn choice_cross_contract_rejects_bad_pair_shapes_and_keeps_legacy_payload_shape() {
+        let schema = sdm_core::FeatureSchemaV2 {
+            version: 2,
+            fields: vec![sdm_core::FeatureSchemaField {
+                id: "active".into(),
+                value_type: sdm_core::FeatureType::Boolean,
+                required: true,
+                categories: vec![],
+            }],
+        };
+        let projection = sdm_core::FeatureProjectionV2 {
+            schema_version: 2,
+            schema_sha256: schema.fingerprint().unwrap(),
+            fields: vec![sdm_core::FeatureField {
+                id: "active".into(),
+                required: true,
+                value: Some(sdm_core::FeatureValue::Boolean(true)),
+            }],
+        };
+        let encoder = sdm_core::FittedFeatureEncoderV2::fit(&schema, &[projection]).unwrap();
+        let args = || {
+            (
+                encoder.clone(),
+                vec![0.; 3],
+                0.,
+                vec![0.],
+                0.,
+                0.0,
+                "dev",
+                "train",
+                "m",
+                2,
+            )
+        };
+        let (e, w, b, aw, ab, t, d, train, id, cap) = args();
+        assert!(ArtifactEnvelopeV2::for_typed_choice_cross(
+            &e,
+            w,
+            b,
+            aw,
+            ab,
+            vec![(0, 0), (0, 0)],
+            t,
+            d,
+            train,
+            id,
+            cap
+        )
+        .is_err());
+        let (e, w, b, aw, ab, t, d, train, id, cap) = args();
+        assert!(ArtifactEnvelopeV2::for_typed_choice_cross(
+            &e,
+            w,
+            b,
+            aw,
+            ab,
+            vec![(0, 1)],
+            t,
+            d,
+            train,
+            id,
+            cap
+        )
+        .is_err());
+        let payload = TypedTaskPayload {
+            task: "choice".into(),
+            encoder,
+            weights: vec![0.; 3],
+            bias: 0.,
+            answerability_weights: Some(vec![0.]),
+            answerability_bias: Some(0.),
+            training_fingerprint: "train".into(),
+            choice_cross_pairs: None,
+        };
+        let json = serde_json::to_value(payload).unwrap();
+        assert!(json.get("choice_cross_pairs").is_none());
+    }
     #[test]
     fn v2_envelope_checks_payload_and_loads_as_explicitly_unsupported() {
         let payload = vec![1, 2, 3];

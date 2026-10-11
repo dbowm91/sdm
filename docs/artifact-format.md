@@ -37,3 +37,12 @@ Typed `FeatureSchemaV2` and `FeatureProjectionV2` live in `sdm-core`. Schema
 fingerprints use canonical JSON ordering by feature ID and category. Missing required
 values, type mismatches, unknown IDs, non-finite numbers and category violations fail
 validation. The original v1 textual state projection and artifact remain unchanged.
+
+Typed task v2 registers `sdm-typed-task-v1` for Binary, legacy diagonal Choice,
+and Score. `sdm-typed-choice-cross-v1` is an additive Choice-only architecture:
+its payload binds the same fitted encoder and schema fingerprint and includes an
+explicit bounded list of context/option coordinate pairs. It has a hard 4,096
+cross-term cap and excludes text-vocabulary coordinates. Architecture dispatch
+preserves the old 3*D diagonal Choice loader and inference behavior. An enabled
+quality diagnostic report can record pre-threshold logits and probabilities
+without changing the serialized default M011 report format.

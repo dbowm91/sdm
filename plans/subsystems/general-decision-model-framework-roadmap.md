@@ -1,6 +1,6 @@
 # General Decision-Model Framework and First Consumer Roadmap
 
-Status: M012 merged; M013 ready for implementation; M005 externally deferred; crates.io publication gated
+Status: M012 merged; M013 conditionally closed with invalid corpus evidence; M013a ready for a new independent integrity rerun; M005 externally deferred; crates.io publication gated
 Audit baseline: dbowm91/sdm@8139b064bdcf3212e8f6fd912e801a479b55751c (2026-10-05)
 Planning date: 2026-10-10
 Primary decisions: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md; plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md
@@ -103,7 +103,7 @@ Complete train/package/infer/evaluate paths for every declared semantic family u
 Class: capability/release infrastructure. Status: closed; evidence: plans/closure/general-decision-model-framework/011-status.md. Plan: plans/implementation/general-decision-model-framework/011-standalone-release-qualification.md.
 Frozen held-out suites, positive/negative/indeterminate gates, the same trained artifact on three targets, Rust 1.89, independent consumer compilation, documentation, dependency/license metadata and package verification are recorded. Binary OOD evidence is negative; Choice quality and some OOD slices are indeterminate. This is a mechanics/release candidate only and does not qualify CodeGG or auto-publish.
 
-Dependency graph: M008 -> M009 -> M010 -> M011 -> M012 source integration is complete; M012 publication qualification remains conditional on human/legal license review. PR #1 is merged. M013 follows on the independent model-quality line, not CodeGG M005. Existing milestones retain numbered closure evidence and registry state. CodeGG M005 remains deferred on a separate external gate.
+Dependency graph: M008 -> M009 -> M010 -> M011 -> M012 source integration is complete; M012 publication qualification remains conditional on human/legal license review. PR #1 is merged. M013 implemented the additive Choice cross architecture but its first independent suite was invalid: paired rows changed load as well as active, and declared OOD families were excluded rather than tested. M013a follows with a new seed, new group membership, pair-integrity assertions, corrected family holds, and a frozen protocol before any new test inference. Existing M011 evidence remains unchanged. CodeGG M005 remains deferred on a separate external gate.
 
 ### M012 — Release and branch reconciliation corrective
 Class: corrective infrastructure/release readiness. Status: **conditionally closed**.
@@ -114,15 +114,19 @@ Retain the synthetic predictive limitations reported by M011, notably negative B
 Required closure: plans/closure/general-decision-model-framework/012-status.md, including PR URL/state, exact source/head/merge-base, CI logs, package inventory and license-review disposition. A publication blocker can remain when a reviewed source PR is ready; the two decisions must be stated separately.
 
 ### M013 — Binary/Choice predictive-quality corrective and independent qualification
-Class: capability/evidence corrective. Status: **ready**, planning only.
+Class: capability/evidence corrective. Status: **conditionally closed**; evidence in plans/closure/general-decision-model-framework/013-status.md.
 Plan: plans/implementation/general-decision-model-framework/013-predictive-quality-corrective-and-independent-qualification.md.
 Research: docs/m013-quality-diagnostic-baseline.md.
 Planning source baseline: main@2bd0d5af16d143828dcbce77f411b8f3b675e7be; M011 closure and M012 merged source are hard predecessors.
 External dependencies: none for standalone work; no approved CodeGG corpus required.
 
-Resolve model-quality failures without weakening integrity gates: prove or disprove the diagonal Choice interaction representability hypothesis, measure raw scores versus abstained decisions, isolate Binary load/text nuisance sensitivity under constant label rules, and implement only bounded versioned backward-compatible model/feature corrections justified by observed mechanisms. Freeze independent M013 synthetic groups, ID and distinct OOD shifts, no-answer slices and counterfactuals, with preregistered clustered uncertainty and baseline comparisons before FINAL inference. Preserve M011 negative/indeterminate records unchanged. Completion records mechanical and predictive verdicts separately and cannot promote CodeGG models or authorize crates.io publication.
+The diagonal Choice representability failure was demonstrated and repaired with additive `sdm-typed-choice-cross-v1`, retaining the legacy 3*D Choice artifact path. M013's prospective corpus failed counterfactual integrity because load differed within active-flip pairs. Its split also passed OOD families to both `--exclude-family` and `--test-family`; exclusion takes precedence, leaving OOD rows out of test. The M013 held-out quality outcome is therefore invalid and not used for selection. No Binary repair or predictive-quality claim is accepted. M011 negative/indeterminate records remain unchanged; closure does not promote CodeGG models or authorize crates.io publication.
 
-M013 -> possible later M014 architecture comparison is a soft successor only. M005 remains independent, deferred, and is not a gate on M013.
+### M013a — Independent quality-suite integrity rerun
+Class: evidence corrective. Status: **ready**. Plan: plans/implementation/general-decision-model-framework/013a-independent-quality-suite-integrity-rerun.md.
+Use a new deterministic generator seed, IDs, groups and split. Verify all paired inputs are identical except active and target, place OOD family holdouts in test without overlapping exclusions, and confirm support before final inference. Keep the candidate set fixed to legacy/cross Choice and current Binary with the preregistered configuration. No M013 held-out output is training or selection evidence. Closure captures each task's honest positive/negative/indeterminate outcome; passing synthetic tests do not establish real-world effectiveness.
+
+M013a -> possible later M014 generalized architecture comparison is a soft successor only. M005 remains independent, deferred, and is not a gate on M013a.
 
 ## 7. Cross-cutting requirements
 

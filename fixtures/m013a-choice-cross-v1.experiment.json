@@ -1,0 +1,19 @@
+{
+  "dataset_path": "fixtures/m013a-choice-v1.json",
+  "split_path": "fixtures/m013a-choice-v1.split.json",
+  "architecture": "typed-choice-cross",
+  "seed": 14014,
+  "epochs": 120,
+  "learning_rate": 0.2,
+  "artifact_path": "target/m013a/choice-cross.artifact.json",
+  "report_path": "target/m013a/choice-cross.report.json",
+  "provenance": {
+    "source": "SDM M013a deterministic synthetic quality suite v1",
+    "license": "MIT",
+    "consent_scope": "synthetic-only; no human or application data",
+    "label_lineage": "scripts/generate_m013a_quality_suite.py; seed 14014; rule and nuisance family definitions are versioned here",
+    "redistributable": true
+  },
+  "quality_diagnostics": true,
+  "seeded_epoch_order": true
+}

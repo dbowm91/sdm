@@ -28,6 +28,10 @@ pub struct ExperimentSpec {
     pub artifact_path: String,
     pub report_path: String,
     pub provenance: Provenance,
+    #[serde(default)]
+    pub quality_diagnostics: bool,
+    #[serde(default)]
+    pub seeded_epoch_order: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -79,7 +83,16 @@ pub struct SemanticExperimentRunManifest {
     pub metrics: SemanticMetrics,
     pub abstentions: usize,
     pub outcomes: Vec<SemanticCaseOutcome>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub training_curve: Vec<TrainingEpochLoss>,
     pub verdict: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TrainingEpochLoss {
+    pub epoch: usize,
+    pub train_loss: f64,
+    pub dev_loss: f64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -89,14 +102,20 @@ pub struct SemanticCaseOutcome {
     pub target: serde_json::Value,
     pub prediction: serde_json::Value,
     pub score: Option<f64>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub raw_probabilities: Option<Vec<f64>>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub raw_logits: Option<Vec<f64>>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub answerability_probability: Option<f64>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub nuisance_probabilities: Option<BTreeMap<String, f64>>,
+    #[serde(default, skip_serializing_if = "is_false")]
     pub abstained: bool,
+}
+
+fn is_false(value: &bool) -> bool {
+    !value
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -481,52 +500,6 @@ fn semantic_task(architecture: &str) -> Option<&'static str> {
         _ => None,
     }
 }
-fn typed_task_vector(
-    encoder: &sdm_core::FittedFeatureEncoderV2,
-    example: &DatasetExample,
-    item: Option<&str>,
-    task: &str,
-    cross_pairs: Option<&[(usize, usize)]>,
-) -> Result<Vec<f64>, ExperimentError> {
-    let binding = example
-        .typed_rank_features
-        .as_ref()
-        .ok_or_else(|| ExperimentError::Invalid("typed features missing".into()))?;
-    let context = encoder
-        .encode(&binding.context)
-        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
-    let Some(id) = item else {
-        let mut v = context.clone();
-        v.resize(
-            if task == "choice" && cross_pairs.is_none() {
-                context.len() * 3
-            } else {
-                context.len() * 2 + cross_pairs.map_or(0, |p| p.len())
-            },
-            0.0,
-        );
-        return Ok(v);
-    };
-    let candidate =
-        encoder
-            .encode(binding.candidates.get(id).ok_or_else(|| {
-                ExperimentError::Invalid("typed option projection missing".into())
-            })?)
-            .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
-    let mut vector = context
-        .iter()
-        .copied()
-        .chain(candidate.iter().copied())
-        .collect::<Vec<_>>();
-    if task == "choice" {
-        if let Some(pairs) = cross_pairs {
-            vector.extend(pairs.iter().map(|(c, o)| context[*c] * candidate[*o]));
-        } else {
-            vector.extend(context.iter().zip(&candidate).map(|(a, b)| a * b));
-        }
-    }
-    Ok(vector)
-}
 fn sigmoid(z: f64) -> f64 {
     1.0 / (1.0 + (-z).exp())
 }
@@ -538,8 +511,173 @@ type TypedTaskModel = (
     Option<f64>,
     f64,
     Option<Vec<(usize, usize)>>,
+    Vec<TrainingEpochLoss>,
 );
 
+struct PreparedTypedExample {
+    context: Vec<f64>,
+    standalone: Vec<f64>,
+    options: Vec<Vec<f64>>,
+}
+
+fn prepare_typed_examples(
+    encoder: &sdm_core::FittedFeatureEncoderV2,
+    examples: &[&DatasetExample],
+    task: &str,
+    choice_cross: bool,
+    cross_pairs: &[(usize, usize)],
+) -> Result<Vec<PreparedTypedExample>, ExperimentError> {
+    examples
+        .iter()
+        .map(|e| {
+            let binding = e
+                .typed_rank_features
+                .as_ref()
+                .ok_or_else(|| ExperimentError::Invalid("typed features missing".into()))?;
+            let context = encoder
+                .encode(&binding.context)
+                .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+            let mut standalone = context.clone();
+            standalone.resize(
+                if task == "choice" && !choice_cross {
+                    context.len() * 3
+                } else {
+                    context.len() * 2 + if choice_cross { cross_pairs.len() } else { 0 }
+                },
+                0.0,
+            );
+            let options = if task == "choice" {
+                let sdm_core::DecisionSpec::Choice { options, .. } = &e.request.spec else {
+                    return Err(ExperimentError::Invalid(
+                        "Choice request missing options".into(),
+                    ));
+                };
+                options
+                    .iter()
+                    .map(|o| {
+                        let item = encoder
+                            .encode(binding.candidates.get(&o.id).ok_or_else(|| {
+                                ExperimentError::Invalid("typed option projection missing".into())
+                            })?)
+                            .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                        let mut vector = context
+                            .iter()
+                            .copied()
+                            .chain(item.iter().copied())
+                            .collect::<Vec<_>>();
+                        if choice_cross {
+                            vector.extend(cross_pairs.iter().map(|(c, o)| context[*c] * item[*o]));
+                        } else {
+                            vector.extend(context.iter().zip(&item).map(|(c, o)| c * o));
+                        }
+                        Ok(vector)
+                    })
+                    .collect::<Result<Vec<_>, ExperimentError>>()?
+            } else {
+                Vec::new()
+            };
+            Ok(PreparedTypedExample {
+                context,
+                standalone,
+                options,
+            })
+        })
+        .collect()
+}
+
+fn binary_log_loss(y: f64, p: f64) -> f64 {
+    let p = p.clamp(1e-15, 1.0 - 1e-15);
+    -y * p.ln() - (1.0 - y) * (1.0 - p).ln()
+}
+
+fn training_order(length: usize, seed: u64, epoch: usize, shuffled: bool) -> Vec<usize> {
+    let mut order: Vec<usize> = (0..length).collect();
+    if shuffled {
+        let mut state = seed ^ (epoch as u64).wrapping_mul(0x9e3779b97f4a7c15);
+        for i in (1..order.len()).rev() {
+            state = state.wrapping_add(0x9e3779b97f4a7c15);
+            let mut z = state;
+            z = (z ^ (z >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
+            z = (z ^ (z >> 27)).wrapping_mul(0x94d049bb133111eb);
+            z ^= z >> 31;
+            order.swap(i, (z as usize) % (i + 1));
+        }
+    }
+    order
+}
+
+fn typed_task_loss(
+    examples: &[&DatasetExample],
+    prepared: &[PreparedTypedExample],
+    task: &str,
+    weights: &[f64],
+    bias: f64,
+    answerability_weights: Option<&[f64]>,
+    answerability_bias: Option<f64>,
+) -> f64 {
+    if examples.is_empty() {
+        return 0.0;
+    }
+    let mut loss = 0.0;
+    for (e, x) in examples.iter().zip(prepared) {
+        match (&e.label, task) {
+            (TargetLabel::Binary(y), "binary") => {
+                let z = x
+                    .standalone
+                    .iter()
+                    .zip(weights)
+                    .map(|(a, b)| a * b)
+                    .sum::<f64>()
+                    + bias;
+                loss += binary_log_loss(f64::from(*y), sigmoid(z));
+            }
+            (TargetLabel::Choice(target), "choice") => {
+                let aw = answerability_weights.expect("Choice answerability head");
+                let p = sigmoid(
+                    x.context.iter().zip(aw).map(|(a, b)| a * b).sum::<f64>()
+                        + answerability_bias.unwrap_or(0.0),
+                );
+                loss += binary_log_loss(f64::from(target.is_some()), p);
+                if let Some(target) = target {
+                    let sdm_core::DecisionSpec::Choice { options, .. } = &e.request.spec else {
+                        unreachable!()
+                    };
+                    let scores = x
+                        .options
+                        .iter()
+                        .map(|v| v.iter().zip(weights).map(|(a, b)| a * b).sum::<f64>() + bias)
+                        .collect::<Vec<_>>();
+                    let max = scores.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+                    let lse = max + scores.iter().map(|s| (s - max).exp()).sum::<f64>().ln();
+                    if let Some(i) = options.iter().position(|o| o.id == *target) {
+                        loss += lse - scores[i];
+                    }
+                }
+            }
+            (TargetLabel::Score(y), "score") => {
+                let sdm_core::DecisionSpec::Score {
+                    minimum, maximum, ..
+                } = &e.request.spec
+                else {
+                    unreachable!()
+                };
+                let target = (*y - *minimum) / (*maximum - *minimum);
+                let z = x
+                    .standalone
+                    .iter()
+                    .zip(weights)
+                    .map(|(a, b)| a * b)
+                    .sum::<f64>()
+                    + bias;
+                loss += binary_log_loss(target, sigmoid(z));
+            }
+            _ => {}
+        }
+    }
+    loss / examples.len() as f64
+}
+
+#[allow(clippy::too_many_arguments)]
 fn train_typed_task(
     train: &[&DatasetExample],
     dev: &[&DatasetExample],
@@ -548,6 +686,8 @@ fn train_typed_task(
     epochs: usize,
     lr: f64,
     choice_cross: bool,
+    seeded_epoch_order: bool,
+    quality_diagnostics: bool,
 ) -> Result<TypedTaskModel, ExperimentError> {
     let first = train
         .first()
@@ -595,11 +735,17 @@ fn train_typed_task(
     let mut bias = 0.0;
     let mut answerability_weights = (task == "choice").then(|| vec![0.0; input_dim]);
     let mut answerability_bias = (task == "choice").then_some(0.0);
-    for _ in 0..epochs {
-        for e in train {
+    let train_prepared = prepare_typed_examples(&encoder, train, task, choice_cross, &cross_pairs)?;
+    let dev_prepared = prepare_typed_examples(&encoder, dev, task, choice_cross, &cross_pairs)?;
+    let mut training_curve = Vec::new();
+    for epoch in 0..epochs {
+        let order = training_order(train.len(), seed, epoch, seeded_epoch_order);
+        for index in order {
+            let e = train[index];
+            let prepared = &train_prepared[index];
             match (&e.label, &e.request.spec) {
                 (TargetLabel::Binary(y), sdm_core::DecisionSpec::Binary { .. }) => {
-                    let x = typed_task_vector(&encoder, e, None, task, None)?;
+                    let x = &prepared.standalone;
                     let p = sigmoid(x.iter().zip(&weights).map(|(a, b)| a * b).sum::<f64>() + bias);
                     let error = f64::from(*y) - p;
                     bias += lr * error;
@@ -610,9 +756,7 @@ fn train_typed_task(
                 (TargetLabel::Choice(target), sdm_core::DecisionSpec::Choice { options, .. })
                     if task == "choice" =>
                 {
-                    let context = encoder
-                        .encode(&e.typed_rank_features.as_ref().unwrap().context)
-                        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                    let context = &prepared.context;
                     let ans_w = answerability_weights.as_mut().unwrap();
                     let ans_b = answerability_bias.as_mut().unwrap();
                     let p_answerable = sigmoid(
@@ -625,24 +769,13 @@ fn train_typed_task(
                     );
                     let answer_error = f64::from(target.is_some()) - p_answerable;
                     *ans_b += lr * answer_error;
-                    for (w, x) in ans_w.iter_mut().zip(&context) {
+                    for (w, x) in ans_w.iter_mut().zip(context.iter()) {
                         *w += lr * answer_error * x;
                     }
                     if target.is_none() {
                         continue;
                     }
-                    let xs = options
-                        .iter()
-                        .map(|o| {
-                            typed_task_vector(
-                                &encoder,
-                                e,
-                                Some(&o.id),
-                                task,
-                                choice_cross.then_some(cross_pairs.as_slice()),
-                            )
-                        })
-                        .collect::<Result<Vec<_>, _>>()?;
+                    let xs = &prepared.options;
                     let scores: Vec<_> = xs
                         .iter()
                         .map(|x| x.iter().zip(&weights).map(|(a, b)| a * b).sum::<f64>() + bias)
@@ -673,7 +806,7 @@ fn train_typed_task(
                         minimum, maximum, ..
                     },
                 ) => {
-                    let x = typed_task_vector(&encoder, e, None, task, None)?;
+                    let x = &prepared.standalone;
                     let target = (*y - *minimum) / (*maximum - *minimum);
                     let z = x.iter().zip(&weights).map(|(a, b)| a * b).sum::<f64>() + bias;
                     let p = sigmoid(z);
@@ -690,21 +823,43 @@ fn train_typed_task(
                 }
             }
         }
+        if quality_diagnostics {
+            training_curve.push(TrainingEpochLoss {
+                epoch: epoch + 1,
+                train_loss: typed_task_loss(
+                    train,
+                    &train_prepared,
+                    task,
+                    &weights,
+                    bias,
+                    answerability_weights.as_deref(),
+                    answerability_bias,
+                ),
+                dev_loss: typed_task_loss(
+                    dev,
+                    &dev_prepared,
+                    task,
+                    &weights,
+                    bias,
+                    answerability_weights.as_deref(),
+                    answerability_bias,
+                ),
+            });
+        }
     }
     let mut obs = Vec::new();
-    for e in dev {
+    for (dev_index, e) in dev.iter().enumerate() {
+        let prepared = &dev_prepared[dev_index];
         match (&e.label, &e.request.spec) {
             (TargetLabel::Binary(y), sdm_core::DecisionSpec::Binary { .. }) if task == "binary" => {
-                let x = typed_task_vector(&encoder, e, None, task, None)?;
+                let x = &prepared.standalone;
                 let p = sigmoid(x.iter().zip(&weights).map(|(a, b)| a * b).sum::<f64>() + bias);
                 obs.push((p.max(1.0 - p), (p >= 0.5) == *y));
             }
             (TargetLabel::Choice(target), sdm_core::DecisionSpec::Choice { .. })
                 if task == "choice" =>
             {
-                let context = encoder
-                    .encode(&e.typed_rank_features.as_ref().unwrap().context)
-                    .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                let context = &prepared.context;
                 let confidence = sigmoid(
                     context
                         .iter()
@@ -738,7 +893,6 @@ fn train_typed_task(
             threshold = threshold.max((max_no_answer + 0.01).min(1.0));
         }
     }
-    let _ = seed;
     Ok((
         encoder,
         weights,
@@ -751,6 +905,7 @@ fn train_typed_task(
         } else {
             None
         },
+        training_curve,
     ))
 }
 
@@ -846,16 +1001,26 @@ pub fn run_semantic(
             ));
         }
     }
-    let (encoder, weights, bias, answerability_weights, answerability_bias, threshold, cross_pairs) =
-        train_typed_task(
-            &train,
-            &dev,
-            task,
-            spec.seed,
-            spec.epochs,
-            spec.learning_rate,
-            choice_cross,
-        )?;
+    let (
+        encoder,
+        weights,
+        bias,
+        answerability_weights,
+        answerability_bias,
+        threshold,
+        cross_pairs,
+        training_curve,
+    ) = train_typed_task(
+        &train,
+        &dev,
+        task,
+        spec.seed,
+        spec.epochs,
+        spec.learning_rate,
+        choice_cross,
+        spec.seeded_epoch_order,
+        spec.quality_diagnostics,
+    )?;
     let train_id = digest(&train.to_vec())?;
     let envelope = if let Some(pairs) = cross_pairs {
         sdm_runtime::ArtifactEnvelopeV2::for_typed_choice_cross(
@@ -919,16 +1084,48 @@ pub fn run_semantic(
                         .binary_probability(&e.request, b)
                         .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
                     probabilities.push(probs);
+                    let was_abstained = r.answer.is_none();
+                    let nuisance_probabilities = if spec.quality_diagnostics {
+                        let base = e.typed_rank_features.as_ref().unwrap();
+                        let mut results = BTreeMap::new();
+                        for shift in ["load", "text", "combined"] {
+                            let mut changed = base.clone();
+                            for field in &mut changed.context.fields {
+                                if field.id == "load" && matches!(shift, "load" | "combined") {
+                                    field.value = Some(sdm_core::FeatureValue::Number(20.0));
+                                }
+                                if field.id == "note" && matches!(shift, "text" | "combined") {
+                                    field.value = Some(sdm_core::FeatureValue::Text(
+                                        "quartz nebula unseen".into(),
+                                    ));
+                                }
+                            }
+                            results.insert(
+                                shift.into(),
+                                runtime
+                                    .binary_probability(&e.request, &changed)
+                                    .map_err(|e| ExperimentError::Invalid(e.to_string()))?,
+                            );
+                        }
+                        Some(results)
+                    } else {
+                        None
+                    };
                     outcomes.push(SemanticCaseOutcome {
                         case_id: e.case_id.clone(),
                         leakage_group: e.leakage_group.clone(),
                         target: serde_json::json!(y),
-                        prediction: serde_json::json!(probs >= 0.5),
+                        prediction: if spec.quality_diagnostics && was_abstained {
+                            serde_json::Value::Null
+                        } else {
+                            serde_json::json!(probs >= 0.5)
+                        },
                         score: Some(probs),
-                        raw_probabilities: Some(vec![probs]),
+                        raw_probabilities: spec.quality_diagnostics.then_some(vec![probs]),
                         raw_logits: None,
                         answerability_probability: None,
-                        abstained: r.answer.is_none(),
+                        nuisance_probabilities,
+                        abstained: spec.quality_diagnostics && was_abstained,
                     });
                 }
                 SemanticMetrics::Binary(
@@ -963,15 +1160,33 @@ pub fn run_semantic(
                                 .map_err(|e| ExperimentError::Invalid(e.to_string()))?,
                         );
                     }
-                    let raw_probs = runtime
-                        .choice_probabilities(&e.request, b)
-                        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
-                    let raw_logits = runtime
-                        .choice_logits(&e.request, b)
-                        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
-                    let answerability = runtime
-                        .choice_answerability_probability(&e.request, b)
-                        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                    let raw_probs = if spec.quality_diagnostics {
+                        Some(
+                            runtime
+                                .choice_probabilities(&e.request, b)
+                                .map_err(|e| ExperimentError::Invalid(e.to_string()))?,
+                        )
+                    } else {
+                        None
+                    };
+                    let raw_logits = if spec.quality_diagnostics {
+                        Some(
+                            runtime
+                                .choice_logits(&e.request, b)
+                                .map_err(|e| ExperimentError::Invalid(e.to_string()))?,
+                        )
+                    } else {
+                        None
+                    };
+                    let answerability = if spec.quality_diagnostics {
+                        Some(
+                            runtime
+                                .choice_answerability_probability(&e.request, b)
+                                .map_err(|e| ExperimentError::Invalid(e.to_string()))?,
+                        )
+                    } else {
+                        None
+                    };
                     let abstained = r.answer.is_none();
                     let predicted = match r.answer {
                         Some(sdm_core::DecisionAnswer::Choice { option_id, .. }) => {
@@ -985,10 +1200,11 @@ pub fn run_semantic(
                         target: serde_json::json!(target),
                         prediction: predicted,
                         score: None,
-                        raw_probabilities: Some(raw_probs),
-                        raw_logits: Some(raw_logits),
-                        answerability_probability: Some(answerability),
-                        abstained,
+                        raw_probabilities: raw_probs,
+                        raw_logits,
+                        answerability_probability: answerability,
+                        nuisance_probabilities: None,
+                        abstained: spec.quality_diagnostics && abstained,
                     });
                 }
                 SemanticMetrics::Choice(
@@ -1034,6 +1250,7 @@ pub fn run_semantic(
                             raw_probabilities: None,
                             raw_logits: None,
                             answerability_probability: None,
+                            nuisance_probabilities: None,
                             abstained: false,
                         });
                     } else {
@@ -1047,6 +1264,7 @@ pub fn run_semantic(
                             raw_probabilities: None,
                             raw_logits: None,
                             answerability_probability: None,
+                            nuisance_probabilities: None,
                             abstained: true,
                         });
                     }
@@ -1080,18 +1298,33 @@ pub fn run_semantic(
         metrics,
         abstentions,
         outcomes,
+        training_curve,
         verdict: "synthetic-mechanics-only".into(),
     };
-    report.report_sha256 = digest(&(
-        &report.dataset_sha256,
-        &report.split_fingerprint,
-        &report.semantic,
-        &report.model_sha256,
-        &report.calibration_sha256,
-        &report.metrics,
-        &report.abstentions,
-        &report.outcomes,
-    ))?;
+    report.report_sha256 = if report.training_curve.is_empty() {
+        digest(&(
+            &report.dataset_sha256,
+            &report.split_fingerprint,
+            &report.semantic,
+            &report.model_sha256,
+            &report.calibration_sha256,
+            &report.metrics,
+            &report.abstentions,
+            &report.outcomes,
+        ))?
+    } else {
+        digest(&(
+            &report.dataset_sha256,
+            &report.split_fingerprint,
+            &report.semantic,
+            &report.model_sha256,
+            &report.calibration_sha256,
+            &report.metrics,
+            &report.abstentions,
+            &report.outcomes,
+            &report.training_curve,
+        ))?
+    };
     atomic_write(&spec.artifact_path, &artifact)?;
     atomic_write(&spec.report_path, &serde_json::to_vec_pretty(&report)?)?;
     Ok(report)
@@ -1339,6 +1572,8 @@ mod tests {
                 .display()
                 .to_string(),
             provenance,
+            quality_diagnostics: false,
+            seeded_epoch_order: false,
         }
     }
     fn temp_root() -> std::path::PathBuf {
@@ -1354,6 +1589,73 @@ mod tests {
         ));
         fs::create_dir_all(&p).unwrap();
         p
+    }
+    #[test]
+    fn seeded_epoch_order_is_repeatable_and_manifest_order_is_legacy_default() {
+        let ordered = training_order(20, 14014, 0, false);
+        assert_eq!(ordered, (0..20).collect::<Vec<_>>());
+        let a = training_order(20, 14014, 3, true);
+        assert_eq!(a, training_order(20, 14014, 3, true));
+        assert_ne!(a, training_order(20, 14015, 3, true));
+        assert_ne!(a, training_order(20, 14014, 4, true));
+    }
+    #[test]
+    fn opt_in_quality_reports_include_loss_curves_final_decisions_and_nuisance_probes() {
+        let root = temp_root();
+        for task in ["binary", "choice"] {
+            let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../fixtures");
+            let dataset = dir
+                .join(format!("synthetic-{task}-typed-v1.json"))
+                .display()
+                .to_string();
+            let split = dir
+                .join(format!("synthetic-{task}-typed-v1.split.json"))
+                .display()
+                .to_string();
+            let raw: serde_json::Value = serde_json::from_str(if task == "binary" {
+                include_str!("../../../fixtures/synthetic-binary-typed-v1.json")
+            } else {
+                include_str!("../../../fixtures/synthetic-choice-typed-v1.json")
+            })
+            .unwrap();
+            let provenance: Provenance = serde_json::from_value(raw["provenance"].clone()).unwrap();
+            let mut cfg = spec(
+                &root,
+                &format!("typed-{task}"),
+                &dataset,
+                &split,
+                task,
+                provenance,
+            );
+            cfg.epochs = 2;
+            cfg.quality_diagnostics = true;
+            cfg.seeded_epoch_order = true;
+            let report = run_semantic(&cfg).unwrap();
+            assert_eq!(report.training_curve.len(), 2);
+            assert!(report
+                .training_curve
+                .iter()
+                .all(|row| row.train_loss.is_finite() && row.dev_loss.is_finite()));
+            assert!(report
+                .outcomes
+                .iter()
+                .all(|row| row.raw_probabilities.is_some()));
+            if task == "binary" {
+                assert!(report.outcomes.iter().all(|row| row
+                    .nuisance_probabilities
+                    .as_ref()
+                    .is_some_and(|m| m.len() == 3)));
+            } else {
+                assert!(
+                    report
+                        .outcomes
+                        .iter()
+                        .all(|row| row.raw_logits.is_some()
+                            && row.answerability_probability.is_some())
+                );
+            }
+        }
+        fs::remove_dir_all(root).unwrap();
     }
     #[test]
     fn diagonal_choice_head_cannot_represent_active_candidate_kind_flip() {

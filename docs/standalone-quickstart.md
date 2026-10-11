@@ -23,6 +23,13 @@ Repeat with the Choice, Score, or Rank configs listed in the repository
 [README](../README.md#build-and-qualify). These checked-in datasets are
 synthetic mechanics examples.
 
+For a fresh Choice comparison, `typed-choice` selects the historical diagonal
+head, while `typed-choice-cross` uses the bounded declared cross-coordinate
+contract. M013a configs opt in to per-case logits, conditional option
+probabilities, answerability, actual runtime selection, and abstention with
+`quality_diagnostics: true`. Outputs remain mechanics-only; consult the frozen
+M013a protocol and status before interpreting its held-out comparisons.
+
 ## Load an artifact
 
 The public runtime validates bounded local artifact bytes and the caller's

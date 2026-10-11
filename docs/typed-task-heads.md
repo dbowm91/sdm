@@ -1,6 +1,7 @@
 # Typed task heads
 
-`sdm experiment run --config PATH` accepts `typed-binary`, `typed-choice`, and
+`sdm experiment run --config PATH` accepts `typed-binary`, `typed-choice`,
+`typed-choice-cross`, and
 `typed-score` architectures in addition to the two legacy Rank paths and
 `typed-linear` Rank. Each task artifact carries one semantic capability, a
 train-fitted `FittedFeatureEncoderV2`, the task head weights, the training input
@@ -17,8 +18,18 @@ is shared by training and runtime inference.
 
 - Binary uses a logistic head, reports probability-based binary metrics, and may
   abstain when confidence is below the threshold selected on dev.
-- Choice uses a context/item interaction head and normalizes probabilities over
-  exactly the caller-supplied option IDs. A dev-selected confidence threshold may
+- Legacy Choice uses `sdm-typed-task-v1`'s 3*D context, option, and diagonal
+  interaction weights. It normalizes probabilities over exactly the
+  caller-supplied option IDs and retains its historical dev-selected cutoff.
+- `typed-choice-cross` is an additive `sdm-typed-choice-cross-v1` contract. It
+  stores an ordered list of up to 4,096 declared context-coordinate ×
+  option-coordinate pairs, with bounded finite weights and schema digest
+  validation. Text-vocabulary coordinates are excluded. Pair ordering and
+  architecture ID are serialized; malformed, duplicate, out-of-range, or
+  oversized coordinates fail closed. Old typed Choice artifacts are never
+  reinterpreted by this constructor.
+- Choice normalizes probabilities over exactly the caller-supplied option IDs.
+  A dev-selected confidence threshold may
   abstain. `Choice(None)` labels are never converted into a synthetic option;
   they are excluded from choice log-loss and inform the dev abstention threshold.
 - Score maps a logistic output into each request's finite `[minimum, maximum]`
@@ -26,6 +37,11 @@ is shared by training and runtime inference.
 - Rank continues to score each caller-supplied candidate independently and retains
   multi-relevant labels.
 
-The checked-in task suites are generated, redistributable mechanics examples, not
-application data or effectiveness evidence. They deliberately do not provide
-consumer authority, policy or actuation.
+Semantic experiments may set `quality_diagnostics: true` to record raw Choice
+logits/probabilities and answerability beside the actual final runtime decision
+and abstention. The default remains off to preserve historical M011 report
+serialization. The M013 first corpus is retained as invalid diagnostic
+evidence: its pair members differed in load as well as active. M013a uses a new
+seed, group split and frozen suite; neither result can promote an application
+model. The checked-in task suites are synthetic-only and provide no consumer
+authority, policy or actuation.
