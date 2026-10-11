@@ -21,7 +21,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     }
     let spec: sdm_experiment::ExperimentSpec = serde_json::from_slice(&bytes)?;
     let result = match spec.architecture.as_str() {
-        "typed-binary" | "typed-choice" | "typed-score" => {
+        "typed-binary" | "typed-choice" | "typed-choice-cross" | "typed-score" => {
             serde_json::to_value(sdm_experiment::run_semantic(&spec)?)?
         }
         _ => serde_json::to_value(sdm_experiment::run(&spec)?)?,

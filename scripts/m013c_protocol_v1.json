@@ -1,0 +1,94 @@
+{
+  "protocol_version": "m013c-protocol-v1",
+  "evaluator_version": "m013c-evaluator-v1",
+  "inherits": "scripts/m013b_protocol_v1.json",
+  "inherits_protocol_version": "m013b-protocol-v1",
+  "note": "STRUCTURAL DECLARATIONS ONLY. Every numeric success threshold inherited from the frozen M013a/M013b protocol stays undeclared, so a positive verdict remains unreachable on the frozen M013a cohort. Nothing here backfills a favorable post-test criterion: the only additions restrict which families may be qualified and how a control comparison is judged. A future prospective protocol may declare numeric thresholds and an alpha/multiple-comparison policy, but it must do so BEFORE its data are frozen.",
+  "bootstrap": {
+    "method": "paired_group_bootstrap_percentile",
+    "seed": 14014,
+    "replicates": 10000,
+    "confidence": 0.95,
+    "resampling_unit": "independent leakage group, never per row",
+    "note": "Mirrored from the frozen M013a/M013b protocol. A report whose replicate count or confidence disagrees with this declaration is an integrity failure."
+  },
+  "support": {
+    "min_independent_groups_per_primary_slice": 50,
+    "min_answerable_groups_per_accuracy_slice": 50,
+    "min_no_answer_groups_per_no_answer_slice": 20,
+    "denominator_rule": "Support is counted in independent leakage-group units within the eligible population for the exact metric. Total slice groups must never substitute for the answerable-group population of an accuracy metric, and the same minimum_group_support must be attached to the interval it governs."
+  },
+  "binary_gates": {
+    "required_families": [
+      "m013a-binary-id-a-v1",
+      "m013a-binary-id-b-v1",
+      "m013a-binary-load-shift-v1",
+      "m013a-binary-text-shift-v1",
+      "m013a-binary-combined-shift-v1"
+    ],
+    "critical_families": [
+      "m013a-binary-text-shift-v1",
+      "m013a-binary-combined-shift-v1"
+    ],
+    "diagnostic_only_families": [],
+    "min_independent_groups_per_family": 50,
+    "decision_rule": "favorable requires the 95% paired group interval lower bound > 0 with at least min_independent_groups_per_family eligible independent groups; unfavorable requires the upper bound < 0 with the same support; an interval spanning or touching zero is indeterminate regardless of the point estimate",
+    "critical_regression_rule": "a critical family whose Brier improvement 95% paired group interval lies wholly below zero AND has at least min_independent_groups_per_family eligible independent groups is a supported critical regression and yields negative; below that support it is insufficient_support, never negative"
+  },
+  "choice_gates": {
+    "required_ood_families": [
+      "m013a-choice-load-shift-v1",
+      "m013a-choice-text-shift-v1",
+      "m013a-choice-combined-shift-v1"
+    ],
+    "critical_ood_families": [
+      "m013a-choice-text-shift-v1",
+      "m013a-choice-combined-shift-v1"
+    ],
+    "diagnostic_only_families": [
+      "m013a-choice-id-a-v1",
+      "m013a-choice-id-b-v1"
+    ],
+    "diagnostic_only_rule": "In-distribution ID families are measured and reported but are excluded from OOD qualification. They are declared here explicitly so an undeclared family can never be silently qualified and a declared one is never rejected as unexpected.",
+    "min_independent_groups_per_family": 50,
+    "counterfactual_both_correct_min_rate": null,
+    "counterfactual_response_min_rate": null,
+    "answerability_no_answer_recall_min": null,
+    "calibration_max_conditional_brier": null,
+    "unmet_threshold_consequence": "indeterminate",
+    "rationale": "The frozen M013a protocol requires positive to satisfy the primary CI together with support, counterfactual, critical OOD, answerability and calibration gates, but declares no numeric counterfactual, critical OOD, answerability or calibration success threshold. These criteria therefore cannot be established retrospectively against the observed M013a test rows."
+  },
+  "negative_controls": {
+    "required": [
+      "train_majority_option_id",
+      "always_abstain",
+      "always_answer",
+      "shuffled_score",
+      "context_only_identical_option_features_min_id"
+    ],
+    "discriminating": [
+      "train_majority_option_id",
+      "always_abstain",
+      "shuffled_score",
+      "context_only_identical_option_features_min_id"
+    ],
+    "non_discriminating": [
+      "always_answer"
+    ],
+    "learned_beats_control_min_delta": null,
+    "coverage_rule": "Every declared control is measured as a separate versioned quantity on the same answerable cases, the same independent leakage groups and the same candidate option identities as the learned model. A control that is never measured is invalid: it may not be replaced by a zero baseline or omitted.",
+    "discrimination_rule": "always_answer is the candidate's own unthresholded argmax, so learned-minus-always_answer is zero by construction for every candidate; it is measured and recorded but can neither carry evidence nor block a verdict that every other mandatory gate has established. always_abstain never answers, so its answerable accuracy is 0.0 by construction; beating it is a genuine requirement that the candidate answers something correctly, and its perfect no-answer recall must never be read as evidence of learned answerability.",
+    "retrospective_note": "learned_beats_control_min_delta stays null because the frozen M013a protocol declared no learned-versus-control threshold. Backfilling a numeric threshold from observed M013a test rows would be a favorable post-hoc criterion and is forbidden."
+  },
+  "verdict_priority": [
+    "invalid",
+    "negative",
+    "indeterminate",
+    "positive"
+  ],
+  "preserved_historical_verdicts": {
+    "binary": "negative",
+    "choice": "indeterminate",
+    "note": "M013c hardens gate semantics. It must not flip either disposition without an acknowledged evidence-integrity cause; a flip is a STOP condition, not a success."
+  }
+}
