@@ -1,6 +1,6 @@
 # M013c closure — Qualification-gate hardening corrective
 
-Status: **conditionally closed** — the four preregistered gate defects and one latent bootstrap defect are closed on the source branch and verified locally. Hosted CI and the main-targeted merge are outstanding, so the status is conditional. **No model is qualified or promoted.** The historical Binary `negative` and Choice `indeterminate` dispositions are unchanged.
+Status: **conditionally closed** — the four preregistered gate defects and one latent bootstrap defect are closed on the source branch, verified locally and **green on hosted CI run 38109417539**. The main-targeted merge is outstanding, so the status is conditional on that review step alone. **No model is qualified or promoted.** The historical Binary `negative` and Choice `indeterminate` dispositions are unchanged.
 
 Plan: `plans/implementation/general-decision-model-framework/013c-qualification-gate-hardening-corrective.md`
 Planning baseline: `dbowm91/sdm@11ea106c9af3b1ec362a98e709b530cc0fa137d0` (`work/plans-sdm-m013b-quality-gates-diagnostics`; main remains `2bd0d5af16d143828dcbce77f411b8f3b675e7be`)
@@ -136,7 +136,7 @@ Every plan-named case is covered, and the properties are proven rather than asse
 
 Closing the gate defects makes the machinery trustworthy; it does not authorize an experiment. Per the planning process, a future predictive milestone requires more than a green local run. The registry and roadmap now state the three preconditions and **no successor is registered or ready**:
 
-1. **Hosted CI green** on the M013/M013a/M013b/M013c stack, followed by a separately reviewed main-targeted PR merge. Until then the stack is locally verified only.
+1. **Hosted CI green, then a reviewed main merge.** Run [38109417539](https://github.com/dbowm91/sdm/actions/runs/38109417539) is green on `8dd8a21`, so this precondition is half-satisfied: the remaining step is the separately reviewed main-targeted PR merge. Until that merge lands the stack is branch-verified, not main-verified.
 2. **A corrective for the M013b quantile-ordering defect** (§3). A future protocol must use `scripts/m013c_evaluator.py`, which sorts correctly; it must not reuse the M013b bootstrap path for a non-degenerate interval.
 3. **Prospective freeze before inference**: new independent frozen test groups, numeric thresholds and an alpha/multiple-comparison policy declared *before* the data are seen, and `scripts/validate_future_support.py` passing on the eligible subgroups.
 
@@ -167,11 +167,11 @@ Run locally on the M013c implementation branch (hosted CI not yet executed for t
 | `python3 scripts/audit_package_contents.py docs/package-files.json` | Pass — no Python file in any published crate |
 | `cargo package --workspace --locked --no-verify` | **Blocked in this environment.** Fails with `no matching package named 'sdm-core' found; location searched: crates.io index`. Pre-existing and unrelated: M013c changes no Cargo or Rust file, and the identical failure is recorded in the M013b closure. Hosted CI is the authoritative check. |
 | `python3 scripts/check_m011_frozen_reports.py` | Not run locally — gated to `linux-x64` in CI. M011 evidence is untouched by M013c. |
-| Hosted 10-job matrix (MSRV 1.89, linux-x64/arm64, macOS arm64, portability, choice-portability) | **Not yet run for this commit.** Outstanding gate on full closure. |
+| Hosted CI run [38109417539](https://github.com/dbowm91/sdm/actions/runs/38109417539) on `8dd8a21` | **Green across all 10 jobs**: `msrv` (Rust 1.89), `verify` on linux-x64 / linux-arm64 / macos-arm64, all three `portability` and all three `choice-portability` jobs. The new `Verify M013c qualification-gate hardening` step passed on all three `verify` targets, including the 71-test constructed suite, the read-only audit, and the verdict/support/control assertions. |
 
 Source ancestry: `work/plans-sdm-m013c-qualification-gate-hardening` descends from the M013b stack (`99c5d51` → `11ea106` → …), **not** from M012-only main. main remains `2bd0d5af16d143828dcbce77f411b8f3b675e7be`.
 
-Integration disposition: **no main-targeted PR has been opened.** Opening it, merging it, and crates.io legal sign-off are three separate human-reviewed actions; none is performed here, and nothing was pushed to main.
+Integration disposition: **no main-targeted PR has been opened.** Opening it, merging it, and crates.io legal sign-off are three separate human-reviewed actions; none is performed here, and nothing was pushed to main. Hosted CI for this exact commit is green, so the mechanical gate is satisfied and the only remaining step is human review of the merge.
 
 ## 9. Compatibility, security, privacy and resource audit
 
@@ -186,14 +186,14 @@ Integration disposition: **no main-targeted PR has been opened.** Opening it, me
 
 ## 10. Disposition, remaining risks and open items
 
-M013c is **conditionally closed**. Conditional on hosted CI being green and the stack being merged through review.
+M013c is **conditionally closed**. Hosted CI run 38109417539 is green on the implementation commit; the status is conditional solely on the reviewed merge of the stack into main.
 
 Remaining limitations by severity:
 
 1. **High — no qualified predictive model.** Binary remains negative under text/combined shift; Choice remains indeterminate and now additionally shows it beats no discriminating control except the structural `always_abstain`. No remedy was selected, by design: M013c is forbidden from using observed M013a test evidence to choose one.
 2. **Medium — the M013b quantile-ordering defect is live in `scripts/m013b_evaluator.py`** (§3). Inert for all recorded evidence, but any future experiment reusing that bootstrap path on a non-degenerate interval would be wrong. Requires its own corrective.
 3. **Medium — positive eligibility is not establishable for the M013a cohort.** Four Choice gates and all five control comparisons have no preregistered numeric threshold and cannot be backfilled.
-4. **Medium — the source stack is still unmerged.** M013/M013a/M013b/M013c require a separately reviewed main-targeted PR; hosted CI for this commit is outstanding.
+4. **Medium — the source stack is still unmerged.** M013/M013a/M013b/M013c require a separately reviewed main-targeted PR. Hosted CI for the M013c commit is green, so only the human review step remains.
 5. **Medium — crates.io publication remains blocked** on human/legal license sign-off. Not addressed or bypassed here.
 
 Open items carried forward: the M013b bootstrap corrective (§3), the main-targeted integration PR (§8), crates.io legal sign-off, and an approved independent CodeGG corpus for M005.

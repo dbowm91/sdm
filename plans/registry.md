@@ -12,7 +12,7 @@ States: proposed, ready, active, blocked, closing, closed, conditionally closed,
 
 | Subsystem | Status | Next handoff | Blockers |
 | --- | --- | --- | --- |
-| Standalone general decision-model framework | M013/M013a/M013b/M013c conditionally closed; **no ready milestone** | main-targeted reviewed source PR for the M013/M013a/M013b/M013c stack | Stack unmerged; Binary CI-bound gate and negative-control defects closed but unverified on hosted CI; crates.io separately gated |
+| Standalone general decision-model framework | M013/M013a/M013b/M013c conditionally closed; **no ready milestone** | main-targeted reviewed source PR for the M013/M013a/M013b/M013c stack | Stack unmerged (CI green at 8dd8a21, merge unopened); M013b bootstrap quantile defect live; crates.io separately gated |
 | CodeGG consumer-specific effectiveness (M005) | deferred / indeterminate | independent CodeGG-owned evidence, unscheduled | No approved corpus; does not block M008-M011 |
 
 ## Registered milestone plans
@@ -34,7 +34,7 @@ States: proposed, ready, active, blocked, closing, closed, conditionally closed,
 | M013 | **conditionally closed** | capability / evidence corrective | plans/implementation/general-decision-model-framework/013-predictive-quality-corrective-and-independent-qualification.md | Bounded Choice cross architecture implemented; original prospective corpus invalid; see 013-status.md |
 | M013a | **conditionally closed** | evidence corrective | plans/implementation/general-decision-model-framework/013a-independent-quality-suite-integrity-rerun.md | Valid independent suite; negative Binary result, indeterminate Choice and three under-supported Choice OOD accuracy slices in plans/closure/general-decision-model-framework/013a-status.md |
 | M013b | **conditionally closed** (mechanically passed, unmerged) | infrastructure / evaluation-integrity corrective | plans/implementation/general-decision-model-framework/013b-evaluation-gates-and-failure-diagnostics.md | Hosted CI 38107890553 green; outstanding reusable gate defects now M013c; see plans/closure/general-decision-model-framework/013b-status.md |
-| M013c | **conditionally closed** (mechanically complete, unmerged) | infrastructure / evidence-integrity corrective | plans/implementation/general-decision-model-framework/013c-qualification-gate-hardening-corrective.md | CI-bound decisions, support-bounded critical negatives, complete family/control coverage implemented; hosted CI and main merge outstanding; see plans/closure/general-decision-model-framework/013c-status.md |
+| M013c | **conditionally closed** (hosted CI green, unmerged) | infrastructure / evidence-integrity corrective | plans/implementation/general-decision-model-framework/013c-qualification-gate-hardening-corrective.md | CI-bound decisions, support-bounded critical negatives, complete family/control coverage implemented; CI run 38109417539 green at 8dd8a21; reviewed main merge outstanding; see plans/closure/general-decision-model-framework/013c-status.md |
 
 ## Interface and operational dependencies
 
@@ -48,7 +48,7 @@ Accepted boundary: plans/adrs/ADR-0002-standalone-framework-before-consumer-qual
 
 Plan: plans/implementation/general-decision-model-framework/013c-qualification-gate-hardening-corrective.md. Planning source: work/plans-sdm-m013b-quality-gates-diagnostics@11ea106c9af3b1ec362a98e709b530cc0fa137d0. Implementation branch: work/plans-sdm-m013c-qualification-gate-hardening. Closure evidence: plans/closure/general-decision-model-framework/013c-status.md.
 
-M013c is **conditionally closed**. It hardens the reusable gate logic: decisions come from the 95% paired-group interval bounds rather than a point mean, a critical negative requires the preregistered minimum of eligible independent groups, the declared Binary required families and Choice required OOD families are enumerated from the protocol rather than from whatever the report happens to contain, and all five declared negative controls are measured separately on the same answerable population with real paired learned-minus-control intervals. It also repaired a latent unsorted-quantile defect inherited from the M013b bootstrap without altering any frozen M013b file or recorded M013a/M013b result.
+M013c is **conditionally closed**, green on hosted CI run [38109417539](https://github.com/dbowm91/sdm/actions/runs/38109417539) at `8dd8a21`; only the reviewed main merge remains outstanding. It hardens the reusable gate logic: decisions come from the 95% paired-group interval bounds rather than a point mean, a critical negative requires the preregistered minimum of eligible independent groups, the declared Binary required families and Choice required OOD families are enumerated from the protocol rather than from whatever the report happens to contain, and all five declared negative controls are measured separately on the same answerable population with real paired learned-minus-control intervals. It also repaired a latent unsorted-quantile defect inherited from the M013b bootstrap without altering any frozen M013b file or recorded M013a/M013b result.
 
 **Defect-E follow-up (registered, not closed).** The M013b `group_bootstrap`/`quantile` ordering defect remains in `scripts/m013b_evaluator.py` because that file is frozen evidence and is hashed by the M013b sidecar. It is inert for every recorded M013a/M013b interval (the frozen M013a analyzer sorts correctly and the affected intervals are degenerate), but it is recorded here as a live defect in the reusable M013b module and must be fixed by a separate corrective before any new experiment relies on that module.
 
@@ -64,7 +64,7 @@ M013c is **conditionally closed** — the four gate defects plus one latent boot
 
 **A successor predictive-quality milestone (M013d or M014) is NOT unblocked and is NOT registered ready.** Three things must happen first, in order:
 
-1. **Hosted CI green** on the M013/M013a/M013b/M013c stack, and a separately reviewed main-targeted PR merged. Until then the stack's mechanics are locally verified only.
+1. **A reviewed main-targeted merge.** Hosted CI run [38109417539](https://github.com/dbowm91/sdm/actions/runs/38109417539) is already green on `8dd8a21`; what remains is the human-reviewed PR merge. Until that lands the stack is branch-verified, not main-verified.
 2. **The M013b quantile-ordering defect corrected** under its own narrow corrective. A new protocol may reuse `scripts/m013c_evaluator.py`, which sorts correctly; it may not reuse the M013b bootstrap path for a non-degenerate interval.
 3. **Prospective freeze before inference**: new independent frozen test groups, numeric thresholds and an alpha/multiple-comparison policy declared BEFORE the data are seen, and `scripts/validate_future_support.py` passing on the eligible subgroups.
 
