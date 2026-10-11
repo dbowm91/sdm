@@ -10,7 +10,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import subprocess
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -47,6 +49,22 @@ def git_source_hash(commit: str) -> str:
         stdout=subprocess.PIPE,
     ).stdout
     return hashlib.sha256(source).hexdigest()
+
+
+def atomic_write_json(path: Path, payload) -> None:
+    """Write a complete audit or leave the previous accepted file intact."""
+    text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    descriptor, temporary = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
+    try:
+        with os.fdopen(descriptor, "w") as stream:
+            stream.write(text)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    except BaseException:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+        raise
 
 
 def main() -> None:
@@ -127,7 +145,7 @@ def main() -> None:
         "disclaimer": "Mechanical replay and semantic audit only; no new model qualification or held-out inference.",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(output, indent=2, sort_keys=True) + "\n")
+    atomic_write_json(args.output, output)
     print(json.dumps(output, indent=2, sort_keys=True))
 
 
