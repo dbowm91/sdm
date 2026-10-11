@@ -88,6 +88,9 @@ jobs:
       - name: Verify M013b evaluation-integrity evaluator
         if: hashFiles('target/m013a/*.report.json') != ''
         run: |
+          # The scripts create this directory atomically, but the shell
+          # redirections below are evaluated first, so create it up front.
+          mkdir -p target/m013b
           # Unit tests run against constructed fixtures only: no training, no
           # held-out model-selection loop, no M013a test feedback.
           python3 -m unittest discover -s scripts -p 'test_m013b_*.py'
