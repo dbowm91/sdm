@@ -2,7 +2,7 @@
 
 This directory follows the CodeGG planning and handoff convention as adapted in [003-planning-process.md](003-planning-process.md).
 
-**Start here:** [Registry](registry.md) -> [General decision-model framework roadmap](subsystems/general-decision-model-framework-roadmap.md) -> **[M013b closure evidence](closure/general-decision-model-framework/013b-status.md) (closed)**. CodeGG M005 remains externally deferred. The [framework boundary ADR](adrs/ADR-0001-general-framework-and-model-boundaries.md) governs the milestone plans.
+**Start here:** [Registry](registry.md) -> [General decision-model framework roadmap](subsystems/general-decision-model-framework-roadmap.md) -> **[M013c qualification-gate hardening](implementation/general-decision-model-framework/013c-qualification-gate-hardening-corrective.md) (ready)**. CodeGG M005 remains externally deferred. The [framework boundary ADR](adrs/ADR-0001-general-framework-and-model-boundaries.md) governs the milestone plans.
 
 ## Completed handoffs
 
@@ -23,7 +23,7 @@ All four milestones are SDM-owned, use explicitly provided synthetic data, prese
 
 ## Current corrective handoff
 
-**[M012 — post-M011 release reconciliation](implementation/general-decision-model-framework/012-post-m011-release-reconciliation-corrective.md)** is conditionally closed: source [PR #1](https://github.com/dbowm91/sdm/pull/1) is merged into main; crates.io publication remains blocked pending human/legal license review. **M013 and M013a are conditionally closed** on an unmerged development branch; their invalid/negative/indeterminate results remain visible. **[M013b](closure/general-decision-model-framework/013b-status.md) is closed** as a bounded evaluator corrective; it qualified no model. CodeGG M005 remains externally deferred.
+**[M012 — post-M011 release reconciliation](implementation/general-decision-model-framework/012-post-m011-release-reconciliation-corrective.md)** is conditionally closed: source [PR #1](https://github.com/dbowm91/sdm/pull/1) is merged into main; crates.io publication remains blocked pending human/legal license review. **M013 and M013a are conditionally closed** on an unmerged development branch; their invalid/negative/indeterminate results remain visible. **[M013b](closure/general-decision-model-framework/013b-status.md) is conditionally closed** (mechanics verified; unmerged), with remaining reusable gate defects now registered as **[M013c](implementation/general-decision-model-framework/013c-qualification-gate-hardening-corrective.md), ready**. Neither milestone qualifies a model. CodeGG M005 remains externally deferred.
 
 Research and predecessor evidence are recorded in [docs/general-framework-research-2026-10.md](../docs/general-framework-research-2026-10.md).
 
@@ -32,3 +32,5 @@ Handoff rule: one implementation agent takes one **ready** milestone; re-audit t
 M013 handoff: [Predictive-quality corrective and independent qualification](implementation/general-decision-model-framework/013-predictive-quality-corrective-and-independent-qualification.md), informed by [diagnostic baseline](../docs/m013-quality-diagnostic-baseline.md). M012 PR #1 has merged; crates.io publication remains separately gated. M013 requires no CodeGG corpus.
 
 M013b handoff: [implementation plan](implementation/general-decision-model-framework/013b-evaluation-gates-and-failure-diagnostics.md), [planning audit](../docs/m013b-evaluation-audit.md), [closure evidence](closure/general-decision-model-framework/013b-status.md). No additional prospective inference on the already-seen M013a test is permitted; a successor experiment must seal new independent frozen test groups and pass `scripts/validate_future_support.py` first.
+
+M013c ready implementation handoff: [qualification-gate hardening](implementation/general-decision-model-framework/013c-qualification-gate-hardening-corrective.md) and [source audit](../docs/m013c-gate-hardening-audit.md). The historical M013b closure record is left intact; current-facing statuses reflect conditional source integration and the narrowed follow-up. Do not treat the planned M013c as a model-quality rerun.
