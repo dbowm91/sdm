@@ -5,7 +5,7 @@ Status: **conditionally closed** — the four preregistered gate defects and one
 Plan: `plans/implementation/general-decision-model-framework/013c-qualification-gate-hardening-corrective.md`
 Planning baseline: `dbowm91/sdm@11ea106c9af3b1ec362a98e709b530cc0fa137d0` (`work/plans-sdm-m013b-quality-gates-diagnostics`; main remains `2bd0d5af16d143828dcbce77f411b8f3b675e7be`)
 Implementation branch: `work/plans-sdm-m013c-qualification-gate-hardening`
-Implementation commit: recorded in §8 below
+Implementation commit: `8dd8a2151ef0c5b88adf5ce0c164992636bc17ee`
 Closure file: `plans/closure/general-decision-model-framework/013c-status.md`
 Class: infrastructure / evidence-integrity corrective
 

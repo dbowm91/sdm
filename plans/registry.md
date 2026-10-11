@@ -2,7 +2,7 @@
 
 Status: M013c **conditionally closed** — gate hardening mechanically complete on the source branch, source still unmerged; M013b **conditionally closed** (mechanical CI passed, source unmerged); M013/M013a conditionally closed; crates.io publication separately gated on human/legal sign-off
 Governance: plans/003-planning-process.md
-Current planning baseline: work/plans-sdm-m013c-qualification-gate-hardening@<M013c-closure-commit> (main remains 2bd0d5af16d143828dcbce77f411b8f3b675e7be)
+Current planning baseline: work/plans-sdm-m013c-qualification-gate-hardening@8dd8a2151ef0c5b88adf5ce0c164992636bc17ee (main remains 2bd0d5af16d143828dcbce77f411b8f3b675e7be)
 Accepted architecture: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md
 
