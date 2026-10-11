@@ -72,6 +72,11 @@ def main() -> None:
     parser.add_argument("--old-commit", required=True)
     parser.add_argument("--old-root", type=Path, required=True, help="clean pinned checkout used for replay")
     parser.add_argument("--new-commit", default="HEAD")
+    parser.add_argument(
+        "--allow-host-specific-hashes",
+        action="store_true",
+        help="record the replayed digests without enforcing the Mac baseline ledger",
+    )
     parser.add_argument("--output", type=Path, default=ROOT / "target/m013d/bootstrap-provenance-audit.json")
     args = parser.parse_args()
 
@@ -92,7 +97,7 @@ def main() -> None:
         raise SystemExit("required audit artifact missing: " + ", ".join(str(path) for path in missing))
 
     old_sha = {name: sha256(path) for name, path in old_paths.items()}
-    if old_sha != EXPECTED_OLD:
+    if not args.allow_host_specific_hashes and old_sha != EXPECTED_OLD:
         raise SystemExit(f"pinned historical hashes do not match the original ledger: {old_sha}")
 
     old_erratum = read(old_paths["m013b_erratum"])
@@ -101,13 +106,17 @@ def main() -> None:
     new_decision = read(current_paths["m013c_decision_audit"])
     m013b_equivalent = semantic(old_erratum) == semantic(new_erratum)
     m013c_equivalent = semantic(old_decision) == semantic(new_decision)
+    host_stable_artifacts_equal = all(
+        old_sha[name] == sha256(current_paths[name])
+        for name in ("m013a_quality_analysis", "m013b_diagnostics")
+    )
     verdicts_unchanged = (
         new_erratum.get("gate_verdicts", {}).get("binary", {}).get("verdict") == "negative"
         and new_erratum.get("gate_verdicts", {}).get("choice", {}).get("verdict") == "indeterminate"
         and new_decision.get("retained_disposition", {}).get("binary") == "negative"
         and new_decision.get("retained_disposition", {}).get("choice") == "indeterminate"
     )
-    if not (m013b_equivalent and m013c_equivalent and verdicts_unchanged):
+    if not (m013b_equivalent and m013c_equivalent and verdicts_unchanged and host_stable_artifacts_equal):
         raise SystemExit("new sidecars differ semantically from the pinned historical result")
 
     current_sha = {name: sha256(path) for name, path in current_paths.items()}
@@ -117,15 +126,17 @@ def main() -> None:
         "new_commit": args.new_commit,
         "old_m013b_source_sha256": git_source_hash(args.old_commit),
         "new_m013b_source_sha256": sha256(ROOT / "scripts/m013b_evaluator.py"),
-        "historical_preserved": True,
+        "historical_preserved": host_stable_artifacts_equal and m013b_equivalent and m013c_equivalent,
         "model_qualifications_unchanged": True,
         "binary_disposition": "negative",
         "choice_disposition": "indeterminate",
         "semantic_comparison": {
             "m013b_erratum_equivalent_ignoring_input_sha256": m013b_equivalent,
             "m013c_decision_audit_equivalent_ignoring_input_sha256": m013c_equivalent,
+            "m013a_and_diagnostics_host_outputs_identical": host_stable_artifacts_equal,
             "verdicts_unchanged": verdicts_unchanged,
         },
+        "host_specific_hashes_allowed": args.allow_host_specific_hashes,
         "artifacts": {
             name: {
                 "historical_path": str(old_paths[name].relative_to(args.old_root)),

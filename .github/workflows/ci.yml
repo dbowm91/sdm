@@ -26,6 +26,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: dtolnay/rust-toolchain@stable
       - name: Record host and toolchain
         run: uname -a && rustc -Vv
@@ -157,7 +159,28 @@ jobs:
           assert len(measured) == 5, f"expected 5 measured controls, got {sorted(measured)}"
           assert controls["choice_required_ood_families"], "required OOD families must be enumerated"
           PY
+      - name: Replay pinned M013c provenance for M013d comparison
+        if: hashFiles('target/m013a/*.report.json') != ''
+        run: |
+          mkdir -p target/m013d
+          git worktree add --detach target/m013d/reference 03c4a982219ffa830b7c0aba9dbb19a541cae56c
+          mkdir -p target/m013d/reference/target/m013a target/m013d/reference/target/m013b target/m013d/reference/target/m013c
+          cp -R target/m013a/. target/m013d/reference/target/m013a/
+          python3 target/m013d/reference/scripts/analyze_m013a_quality.py > target/m013d/reference/target/m013a/quality-analysis.stdout.json
+          python3 target/m013d/reference/scripts/m013b_audit_m013a.py > target/m013d/reference/target/m013b/audit.stdout.json
+          python3 target/m013d/reference/scripts/m013b_diagnostics.py > target/m013d/reference/target/m013b/diagnostics.stdout.json
+          python3 target/m013d/reference/scripts/m013c_qualification_audit.py > target/m013d/reference/target/m013c/audit.stdout.json
+          python3 scripts/m013d_provenance_audit.py --old-commit 03c4a982219ffa830b7c0aba9dbb19a541cae56c --old-root target/m013d/reference --new-commit "$GITHUB_SHA" --allow-host-specific-hashes
+          python3 - <<'PY'
+          import json, pathlib
+          audit = json.loads(pathlib.Path("target/m013d/bootstrap-provenance-audit.json").read_text())
+          assert audit["historical_preserved"] is True
+          assert audit["model_qualifications_unchanged"] is True
+          assert audit["semantic_comparison"]["verdicts_unchanged"] is True
+          assert audit["semantic_comparison"]["m013a_and_diagnostics_host_outputs_identical"] is True
+          PY
       - name: Verify M013d bootstrap percentile repair
+        if: hashFiles('target/m013a/*.report.json') != ''
         run: python3 -m unittest discover -s scripts -p 'test_m013d_*.py'
       - name: Capture runtime benchmark
         run: cargo run -p sdm-runtime --example benchmark -- fixtures/benchmark-rank-request.json artifacts/compatibility-rank-v1.json > benchmark-${{ matrix.name }}.json

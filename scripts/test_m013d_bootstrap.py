@@ -201,6 +201,19 @@ class M013dProvenanceTests(unittest.TestCase):
         self.assertEqual(diagnostics["root_cause_status"]["binary"], "root_cause_isolated")
         self.assertEqual(diagnostics["root_cause_status"]["choice"], "root_cause_isolated")
 
+    @unittest.skipUnless(
+        (Path(__file__).resolve().parents[1] / "target/m013d/bootstrap-provenance-audit.json").is_file(),
+        "generated M013d provenance audit is not present",
+    )
+    def test_machine_readable_provenance_audit_passed(self):
+        root = Path(__file__).resolve().parents[1]
+        audit = json.loads((root / "target/m013d/bootstrap-provenance-audit.json").read_text())
+        self.assertIs(audit["historical_preserved"], True)
+        self.assertIs(audit["model_qualifications_unchanged"], True)
+        self.assertEqual(audit["binary_disposition"], "negative")
+        self.assertEqual(audit["choice_disposition"], "indeterminate")
+        self.assertTrue(all(audit["semantic_comparison"].values()))
+
 
 if __name__ == "__main__":
     unittest.main()
