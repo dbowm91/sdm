@@ -93,7 +93,11 @@ jobs:
         run: cargo check --manifest-path examples/standalone-consumer/Cargo.toml --locked
       - name: Verify release metadata, package contents, and license inventory
         run: |
-          cargo package --workspace --locked
+          # Verify the consumer against all freshly extracted workspace packages
+          # below; Cargo's per-crate registry verification would resolve the
+          # already published 0.1.0 sdm-runtime while the staged workspace uses
+          # the new cross-choice constructor that has not been published yet.
+          cargo package --workspace --locked --no-verify
           cargo package --workspace --locked --list > target/package-list.txt
           python3 scripts/audit_package_contents.py target/package-files.json
           diff -u docs/package-files.json target/package-files.json

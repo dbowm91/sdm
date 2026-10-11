@@ -46,6 +46,7 @@
     "Cargo.toml.orig",
     "examples/benchmark.rs",
     "examples/benchmark_nonlinear.rs",
+    "examples/benchmark_typed_choice.rs",
     "src/lib.rs"
   ],
   "sdm-training": [

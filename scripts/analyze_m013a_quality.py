@@ -101,6 +101,11 @@ def main():
     verify_pairs(cb); verify_pairs(bb)
     cm={e["case_id"]:e for e in cb["examples"]}; bm={e["case_id"]:e for e in bb["examples"]}
     reports={n:read(OUT/f"{n}.report.json") for n in ("choice-legacy","choice-cross","binary")}
+    # Legacy-compatible report serialization omits false-valued optional
+    # abstention diagnostics. Interpret absence as the runtime default.
+    for report in reports.values():
+        for outcome in report["outcomes"]:
+            outcome.setdefault("abstained", False)
     expected_families={f"m013a-choice-{x}-v1" for x in ("load-shift","text-shift","combined-shift")}
     test_choice=[cm[i] for i in cs["test"]]
     test_families={e["family"] for e in test_choice}
@@ -130,6 +135,16 @@ def main():
         b=cross[case_id]
         paired.append({"case_id":case_id,"leakage_group":a["leakage_group"],"delta":float(not b["abstained"] and b["prediction"]==b["target"])-float(not a["abstained"] and a["prediction"]==a["target"])})
     choice["cross_minus_legacy_accuracy"]={"mean":mean([r["delta"] for r in paired]),"ci":group_bootstrap(paired,lambda g:mean([r["delta"] for r in g]))}
+    delta_ci=choice["cross_minus_legacy_accuracy"]["ci"]
+    if delta_ci["lower"] is not None and delta_ci["lower"]>0:
+        choice["classification"]="positive"
+        choice["classification_reason"]="cross head improves paired answerable final accuracy with a favorable 95% interval"
+    elif delta_ci["upper"] is not None and delta_ci["upper"]<0:
+        choice["classification"]="negative"
+        choice["classification_reason"]="cross head regresses paired answerable final accuracy with a 95% interval below zero"
+    else:
+        choice["classification"]="indeterminate"
+        choice["classification_reason"]="paired answerable final-accuracy interval does not favor either architecture"
     pair_rows=defaultdict(list)
     for r in rows:pair_rows[r["leakage_group"]].append(r)
     flips=[]
@@ -183,6 +198,16 @@ def main():
     # Each nuisance transformation is label-preserving and changes one feature
     # family at a time; report both mean delta and label-stratified deltas.
     binary["nuisance_label_stratified"]={key:{str(y):mean([r["nuisance_probabilities"][key]-r["score"] for r in b_rows if bool(r["target"])==y]) for y in (False,True)} for key in ("load","text","combined")}
+    intervals=[s["improvement_ci_vs_train_prior"] for s in binary["slices"].values()]
+    if any(ci["upper"] is not None and ci["upper"]<0 for ci in intervals):
+        binary["classification"]="negative"
+        binary["classification_reason"]="at least one preregistered family has a Brier improvement interval wholly below zero"
+    elif intervals and all(ci["lower"] is not None and ci["lower"]>0 for ci in intervals) and all(s["support_sufficient"] for s in binary["slices"].values()):
+        binary["classification"]="positive"
+        binary["classification_reason"]="every preregistered family improves on train-prior Brier with sufficient support"
+    else:
+        binary["classification"]="indeterminate"
+        binary["classification_reason"]="the preregistered family-level Brier intervals do not all establish improvement or regression"
     output={"protocol":"docs/m013a-protocol-v1.md","seed":SEED,"replicates":REPLICATES,
             "choice":choice,"binary":binary,"dataset_sha256":{"choice":reports["choice-cross"]["dataset_sha256"],"binary":reports["binary"]["dataset_sha256"]},
             "note":"All primary metrics use final runtime decisions; option loss/Brier are conditional on answerable cases. Synthetic only; negative controls are not qualification candidates."}
