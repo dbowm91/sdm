@@ -44,6 +44,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if envelope.architecture != "sdm-typed-choice-cross-v1" {
         return Err("unexpected Choice architecture".into());
     }
+    let trainable_parameters = payload["weights"].as_array().map_or(0, Vec::len)
+        + payload["answerability_weights"]
+            .as_array()
+            .map_or(0, Vec::len)
+        + payload["choice_cross_pairs"].as_array().map_or(0, Vec::len)
+        + 2; // choice bias and answerability bias
     let bundle: serde_json::Value = serde_json::from_slice(&fs::read(&args[1])?)?;
     let example = &bundle["examples"][0];
     let base_request: DecisionRequest = serde_json::from_value(example["request"].clone())?;
@@ -90,7 +96,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "{}",
         serde_json::to_string_pretty(&serde_json::json!({
             "architecture":envelope.architecture,"model_sha256":envelope.tensor_payload_sha256,
-            "artifact_sha256":runtime.digest(),"artifact_bytes":bytes.len(),"parameter_count":envelope.parameter_count,
+            "artifact_sha256":runtime.digest(),"artifact_bytes":bytes.len(),"trainable_parameters":trainable_parameters,
             "cross_term_count":payload["choice_cross_pairs"].as_array().map_or(0,Vec::len),
             "cold_load_micros":cold_load_micros,"peak_rss_bytes":peak_rss_bytes(),"invalid_artifact_rejected":invalid_rejected,
             "host":{"os":env::consts::OS,"arch":env::consts::ARCH},"latency":latencies

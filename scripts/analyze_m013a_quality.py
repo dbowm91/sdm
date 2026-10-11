@@ -125,8 +125,9 @@ def main():
             rs=[r for r in rows if r["family"]==family]; m=choice_metrics(rs)
             m["independent_groups"]=len({r["leakage_group"] for r in rs})
             m["no_answer_groups"]=len({r["leakage_group"] for r in rs if r["target"] is None})
-            m["support_sufficient"]=m["independent_groups"]>=50 and (m["no_answer"]==0 or m["no_answer_groups"]>=20)
             m["accuracy_ci"]=group_bootstrap(rs,lambda g:mean([float(r["target"] is not None and not r["abstained"] and r["prediction"]==r["target"]) for r in g if r["target"] is not None]))
+            m["answerable_groups"]=m["accuracy_ci"]["groups"]
+            m["support_sufficient"]=m["answerable_groups"]>=50 and (m["no_answer"]==0 or m["no_answer_groups"]>=20)
             choice[name]["slices"][family]=m
     leg={r["case_id"]:r for r in reports["choice-legacy"]["outcomes"]}; cross={r["case_id"]:r for r in reports["choice-cross"]["outcomes"]}
     paired=[]
@@ -145,6 +146,10 @@ def main():
     else:
         choice["classification"]="indeterminate"
         choice["classification_reason"]="paired answerable final-accuracy interval does not favor either architecture"
+    choice["unsupported_primary_slices"]=[
+        family for family, metrics in choice["choice-cross"]["slices"].items()
+        if not metrics["support_sufficient"]
+    ]
     pair_rows=defaultdict(list)
     for r in rows:pair_rows[r["leakage_group"]].append(r)
     flips=[]

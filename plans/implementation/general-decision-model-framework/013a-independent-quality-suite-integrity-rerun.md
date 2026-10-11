@@ -1,6 +1,6 @@
 # SDM M013a — Independent Quality-Suite Integrity Rerun
 
-Status: active (bounded successor to an invalid M013 held-out corpus)
+Status: conditionally closed (suite integrity passed; Binary quality negative and Choice quality indeterminate)
 Class: evidence corrective
 Parent: M013 implementation `c56f442fae14ede38fd1cd6e0eccf61315df96da`
 Governance: plans/003-planning-process.md

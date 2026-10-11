@@ -1,6 +1,6 @@
 # SDM M013 — Predictive-Quality Corrective and Independent Qualification
 
-Status: conditionally closed (bounded architecture implemented; M013 quality evidence invalidated; fresh qualification delegated to M013a)
+Status: conditionally closed (bounded architecture implemented; M013 evidence invalid; M013a valid rerun found negative Binary and indeterminate Choice quality)
 Class: capability / evidence corrective
 Planning baseline: dbowm91/sdm@2bd0d5af16d143828dcbce77f411b8f3b675e7be; implementation agent must re-audit HEAD and main CI
 Work branch: work/plans-sdm-m013-predictive-quality-corrective
@@ -110,4 +110,4 @@ Stop and register a new corrective if the intended task is unrepresentable with 
 
 ## 8. Successor boundary
 
-M013 repairs and qualifies the CURRENT bounded typed model line. M014, if later approved, may compare generalized MLP, bilinear/low-rank, tree and embedding architectures via a reusable training interface; do not build that generalized framework as an opportunistic M013 change. CodeGG M005 continues to wait on an independent approved corpus. M013 does not require M005, nor does it authorize a CodeGG pin change.
+M013 repairs and evaluates the CURRENT bounded typed model line. The additive cross architecture is implemented, but quality remains unqualified: M013 was invalid and M013a found negative Binary text/combined-shift evidence and indeterminate Choice results. See `plans/closure/general-decision-model-framework/013a-status.md`. M014, if later approved, may compare generalized MLP, bilinear/low-rank, tree and embedding architectures via a reusable training interface; do not build that generalized framework as an opportunistic M013 change. CodeGG M005 continues to wait on an independent approved corpus. M013 does not require M005, nor does it authorize a CodeGG pin change.
