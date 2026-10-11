@@ -2,7 +2,7 @@
 
 This directory follows the CodeGG planning and handoff convention as adapted in [003-planning-process.md](003-planning-process.md).
 
-**Start here:** [Registry](registry.md) -> [General decision-model framework roadmap](subsystems/general-decision-model-framework-roadmap.md) -> **[M013c qualification-gate hardening](closure/general-decision-model-framework/013c-status.md) (conditionally closed)**. CodeGG M005 remains externally deferred. The [framework boundary ADR](adrs/ADR-0001-general-framework-and-model-boundaries.md) governs the milestone plans.
+**Start here:** [Registry](registry.md) -> [General decision-model framework roadmap](subsystems/general-decision-model-framework-roadmap.md) -> **[M013d bootstrap repair/source integration](implementation/general-decision-model-framework/013d-bootstrap-repair-and-source-integration.md) (ready)**. CodeGG M005 remains externally deferred. The [framework boundary ADR](adrs/ADR-0001-general-framework-and-model-boundaries.md) governs the milestone plans.
 
 ## Completed handoffs
 
@@ -34,3 +34,5 @@ M013 handoff: [Predictive-quality corrective and independent qualification](impl
 M013b handoff: [implementation plan](implementation/general-decision-model-framework/013b-evaluation-gates-and-failure-diagnostics.md), [planning audit](../docs/m013b-evaluation-audit.md), [closure evidence](closure/general-decision-model-framework/013b-status.md). No additional prospective inference on the already-seen M013a test is permitted; a successor experiment must seal new independent frozen test groups and pass `scripts/validate_future_support.py` first.
 
 M013c handoff: [implementation plan](implementation/general-decision-model-framework/013c-qualification-gate-hardening-corrective.md), [source audit](../docs/m013c-gate-hardening-audit.md), [closure evidence](closure/general-decision-model-framework/013c-status.md). The historical M013b closure record is left intact; current-facing statuses reflect conditional source integration and the narrowed follow-up. M013c hardens gate mechanics only and is not a model-quality rerun. A successor predictive milestone stays unregistered until the stack is merged through review, the M013b quantile-ordering defect has its own corrective, and a new protocol prospectively freezes test groups and numeric thresholds.
+
+M013d ready handoff: [legacy bootstrap safety and reviewed M013 source integration](implementation/general-decision-model-framework/013d-bootstrap-repair-and-source-integration.md) and [provenance audit](../docs/m013d-final-corrective-audit.md). M013d is NOT a predictive rerun. Historical M013b/M013c sidecar hashes are reproduced at pinned commits; after changing source, newly regenerated sidecars have distinct hashes that must be documented, not suppressed. Full integration only after reviewed main merge and main CI.
