@@ -1,0 +1,46 @@
+{
+  "freeze_id": "sdm-m014-freeze-v1",
+  "status": "pre-final-test",
+  "protocol": "docs/m014-protocol-v1.json",
+  "split_memberships": {
+    "binary": "fixtures/m014-binary-v1.split.json",
+    "choice": "fixtures/m014-choice-v1.split.json"
+  },
+  "candidate_reports": [
+    "binary-baseline.report.json",
+    "binary-mask.report.json",
+    "choice-legacy.report.json",
+    "choice-cross.report.json",
+    "binary-mask-l2.report.json",
+    "choice-compositional.report.json"
+  ],
+  "sha256": {
+    "scripts/generate_m014_synthetic_suite.py": "6629f91123165f52078c2927498d00a7d39bc47eeee3530178c135aff6aa7f48",
+    "scripts/verify_m014_freeze.py": "4956dd186ad519605150123d5ce0647a1f70cd110d7753bf394a19edc7d45ef8",
+    "scripts/test_m014_suite.py": "3850a323a1cfebd6e3fe62ef0c09e86595450a1d0b4f4a6eb41a3eb75d7fa104",
+    "docs/m014-protocol-v1.json": "ed2ba42d407f11cb5121b6ca3132a908169604f217035cab10b8cf728c73ba19",
+    "fixtures/m014-binary-v1.split.json": "aa04923d04af6c9c59b8727108c76eb32ebb81de7553bb7a180abd605d0c71a7",
+    "fixtures/m014-choice-v1.split.json": "1a25ad49b6ec0d09d139a04ea17a2562b77c533007c096ac1f100998429ab4dc",
+    "fixtures/m014-binary-baseline.experiment.json": "b3e9fe6b06ef68347aa3c45ffc386496025b212f0570bfc48bc969795bdb4113",
+    "fixtures/m014-binary-mask.experiment.json": "7d4bf6b2698109f7a9b6db69ec290b8c928e4061ba4aec63119fc4249f98a8f8",
+    "fixtures/m014-binary-mask-l2.experiment.json": "7f3a3a2cca1339ca45ea1984ae0028864a832cc0b60343891667fe4852b55538",
+    "fixtures/m014-choice-legacy.experiment.json": "9dae1b65d3cb189e2effba8b0f50bcd14c2a0e0a9190fb603f6855c3dcdf3455",
+    "fixtures/m014-choice-cross.experiment.json": "4c9fc556b5bf56aa3b1c6d01b3154101a474d0da189d2f62513627ce3c187df9",
+    "fixtures/m014-choice-compositional.experiment.json": "79848250552574850ee1d18ef252af2f3d11df4fbfdeb0ec286571fd72c53fb5",
+    "fixtures/m014-final-binary-baseline.experiment.json": "53cdbd8ffb0078eec1aa44f20bacfa5ab42d8fdac0aa8275ed8c243aaf44adbf",
+    "fixtures/m014-final-binary-mask.experiment.json": "d9a0224ec60dd099b9cc0b91e82282048842f44dd383518204c5e20e2e8aeb24",
+    "fixtures/m014-final-choice-legacy.experiment.json": "81f98f4e2b52f97d06ed9935b51da1f6fe09439ead8640a4543a1e1fad390d14",
+    "fixtures/m014-final-choice-cross.experiment.json": "379f7c52eaae540e2e284e5becbe481c01c80035d2bef1cb03f8ec25b57c054d",
+    "fixtures/m014-final-choice-compositional.experiment.json": "8200fcb866bb2efbfc50553fa265d5091820a178bd6567d984ffbabfb23f93be",
+    "artifacts/m014/binary-baseline-v1.artifact.json": "3d3c1a1453c274d19bdbdd47751c385246f172b5843ad3f5df42e5ddd812e810",
+    "artifacts/m014/binary-constant-mask-v1.artifact.json": "19c2a3406944d19dc9b81aba4647e2c75f87317af2b7d4dd5e8d35129dd83260",
+    "artifacts/m014/choice-legacy-v1.artifact.json": "e512cb53a8a9e56046e0b499c36b167a52ea8d0ff17a42e2f14c271a6a9b284e",
+    "artifacts/m014/choice-cross-v1.artifact.json": "ba17c92979e0365999721822b5b9af6cfb8b2a1a8c2de0405635bc099dad514e",
+    "artifacts/m014/choice-compositional-v1.artifact.json": "e77d44a0c81c39e8adf71108dce680d9d00bcced47416ca9000fd5dd7fc341fb",
+    "target/m014/binary.json": "30397995df53dd709ed654c15440929fa75b5d8a3300bf9f3a554e8d9ece7aeb",
+    "target/m014/choice.json": "43c456567e95b79456e25530e5483139c26aaa162f582585a77a3b6fe70fdb94",
+    "target/m014/binary-support.json": "b1cd8235ab8f83d1b3d88b66554d009fdb54b576537530f753e26c6b5aa0ebbf",
+    "target/m014/choice-support.json": "a18b7ae33a213aad70afe05fcf47d979bf0355c62712be2873dc819d2397a27d",
+    "scripts/analyze_m014_qualification.py": "33988000a626cd99b4907cfccc01cc9f5a26cf87d8770e182f31d90511af5cb3"
+  }
+}

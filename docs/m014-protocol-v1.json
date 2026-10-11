@@ -1,0 +1,97 @@
+{
+  "protocol_id": "sdm-m014-binary-choice-quality-v1",
+  "status": "prospective-freeze-before-final-test",
+  "implementation_base_commit": "c5b608992680daf72510f45dda708a389c8cb31d",
+  "generator": {
+    "path": "scripts/generate_m014_synthetic_suite.py",
+    "seed": 140014,
+    "groups_per_task": 1200,
+    "rows_per_group": 2,
+    "pair_causal_difference": "active only",
+    "provenance": "MIT synthetic data; no user, CodeGG, network, or downloaded data"
+  },
+  "splitting": {
+    "seed": 140014,
+    "method": "sdm-data deterministic leakage-group split with six complete test families",
+    "excluded_families": [],
+    "all counterfactual pair members remain in one group and one split"
+  },
+  "support": {
+    "binary_minimum_independent_groups_per_required_family": 50,
+    "choice_minimum_independent_groups_per_required_family": 50,
+    "choice_minimum_answerable_groups_per_required_family": 50,
+    "choice_minimum_no_answer_groups_per_required_family": 20,
+    "validator": "scripts/validate_future_support.py",
+    "required_binary_families": [
+      "m014-binary-id-a-v1", "m014-binary-id-b-v1", "m014-binary-text-shift-v1",
+      "m014-binary-combined-shift-v1", "m014-binary-load-shift-v1", "m014-binary-unknown-vocab-v1"
+    ],
+    "required_choice_families": [
+      "m014-choice-id-a-v1", "m014-choice-id-b-v1", "m014-choice-text-shift-v1",
+      "m014-choice-combined-shift-v1", "m014-choice-load-shift-v1", "m014-choice-unknown-vocab-v1"
+    ]
+  },
+  "candidates": {
+    "seed": 14014,
+    "epochs": 120,
+    "learning_rate": 0.2,
+    "seeded_epoch_order": true,
+    "binary_screening": [
+      {"id":"binary-legacy-control","config":"fixtures/m014-binary-baseline.experiment.json","mask":false,"l2":0.0},
+      {"id":"binary-constant-mask","config":"fixtures/m014-binary-mask.experiment.json","mask":true,"l2":0.0},
+      {"id":"binary-mask-l2-screen","config":"fixtures/m014-binary-mask-l2.experiment.json","mask":true,"l2":0.01}
+    ],
+    "binary_final": ["binary-legacy-control", "binary-constant-mask"],
+    "binary_selection": "constant-mask selected on train/dev due sub-0.001 maximum dev text/load/combined nuisance deltas and dev Brier 0.000000775; baseline dev Brier 0.000000357 but dev note-only and combined maximum probability deltas exceed 0.99. L2=0.01 is screened and not selected (dev Brier 0.02477). No test rows or labels used.",
+    "choice_screening": [
+      {"id":"choice-legacy","config":"fixtures/m014-choice-legacy.experiment.json"},
+      {"id":"choice-cross","config":"fixtures/m014-choice-cross.experiment.json"},
+      {"id":"choice-compositional","config":"fixtures/m014-choice-compositional.experiment.json"}
+    ],
+    "choice_final": ["choice-legacy", "choice-cross", "choice-compositional"],
+    "choice_selection": "compositional architecture fixed as the prospective candidate based on train/dev loss 0.000460, answerable accuracy 1.0, 53/53 counterfactual pairs correct on both sides, and 1.0 no-answer recall; legacy and cross remain frozen comparators. No test rows or labels used.",
+    "screening_budget": "3 Binary fits and 3 Choice fits; no seed, epoch, L2, architecture, or threshold search after this freeze"
+  },
+  "binary_gates": {
+    "primary_metric": "group-mean Brier improvement (comparator Brier minus candidate Brier)",
+    "critical_families": ["m014-binary-text-shift-v1", "m014-binary-combined-shift-v1"],
+    "critical_threshold": "adjusted 95% lower confidence bound > 0 versus both training-prior constant and frozen legacy incumbent",
+    "id_noninferiority_families": ["m014-binary-id-a-v1", "m014-binary-id-b-v1"],
+    "id_noninferiority_margin": -0.02,
+    "id_noninferiority_threshold": "adjusted 95% lower confidence bound >= -0.02 versus legacy incumbent",
+    "load_and_unknown_vocab": "reported as label-preserving negative controls; no post-test retuning"
+  },
+  "choice_gates": {
+    "primary_metric": "answerable conditional top-1 accuracy",
+    "primary_families": ["m014-choice-id-a-v1", "m014-choice-id-b-v1", "m014-choice-text-shift-v1", "m014-choice-combined-shift-v1"],
+    "comparators": ["choice-legacy", "choice-cross", "always-yes train-prior control", "always-no control"],
+    "primary_threshold": "adjusted 95% lower confidence bound > 0 for candidate minus each frozen comparator on identical answerable groups",
+    "counterfactual_cohort": {"minimum_pair_count": 50, "both_sides_correct_point": 0.8, "adjusted_lower_bound": 0.7},
+    "no_answer_recall": {"point_floor": 0.8, "adjusted_lower_bound": 0.65},
+    "answerable_coverage_point_floor": 0.6,
+    "load_and_unknown_vocab": "reported as label-preserving negative controls; no post-test retuning"
+  },
+  "uncertainty": {
+    "method": "paired leakage-group percentile bootstrap; draw whole groups and keep counterfactual pairs together",
+    "replicates": 10000,
+    "seed": 140015,
+    "multiplicity": "one-sided Bonferroni across 18 preregistered primary and guardrail claims; alpha=0.05/18",
+    "interval_direction": "lower bounds are the conservative direction for improvement, noninferiority, pair correctness, and no-answer recall"
+  },
+  "resource_gates": {
+    "artifact_max_bytes": 16777216,
+    "choice_max_options": 128,
+    "choice_p95_128_options_max_micros": 50000,
+    "runtime_peak_rss_max_bytes": 134217728,
+    "cold_load_max_micros": 100000,
+    "platforms": ["linux-x86_64", "linux-aarch64", "macos-aarch64"]
+  },
+  "controls": ["always-yes", "always-no", "always-answer", "always-abstain", "train-prior-constant", "legacy-choice", "current-cross-choice"],
+  "disposition": {
+    "positive": "all required support, primary, critical OOD, counterfactual, abstention, noninferiority, resource, and negative-control gates pass",
+    "negative": "an adequately supported preregistered critical gate fails",
+    "indeterminate": "otherwise, including insufficient support or inconclusive adjusted intervals",
+    "scope": "synthetic task qualification only; not real-world generalization, CodeGG promotion, publication, or deployment approval"
+  },
+  "one_time_test_rule": "Run the frozen final candidate set once after this protocol, membership manifest, code, candidate artifacts, and support reports are committed. Never rerun, retune, or alter gates based on test outcomes; any later candidate requires a new independent cohort."
+}

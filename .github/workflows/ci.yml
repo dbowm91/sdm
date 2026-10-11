@@ -52,6 +52,21 @@ jobs:
         run: |
           mkdir -p target/m014
           cargo run -q -p sdm-experiment --locked -- experiment run --config fixtures/m014-compositional-choice.experiment.json > target/m014/choice-compositional.stdout.json
+      - name: Regenerate M014 data and certify support before held-out inference
+        run: |
+          mkdir -p target/m014
+          python3 scripts/generate_m014_synthetic_suite.py > target/m014/generator.stdout.json
+          cargo run -q -p sdm-data --bin sdm-dataset --locked -- split target/m014/binary.json 140014 target/m014/binary.split.json --test-family m014-binary-id-a-v1 --test-family m014-binary-id-b-v1 --test-family m014-binary-text-shift-v1 --test-family m014-binary-combined-shift-v1 --test-family m014-binary-load-shift-v1 --test-family m014-binary-unknown-vocab-v1
+          cargo run -q -p sdm-data --bin sdm-dataset --locked -- split target/m014/choice.json 140014 target/m014/choice.split.json --test-family m014-choice-id-a-v1 --test-family m014-choice-id-b-v1 --test-family m014-choice-text-shift-v1 --test-family m014-choice-combined-shift-v1 --test-family m014-choice-load-shift-v1 --test-family m014-choice-unknown-vocab-v1
+          cmp fixtures/m014-binary-v1.split.json target/m014/binary.split.json
+          cmp fixtures/m014-choice-v1.split.json target/m014/choice.split.json
+          python3 scripts/validate_future_support.py --dataset target/m014/binary.json --split target/m014/binary.split.json --task binary --required-family m014-binary-id-a-v1 --required-family m014-binary-id-b-v1 --required-family m014-binary-text-shift-v1 --required-family m014-binary-combined-shift-v1 --required-family m014-binary-load-shift-v1 --required-family m014-binary-unknown-vocab-v1 --out target/m014/binary-support.json
+          python3 scripts/validate_future_support.py --dataset target/m014/choice.json --split target/m014/choice.split.json --task choice --required-family m014-choice-id-a-v1 --required-family m014-choice-id-b-v1 --required-family m014-choice-text-shift-v1 --required-family m014-choice-combined-shift-v1 --required-family m014-choice-load-shift-v1 --required-family m014-choice-unknown-vocab-v1 --out target/m014/choice-support.json
+          mkdir -p target/m014/candidates-v2
+          for config in m014-binary-baseline m014-binary-mask m014-binary-mask-l2 m014-choice-legacy m014-choice-cross m014-choice-compositional; do
+            cargo run -q -p sdm-experiment --locked -- experiment run --config "fixtures/${config}.experiment.json" > "target/m014/candidates-v2/${config}.stdout.json"
+          done
+          python3 scripts/verify_m014_freeze.py
       - name: Run M011 generated held-out suites
         run: |
           mkdir -p target/m011-v2
@@ -269,7 +284,7 @@ jobs:
       - name: Benchmark identical trained Choice artifacts
         run: |
           cargo run -p sdm-runtime --example benchmark_typed_choice --locked -- shared-trained-artifact/target/m013a/choice-cross.artifact.json fixtures/m013a-choice-v1.json > typed-choice-cross-portability-${{ matrix.name }}.json
-          cargo run -p sdm-runtime --example benchmark_typed_choice --locked -- shared-trained-artifact/target/m014/choice-compositional.artifact.json fixtures/synthetic-choice-typed-v1.json > typed-choice-compositional-portability-${{ matrix.name }}.json
+          cargo run -p sdm-runtime --example benchmark_typed_choice --locked -- artifacts/m014/choice-compositional-v1.artifact.json shared-trained-artifact/target/m014/choice.json > typed-choice-compositional-portability-${{ matrix.name }}.json
       - uses: actions/upload-artifact@v4
         with:
           name: typed-choice-portability-${{ matrix.name }}

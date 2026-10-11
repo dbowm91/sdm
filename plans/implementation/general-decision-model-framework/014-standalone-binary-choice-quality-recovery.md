@@ -11,7 +11,7 @@ External dependencies: NONE (no CodeGG corpus, external model service or publish
 Review material: `docs/m014-model-quality-research.md`, M013a/M013b/M013c closures and `docs/m013a-protocol-v1.md`
 Closure: `plans/closure/general-decision-model-framework/014-status.md`
 
-Implementation checkpoint: gate A's frozen-schema four-quadrant separability proof is recorded in `docs/m014-model-quality-research.md` and `scripts/test_m014_representability.py`. A new opt-in compositional Choice artifact architecture and train-only Binary exact-constant mask are implemented with constructed/runtime tests. Gates B/C still require the bounded train/dev candidate comparison, explicit gradient/finite-difference evidence, and diagnostics required below. Gates D/E (new suite, support proof, prospective freeze, one final evaluation, cross-host verification, and closure) remain outstanding; no quality outcome is claimed.
+Implementation checkpoint (2026-10-11): gate A's four-quadrant separability proof and bounded compositional Choice architecture are implemented. Binary train-constant mask and L2 policy plus train/dev diagnostics are implemented. Six train/dev candidate fits, the independent 1,200-group-per-task suite, six-family eligible-support reports, split membership, candidate artifacts, and protocol are recorded in `docs/m014-freeze-v1.json`; no candidate report evaluates test. The freeze must be committed and CI-verified before the five frozen `m014-final-*` runs. Explicit gradient/finite-difference evidence, one-time final evaluation, resource qualification, cross-host final candidate verification, and closure remain outstanding; no quality outcome is claimed.
 
 ## 1. Outcome, success definition, and non-goals
 

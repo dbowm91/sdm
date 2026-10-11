@@ -53,3 +53,6 @@ terms. Context coordinates are canonicalized so `i <= j`; list ordering, uniquen
 shape, bounds, schema digest and payload digest are validated. Text vocabulary is
 excluded from all three positions. The legacy diagonal and pairwise-cross artifact
 payloads retain their existing architecture identifiers and feature order.
+# M014 architecture compatibility
+
+`sdm-typed-choice-compositional-v1` is separately dispatched and serialized. It stores the selected context conjunction definition and bounded conjunction-by-option weights in its own schema; it does not reinterpret earlier `sdm-typed-choice-v1` or `sdm-typed-choice-cross-v1` payloads. Runtime validation checks feature schema identity, option count/order, interaction bounds, tensor shape and payload fingerprint before scoring. Cross-platform portability is exercised in CI with the committed M014 artifact.

@@ -749,6 +749,9 @@ impl TypedTaskRuntime {
     pub fn digest(&self) -> &str {
         &self.digest
     }
+    pub fn abstention_threshold(&self) -> f64 {
+        self.threshold
+    }
     pub fn binary_probability(
         &self,
         request: &DecisionRequest,

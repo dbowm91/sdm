@@ -63,3 +63,6 @@ M014 source-derived truth-table proof and implementation evidence are maintained
 [`docs/m014-model-quality-research.md`](m014-model-quality-research.md). This
 mechanical architecture work does not change M013a's negative Binary or
 indeterminate Choice dispositions and does not qualify a model.
+# M014 compositional Choice head
+
+The opt-in `sdm-typed-choice-compositional-v1` runtime adds a bounded conjunction of selected nontext context coordinates, multiplied by each candidate coordinate. It is a distinct artifact architecture; existing typed Choice and cross-feature artifacts retain their prior interpretation. The trainer rejects a design exceeding 4096 conjunction-by-option terms and the runtime enforces the existing 128-option bound. See [artifact-format.md](artifact-format.md) and the M014 research note for the representability proof.

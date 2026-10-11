@@ -1,0 +1,8 @@
+{
+  "dataset_path": "target/m014/binary.json", "split_path": "fixtures/m014-binary-v1.split.json",
+  "architecture": "typed-binary", "seed": 14014, "epochs": 120, "learning_rate": 0.2,
+  "artifact_path": "target/m014/candidates-v2/binary-baseline.artifact.json",
+  "report_path": "target/m014/candidates-v2/binary-baseline.report.json",
+  "quality_diagnostics": true, "seeded_epoch_order": true, "evaluate_test": false,
+  "provenance": {"source":"SDM M014 deterministic synthetic quality suite v1","license":"MIT","consent_scope":"synthetic-only; no human or application data","label_lineage":"scripts/generate_m014_synthetic_suite.py sha256:6629f91123165f52078c2927498d00a7d39bc47eeee3530178c135aff6aa7f48; seed=140014; groups=1200; source-defined active/available and rule-family truth functions","redistributable":true}
+}

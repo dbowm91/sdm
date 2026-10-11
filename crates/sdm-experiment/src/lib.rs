@@ -35,6 +35,12 @@ pub struct ExperimentSpec {
     /// Opt-in train-only removal of exactly constant encoded Binary coordinates.
     #[serde(default)]
     pub binary_constant_mask: bool,
+    /// Binary L2 weight decay; the scalar intercept remains unpenalized.
+    #[serde(default)]
+    pub binary_l2_weight_decay: f64,
+    /// Set false for train/dev candidate screening that must not score held-out rows.
+    #[serde(default = "default_true")]
+    pub evaluate_test: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -93,6 +99,17 @@ pub struct SemanticExperimentRunManifest {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub training_curve: Vec<TrainingEpochLoss>,
     pub verdict: String,
+    #[serde(default = "default_true", skip_serializing_if = "is_true")]
+    pub test_evaluation_performed: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dev_diagnostics: Option<BTreeMap<String, f64>>,
+}
+
+fn default_true() -> bool {
+    true
+}
+fn is_true(value: &bool) -> bool {
+    *value
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -718,6 +735,7 @@ fn train_typed_task(
     choice_cross: bool,
     choice_compositional: bool,
     binary_constant_mask: bool,
+    binary_l2_weight_decay: f64,
     seeded_epoch_order: bool,
     quality_diagnostics: bool,
 ) -> Result<TypedTaskModel, ExperimentError> {
@@ -814,7 +832,7 @@ fn train_typed_task(
                     bias += lr * error;
                     for (j, (w, x)) in weights.iter_mut().zip(x).enumerate() {
                         if !masked_coordinates.contains(&j) {
-                            *w += lr * error * x;
+                            *w += lr * (error * x - binary_l2_weight_decay * *w);
                         }
                     }
                 }
@@ -1075,6 +1093,8 @@ pub fn run_semantic(
         || spec.epochs > 10_000
         || !spec.learning_rate.is_finite()
         || !(0.0..=1.0).contains(&spec.learning_rate)
+        || !spec.binary_l2_weight_decay.is_finite()
+        || !(0.0..=1.0).contains(&spec.binary_l2_weight_decay)
     {
         return Err(ExperimentError::Invalid("invalid training bounds".into()));
     }
@@ -1100,7 +1120,11 @@ pub fn run_semantic(
     validate_split(&examples, &split, &ds).map_err(|e| ExperimentError::Invalid(e.to_string()))?;
     let train = rank_parts(&examples, &split.train)?;
     let dev = rank_parts(&examples, &split.dev)?;
-    let test = rank_parts(&examples, &split.test)?;
+    let test = if spec.evaluate_test {
+        rank_parts(&examples, &split.test)?
+    } else {
+        Vec::new()
+    };
     for e in &examples {
         if e.typed_rank_features.is_none()
             || !matches!(
@@ -1136,28 +1160,30 @@ pub fn run_semantic(
         choice_cross,
         choice_compositional,
         spec.binary_constant_mask,
+        spec.binary_l2_weight_decay,
         spec.seeded_epoch_order,
         spec.quality_diagnostics,
     )?;
     let train_id = digest(&train.to_vec())?;
-    let binary_training_policy = if task == "binary" && spec.binary_constant_mask {
-        let dimension = encoder
-            .dimension()
-            .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
-        let masked: BTreeSet<_> = binary_masked_coordinates.iter().copied().collect();
-        Some(BinaryTrainingPolicy {
-            version: "binary-train-constant-mask-v1".into(),
-            variation_threshold: 0.0,
-            masked_coordinates: binary_masked_coordinates.clone(),
-            retained_coordinates: (0..dimension).filter(|i| !masked.contains(i)).collect(),
-            encoder_fingerprint: encoder.fingerprint.clone(),
-            training_fingerprint: train_id.clone(),
-            l2_weight_decay: 0.0,
-            intercept: "unpenalized-scalar-bias-v1".into(),
-        })
-    } else {
-        None
-    };
+    let binary_training_policy =
+        if task == "binary" && (spec.binary_constant_mask || spec.binary_l2_weight_decay > 0.0) {
+            let dimension = encoder
+                .dimension()
+                .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+            let masked: BTreeSet<_> = binary_masked_coordinates.iter().copied().collect();
+            Some(BinaryTrainingPolicy {
+                version: "binary-train-coordinate-policy-v1".into(),
+                variation_threshold: 0.0,
+                masked_coordinates: binary_masked_coordinates.clone(),
+                retained_coordinates: (0..dimension).filter(|i| !masked.contains(i)).collect(),
+                encoder_fingerprint: encoder.fingerprint.clone(),
+                training_fingerprint: train_id.clone(),
+                l2_weight_decay: spec.binary_l2_weight_decay,
+                intercept: "unpenalized-scalar-bias-v1".into(),
+            })
+        } else {
+            None
+        };
     let envelope = if let Some(triples) = compositional_triples {
         sdm_runtime::ArtifactEnvelopeV2::for_typed_choice_compositional(
             &encoder,
@@ -1433,6 +1459,149 @@ pub fn run_semantic(
             }
             _ => unreachable!(),
         };
+    let dev_diagnostics = if spec.evaluate_test || !spec.quality_diagnostics {
+        None
+    } else {
+        let mut values = BTreeMap::new();
+        match task {
+            "binary" => {
+                let mut brier = 0.0;
+                let mut note_delta: f64 = 0.0;
+                let mut load_delta: f64 = 0.0;
+                let mut combined_delta: f64 = 0.0;
+                let mut causal_delta = 0.0;
+                for e in &dev {
+                    let TargetLabel::Binary(y) = e.label else {
+                        unreachable!()
+                    };
+                    let binding = e.typed_rank_features.as_ref().unwrap();
+                    let p = runtime
+                        .binary_probability(&e.request, binding)
+                        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                    brier += (p - f64::from(y)).powi(2);
+                    let shifted =
+                        |change_note: bool, change_load: bool| -> Result<f64, ExperimentError> {
+                            let mut changed = binding.clone();
+                            for field in &mut changed.context.fields {
+                                if change_note && field.id == "note" {
+                                    field.value = Some(sdm_core::FeatureValue::Text(
+                                        "quartz nebula unseen m014".into(),
+                                    ));
+                                }
+                                if change_load && field.id == "load" {
+                                    field.value = Some(sdm_core::FeatureValue::Number(20.0));
+                                }
+                            }
+                            runtime
+                                .binary_probability(&e.request, &changed)
+                                .map_err(|e| ExperimentError::Invalid(e.to_string()))
+                        };
+                    note_delta = note_delta.max((shifted(true, false)? - p).abs());
+                    load_delta = load_delta.max((shifted(false, true)? - p).abs());
+                    combined_delta = combined_delta.max((shifted(true, true)? - p).abs());
+                    let mut flipped = binding.clone();
+                    for field in &mut flipped.context.fields {
+                        if field.id == "active" {
+                            if let Some(sdm_core::FeatureValue::Boolean(active)) =
+                                field.value.as_mut()
+                            {
+                                *active = !*active;
+                            }
+                        }
+                    }
+                    causal_delta += (runtime
+                        .binary_probability(&e.request, &flipped)
+                        .map_err(|e| ExperimentError::Invalid(e.to_string()))?
+                        - p)
+                        .abs();
+                }
+                let n = dev.len() as f64;
+                values.insert("dev_brier".into(), brier / n);
+                values.insert("dev_note_only_max_abs_probability_delta".into(), note_delta);
+                values.insert("dev_load_only_max_abs_probability_delta".into(), load_delta);
+                values.insert(
+                    "dev_combined_max_abs_probability_delta".into(),
+                    combined_delta,
+                );
+                values.insert(
+                    "dev_active_flip_mean_abs_probability_delta".into(),
+                    causal_delta / n,
+                );
+            }
+            "choice" => {
+                let mut answerable = 0usize;
+                let mut correct = 0usize;
+                let mut no_answer = 0usize;
+                let mut no_answer_correct = 0usize;
+                let mut covered = 0usize;
+                let mut pair_correct = BTreeMap::<String, Vec<bool>>::new();
+                for e in &dev {
+                    let TargetLabel::Choice(target) = &e.label else {
+                        unreachable!()
+                    };
+                    let binding = e.typed_rank_features.as_ref().unwrap();
+                    let confidence = runtime
+                        .choice_answerability_probability(&e.request, binding)
+                        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                    let response = runtime
+                        .decide_typed(&e.request, binding)
+                        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                    if let Some(target) = target {
+                        answerable += 1;
+                        if response.answer.is_some() {
+                            covered += 1;
+                        }
+                        let logits = runtime
+                            .choice_logits(&e.request, binding)
+                            .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                        let sdm_core::DecisionSpec::Choice { options, .. } = &e.request.spec else {
+                            unreachable!()
+                        };
+                        let best = logits
+                            .iter()
+                            .enumerate()
+                            .max_by(|a, b| a.1.total_cmp(b.1))
+                            .map(|(i, _)| i)
+                            .unwrap();
+                        let ok = options[best].id == *target;
+                        correct += usize::from(ok);
+                        if let Some(pair) = &e.counterfactual_pair {
+                            pair_correct.entry(pair.clone()).or_default().push(ok);
+                        }
+                    } else {
+                        no_answer += 1;
+                        if confidence < runtime.abstention_threshold() {
+                            no_answer_correct += 1;
+                        }
+                    }
+                }
+                let pairs = pair_correct
+                    .values()
+                    .filter(|correct| correct.len() == 2)
+                    .collect::<Vec<_>>();
+                let both = pairs.iter().filter(|pair| pair.iter().all(|x| *x)).count();
+                values.insert(
+                    "dev_answerable_accuracy".into(),
+                    correct as f64 / answerable.max(1) as f64,
+                );
+                values.insert(
+                    "dev_answerable_coverage".into(),
+                    covered as f64 / answerable.max(1) as f64,
+                );
+                values.insert(
+                    "dev_no_answer_recall".into(),
+                    no_answer_correct as f64 / no_answer.max(1) as f64,
+                );
+                values.insert("dev_counterfactual_pairs".into(), pairs.len() as f64);
+                values.insert(
+                    "dev_counterfactual_correct_on_both".into(),
+                    both as f64 / pairs.len().max(1) as f64,
+                );
+            }
+            _ => {}
+        }
+        Some(values)
+    };
     let mut report = SemanticExperimentRunManifest {
         dataset_sha256: ds,
         split_fingerprint: split.fingerprint.clone(),
@@ -1451,9 +1620,31 @@ pub fn run_semantic(
         binary_masked_coordinates,
         binary_training_policy,
         training_curve,
-        verdict: "synthetic-mechanics-only".into(),
+        verdict: if spec.evaluate_test {
+            "synthetic-mechanics-only"
+        } else {
+            "train-dev-only"
+        }
+        .into(),
+        test_evaluation_performed: spec.evaluate_test,
+        dev_diagnostics,
     };
-    report.report_sha256 = if report.binary_training_policy.is_none()
+    report.report_sha256 = if let Some(diagnostics) = &report.dev_diagnostics {
+        digest(&(
+            &report.dataset_sha256,
+            &report.split_fingerprint,
+            &report.semantic,
+            &report.model_sha256,
+            &report.calibration_sha256,
+            &report.metrics,
+            &report.abstentions,
+            &report.outcomes,
+            &report.binary_masked_coordinates,
+            &report.binary_training_policy,
+            &report.training_curve,
+            diagnostics,
+        ))?
+    } else if report.binary_training_policy.is_none()
         && report.binary_masked_coordinates.is_empty()
         && report.training_curve.is_empty()
     {
@@ -1745,6 +1936,8 @@ mod tests {
             quality_diagnostics: false,
             seeded_epoch_order: false,
             binary_constant_mask: false,
+            binary_l2_weight_decay: 0.0,
+            evaluate_test: true,
         }
     }
     fn temp_root() -> std::path::PathBuf {
@@ -2147,7 +2340,7 @@ mod tests {
         let binary = run_semantic(&bin).unwrap();
         assert!(!binary.binary_masked_coordinates.is_empty());
         let policy = binary.binary_training_policy.as_ref().unwrap();
-        assert_eq!(policy.version, "binary-train-constant-mask-v1");
+        assert_eq!(policy.version, "binary-train-coordinate-policy-v1");
         assert_eq!(policy.intercept, "unpenalized-scalar-bias-v1");
         assert!(policy
             .masked_coordinates
