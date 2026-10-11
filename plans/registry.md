@@ -12,7 +12,7 @@ States: proposed, ready, active, blocked, closing, closed, conditionally closed,
 
 | Subsystem | Status | Next handoff | Blockers |
 | --- | --- | --- | --- |
-| Standalone general decision-model framework | M013–M013d source merged; **M014 active** | Complete train/dev corrective comparisons, then freeze and qualify new independent Binary/Choice suites | Requires prospective fresh test freeze before any final inference; CodeGG corpus NOT a blocker; crates.io legal gate separate |
+| Standalone general decision-model framework | M013–M013d source merged; **M014 active, final run indeterminate** | New independent cohort and corrected pre-test evaluation freeze if qualification continues | M014 cohort already consumed once; do not rerun it; CodeGG corpus NOT a blocker; crates.io legal gate separate |
 | CodeGG consumer-specific effectiveness (M005) | deferred / indeterminate | independent CodeGG-owned evidence, unscheduled | No approved corpus; does not block M008-M011 |
 
 ## Registered milestone plans
@@ -36,7 +36,7 @@ States: proposed, ready, active, blocked, closing, closed, conditionally closed,
 | M013b | **conditionally closed** (mechanics and source merged; model quality unqualified) | infrastructure / evaluation-integrity corrective | plans/implementation/general-decision-model-framework/013b-evaluation-gates-and-failure-diagnostics.md | Hosted CI 38107890553 green; outstanding reusable gate defects now M013c; see plans/closure/general-decision-model-framework/013b-status.md |
 | M013c | **closed** (source merged; evaluation integrity only) | infrastructure / evidence-integrity corrective | plans/implementation/general-decision-model-framework/013c-qualification-gate-hardening-corrective.md | CI-bound decisions, support-bounded critical negatives, complete family/control coverage implemented; CI 38112863529 passed on merged main; historical closure retained at plans/closure/general-decision-model-framework/013c-status.md |
 | M013d | **closed** (source merged; CI 10/10) | infrastructure / evidence integrity and source integration | plans/implementation/general-decision-model-framework/013d-bootstrap-repair-and-source-integration.md | PR #2 merged as 0e6c3cae5911681b18185673a30484a976cb3821; main CI 38112863529 passed; publication still separately gated; historical closure remains intact |
-| M014 | **active** | capability / prospective quality corrective | plans/implementation/general-decision-model-framework/014-standalone-binary-choice-quality-recovery.md | Choice capacity gap proven; additive compositional architecture and opt-in Binary constant mask implemented. Train/dev ablations, independent frozen support/protocol, one-time final test, and cross-host CI remain before closure; no external corpus dependency |
+| M014 | **active; final run indeterminate** | capability / prospective quality corrective | plans/implementation/general-decision-model-framework/014-standalone-binary-choice-quality-recovery.md | Choice capacity gap proven; additive compositional architecture and Binary constant mask implemented. Final run record: plans/closure/general-decision-model-framework/014-status.md. Binary artifact identity mismatch and evaluator failure prevent qualification; new independent cohort required for any further attempt |
 
 ## Interface and operational dependencies
 
@@ -48,7 +48,7 @@ Accepted boundary: plans/adrs/ADR-0002-standalone-framework-before-consumer-qual
 
 ## M014 quality-recovery handoff
 
-Active plan: plans/implementation/general-decision-model-framework/014-standalone-binary-choice-quality-recovery.md; research: docs/m014-model-quality-research.md; freeze: docs/m014-freeze-v1.json. The full Choice two-rule XOR-like target is not representable by the old pairwise margin; a source-derived proof and separate compositional architecture exist. Binary has an opt-in train-only exact-constant coordinate mask and bounded L2 policy. Train/dev screening, independent synthetic data, eligible support, prospective protocol, candidate artifacts, and final evaluation configs are frozen. The final held-out test has NOT been run; commit and hosted CI verification of the freeze precede the one-time final run. Do not use M013a test for optimization. M005 and crates.io remain separate external gates. Closure planned at plans/closure/general-decision-model-framework/014-status.md.
+Active plan: plans/implementation/general-decision-model-framework/014-standalone-binary-choice-quality-recovery.md; research: docs/m014-model-quality-research.md; freeze: docs/m014-freeze-v1.json; final run record: plans/closure/general-decision-model-framework/014-status.md. The full Choice two-rule XOR-like target is not representable by the old pairwise margin; a source-derived proof and separate compositional architecture exist. Binary has an opt-in train-only exact-constant coordinate mask and bounded L2 policy. Train/dev screening, independent synthetic data, eligible support, protocol, and candidate artifacts were frozen and CI verified before the one-time final run. That run is **indeterminate**: Binary output artifact hashes do not match the frozen candidates, and the frozen evaluator failed to produce valid confidence intervals. Do not rerun this cohort or make post-test model/gate changes; any further qualification requires a new independent cohort and protocol. Do not use M013a test for optimization. M005 and crates.io remain separate external gates.
 
 ## M013d final bootstrap/source integration handoff
 
@@ -68,14 +68,11 @@ Keep frozen M013a evaluation unchanged. M014 is ready as an independent quality-
 
 Plan: plans/implementation/general-decision-model-framework/013b-evaluation-gates-and-failure-diagnostics.md. Planning branch: work/plans-sdm-m013b-quality-gates-diagnostics; source predecessor work/plans-sdm-m013-predictive-quality-corrective@694da1a002cf29c62724be6ba881240f43aac9c2. Scope: corrected fixed-option counterfactual responsiveness, executable mandatory positive-quality gates, a source-backed M013a erratum sidecar, and train/dev-only Binary and Choice diagnostics. M013b corrected evaluation integrity and isolated both root causes; it did NOT qualify any candidate. Closure evidence: plans/closure/general-decision-model-framework/013b-status.md. No new qualifying held-out experiment is authorized. This statement describes the historical M013b handoff; PR #2 has since merged the source.
 
-## Future-plan readiness after M013d (reconciled 2026-10-11)
+## Future-plan readiness after M013d (historical snapshot, superseded)
 
 Source integration was COMPLETED by PR #2, merge 0e6c3cae5911681b18185673a30484a976cb3821, and merged-main CI 38112863529 (10/10 successful). M013c and M013d engineering/integration source is closed. M013a negative/indeterminate model evidence remains unchanged. The historical M013b source commit still contains the defective helper, but main's M013d implementation corrects it.
 
-**M014 is now registered READY** on a new planning branch. M013d was an engineering/bootstrap corrective, not a predictive experiment. Before M014 can run a qualifying FINAL test:
-
-1. **A reviewed main-targeted merge.** PR #2 must be reviewed and merged; until then the M013–M013d stack is branch-verified, not main-integrated.
-2. **Prospective freeze before inference**: new independent frozen test groups, numeric thresholds and an alpha/multiple-comparison policy declared BEFORE the data are seen, and `scripts/validate_future_support.py` passing on the eligible subgroups.
+This section records the pre-merge state only. PR #2 and the prospective M014 freeze are complete; the final M014 run and its indeterminate disposition are recorded above and in `plans/closure/general-decision-model-framework/014-status.md`. The consumed M014 cohort cannot be run again.
 
 What M013c does unblock is *trustworthy gate machinery*: a future protocol can now be written against CI-bound, support-bounded, completeness-checked gates. That is a necessary precondition, not an authorization. M013b's train/dev diagnostics isolated two testable mechanisms — a constant-feature hidden bias in Binary and a truth-independent interaction offset in Choice — and either could seed a successor design, but selecting a remedy requires prospective evidence this repository does not yet have.
 

@@ -44,4 +44,8 @@ The full pairwise Choice hypothesis is **confirmed** by the frozen feature const
 
 `scripts/test_m014_representability.py` captures this constructed full-table rank/separability proof and a fixed finite conjunction-weight control. It also keeps unavailable cases separate from option ranking. This is a mathematical and executable proof over the source-derived reduced design, not an optimizer run and not evidence from M013a test rows. The next implementation step is the bounded declared context-conjunction × option-coordinate architecture. The earlier M013b assertion that Choice capacity was not a blocker is superseded for this two-rule target; its train/dev finding about a truth-independent offset remains a separate optimizer diagnosis.
 
-Binary's train-constant-coordinate hypothesis remains to be measured on train/dev using the explicit M014 policy. No prospective test result is recorded here.
+Binary's train-constant-coordinate hypothesis was screened on train/dev. The one-time final run did not qualify the frozen Binary candidates because the output artifact identities differed from the frozen candidate artifacts; see the M014 status record.
+
+## 7. One-time final-run status (2026-10-11)
+
+The frozen final configs ran once after freeze CI 38117443065 passed. Aggregate point metrics and report identities are recorded in `plans/closure/general-decision-model-framework/014-status.md`, with full reports and output artifacts under `artifacts/m014/final-v1/`. The result is indeterminate: Binary output artifact identities differ from frozen candidate artifacts, and the frozen analysis program cannot handle the serialized true-test default or paired rows per Binary leakage group. No gates or candidates were revised after observing test outputs; this cohort must not be rerun.
