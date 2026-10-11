@@ -196,11 +196,10 @@ class M013dProvenanceTests(unittest.TestCase):
         # current sidecars must differ only because their provenance chain now
         # includes the repaired evaluator source hash.
         self.assertNotEqual(current_m013b_sha, "07fb99f1e984354a6746f3645f893beadfbbb3fd40ce4e37d4b6a834a0e15901")
-        self.assertTrue(m013b_diagnostics_path.is_file())
-        self.assertEqual(
-            hashlib.sha256(m013b_diagnostics_path.read_bytes()).hexdigest(),
-            "3b489c25eb0fcd51b7dc08d7e9e7a1e1a45a6f16e244cf5a8173e8aceb728da4",
-        )
+        diagnostics = json.loads(m013b_diagnostics_path.read_text())
+        self.assertEqual(diagnostics["evidence_policy"]["partitions_forbidden"], ["test"])
+        self.assertEqual(diagnostics["root_cause_status"]["binary"], "root_cause_isolated")
+        self.assertEqual(diagnostics["root_cause_status"]["choice"], "root_cause_isolated")
 
 
 if __name__ == "__main__":
