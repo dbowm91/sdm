@@ -1,6 +1,6 @@
 # General Decision-Model Framework and First Consumer Roadmap
 
-Status: M001-M011 evidence retained; no standalone milestone active; M005 deferred
+Status: M001-M011 evidence retained; M012 release reconciliation ready; M005 deferred
 Audit baseline: dbowm91/sdm@8139b064bdcf3212e8f6fd912e801a479b55751c (2026-10-05)
 Planning date: 2026-10-10
 Primary decisions: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md; plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md
@@ -103,7 +103,15 @@ Complete train/package/infer/evaluate paths for every declared semantic family u
 Class: capability/release infrastructure. Status: closed; evidence: plans/closure/general-decision-model-framework/011-status.md. Plan: plans/implementation/general-decision-model-framework/011-standalone-release-qualification.md.
 Frozen held-out suites, positive/negative/indeterminate gates, the same trained artifact on three targets, Rust 1.89, independent consumer compilation, documentation, dependency/license metadata and package verification are recorded. Binary OOD evidence is negative; Choice quality and some OOD slices are indeterminate. This is a mechanics/release candidate only and does not qualify CodeGG or auto-publish.
 
-Dependency graph: M008 -> M009 -> M010 -> M011 is complete. Each milestone has its own plans/closure/general-decision-model-framework/NNN-status.md evidence and registry update. CodeGG M005 stays deferred on a separate external gate. No other registered work line is currently eligible.
+Dependency graph: M008 -> M009 -> M010 -> M011 is complete; M012 is ready as a release-process corrective. Existing milestones retain numbered closure evidence and registry state. CodeGG M005 remains deferred on a separate external gate.
+
+### M012 — Release and branch reconciliation corrective
+Class: corrective infrastructure/release readiness. Status: **ready**.
+Plan: plans/implementation/general-decision-model-framework/012-post-m011-release-reconciliation-corrective.md.
+Planning baseline: f9ce89765a1cb07ce23100177d8f56c30e52777d; integration target main at 8139b064bdcf3212e8f6fd912e801a479b55751c (re-audit both).
+Scope: review full M001-M011 ancestry into main, resolve all seven crate manifests' missing registry metadata, verify package contents and an independent consumer, record third-party SPDX/license obligations for human review, reconcile documentation and artifact trust boundaries, rerun Rust 1.89/three-platform and frozen compatibility checks, and prepare a reviewable PR. No implicit merge, crates.io publish, tag, or CodeGG pin change.
+Retain the synthetic predictive limitations reported by M011, notably negative Binary OOD performance and Choice's zero response changes to its tested target-flipping counterfactuals. Those belong in a separate future model-quality line, not as a premise to weaken release mechanics gates.
+Required closure: plans/closure/general-decision-model-framework/012-status.md, including PR URL/state, exact source/head/merge-base, CI logs, package inventory and license-review disposition. A publication blocker can remain when a reviewed source PR is ready; the two decisions must be stated separately.
 
 ## 7. Cross-cutting requirements
 
@@ -132,4 +140,4 @@ Create plans/closure/general-decision-model-framework/NNN-status.md for each mil
 
 ## 10. Readiness
 
-M001-M011 outcomes are retained under plans/closure/general-decision-model-framework/. M005 stays indeterminate because no approved independent CodeGG corpus or consumer adapter exists. The v1 consumer contract remains unchanged and no CodeGG model is promoted. The repository has no active SDM-owned implementation plan after M011; future work requires a newly approved handoff or the external M005 gate to change.
+M001-M011 outcomes are retained under plans/closure/general-decision-model-framework/. M005 stays indeterminate because no approved independent CodeGG corpus or consumer adapter exists. The v1 consumer contract remains unchanged and no CodeGG model is promoted. M012 is the next ready SDM-owned handoff for packaging, license review, documentation, and branch integration; it is independent of the unavailable CodeGG corpus. M005 remains externally deferred.
