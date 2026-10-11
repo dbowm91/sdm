@@ -1,10 +1,17 @@
 # M013c gate-hardening baseline audit
 
-Status: planning-only source inspection; no code/evaluation performed
+Status: **implemented** — all five defects closed; see plans/closure/general-decision-model-framework/013c-status.md
 Baseline: dbowm91/sdm@11ea106c9af3b1ec362a98e709b530cc0fa137d0 on work/plans-sdm-m013b-quality-gates-diagnostics
-Recent hosted checks: https://github.com/dbowm91/sdm/actions/runs/38107890553 (all jobs successful)
+Recent hosted checks: https://github.com/dbowm91/sdm/actions/runs/38107890553 (all jobs successful, for the M013b planning baseline)
 Historical evidence: plans/closure/general-decision-model-framework/013a-status.md and 013b-status.md
 Bounded handoff: plans/implementation/general-decision-model-framework/013c-qualification-gate-hardening-corrective.md
+
+## Outcome summary
+
+All four source defects below were confirmed at the baseline and closed. Implementation also found a
+fifth defect not anticipated by the plan — a latent unsorted-quantile bootstrap bug in
+`scripts/m013b_evaluator.py` — which is documented in closure §3. No recorded M013a or M013b result
+changed; the Binary `negative` and Choice `indeterminate` dispositions are preserved exactly.
 
 ## Four concrete source defects
 
@@ -19,8 +26,10 @@ M013a Binary text-shift improvement -0.2696 and combined shift -0.2699 over trai
 
 ## Planning/status mismatch
 
-The registry and README say M013b closed, while its dated closure header says conditionally closed; roadmap still calls M013b ready. Reconcile current-facing records to "M013b conditionally closed — mechanics complete; source outside main" without rewriting its closure. No main-targeted PR exists yet; main is still at M012 merge 2bd0d5af16d143828dcbce77f411b8f3b675e7be.
+The registry and README said M013b closed, while its dated closure header says conditionally closed; the roadmap still called M013b ready. **Resolved** — all current-facing records now read "conditionally closed" with the historic M013b closure file left untouched. No main-targeted PR exists yet; main is still at M012 merge `2bd0d5af16d143828dcbce77f411b8f3b675e7be`.
 
 ## Reason for a narrow M013c
 
 The M013b evaluator made the right methodological improvements but the next predictive test would trust its verdict code. Fixing confidence-interval and manifest-integrity logic first is cheaper, safer and more decisive than starting a new candidate model or broad architecture search. M013c is a verification/contract task; further model work should receive a separately numbered future milestone and prospectively frozen gates.
+
+That reasoning held. All four defects were real, and the gate logic had to be trusted before any further experiment could be meaningful. M013d/M014 remains unregistered and **not unblocked** — hosted CI, a reviewed main merge, and a corrective for the M013b bootstrap defect must precede it, and any successor must prospectively freeze new test groups and numeric thresholds.

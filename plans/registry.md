@@ -1,8 +1,8 @@
 # SDM Planning Registry
 
-Status: M013c **ready** for evaluator gate hardening; M013b **conditionally closed** (mechanical CI passed, source unmerged); M013/M013a conditionally closed; crates.io publication separately gated on human/legal sign-off
+Status: M013c **conditionally closed** — gate hardening mechanically complete on the source branch, source still unmerged; M013b **conditionally closed** (mechanical CI passed, source unmerged); M013/M013a conditionally closed; crates.io publication separately gated on human/legal sign-off
 Governance: plans/003-planning-process.md
-Current planning baseline: work/plans-sdm-m013b-quality-gates-diagnostics@11ea106c9af3b1ec362a98e709b530cc0fa137d0 (main remains 2bd0d5af16d143828dcbce77f411b8f3b675e7be)
+Current planning baseline: work/plans-sdm-m013c-qualification-gate-hardening@<M013c-closure-commit> (main remains 2bd0d5af16d143828dcbce77f411b8f3b675e7be)
 Accepted architecture: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md
 
@@ -12,7 +12,7 @@ States: proposed, ready, active, blocked, closing, closed, conditionally closed,
 
 | Subsystem | Status | Next handoff | Blockers |
 | --- | --- | --- | --- |
-| Standalone general decision-model framework | M013/M013a/M013b conditionally closed; **M013c ready** | M013c qualification gate hardening; then main-targeted reviewed source PR | Current Binary CI/critical-support and family/control gate defects; M013 stack unmerged; crates.io separately gated |
+| Standalone general decision-model framework | M013/M013a/M013b/M013c conditionally closed; **no ready milestone** | main-targeted reviewed source PR for the M013/M013a/M013b/M013c stack | Stack unmerged; Binary CI-bound gate and negative-control defects closed but unverified on hosted CI; crates.io separately gated |
 | CodeGG consumer-specific effectiveness (M005) | deferred / indeterminate | independent CodeGG-owned evidence, unscheduled | No approved corpus; does not block M008-M011 |
 
 ## Registered milestone plans
@@ -34,7 +34,7 @@ States: proposed, ready, active, blocked, closing, closed, conditionally closed,
 | M013 | **conditionally closed** | capability / evidence corrective | plans/implementation/general-decision-model-framework/013-predictive-quality-corrective-and-independent-qualification.md | Bounded Choice cross architecture implemented; original prospective corpus invalid; see 013-status.md |
 | M013a | **conditionally closed** | evidence corrective | plans/implementation/general-decision-model-framework/013a-independent-quality-suite-integrity-rerun.md | Valid independent suite; negative Binary result, indeterminate Choice and three under-supported Choice OOD accuracy slices in plans/closure/general-decision-model-framework/013a-status.md |
 | M013b | **conditionally closed** (mechanically passed, unmerged) | infrastructure / evaluation-integrity corrective | plans/implementation/general-decision-model-framework/013b-evaluation-gates-and-failure-diagnostics.md | Hosted CI 38107890553 green; outstanding reusable gate defects now M013c; see plans/closure/general-decision-model-framework/013b-status.md |
-| M013c | **ready** | infrastructure / evidence-integrity corrective | plans/implementation/general-decision-model-framework/013c-qualification-gate-hardening-corrective.md | M013b mechanics complete on source branch; no CodeGG corpus, new test labels or external publication needed |
+| M013c | **conditionally closed** (mechanically complete, unmerged) | infrastructure / evidence-integrity corrective | plans/implementation/general-decision-model-framework/013c-qualification-gate-hardening-corrective.md | CI-bound decisions, support-bounded critical negatives, complete family/control coverage implemented; hosted CI and main merge outstanding; see plans/closure/general-decision-model-framework/013c-status.md |
 
 ## Interface and operational dependencies
 
@@ -46,15 +46,31 @@ Accepted boundary: plans/adrs/ADR-0002-standalone-framework-before-consumer-qual
 
 ## M013c evaluation-gate-hardening handoff
 
-Ready corrective: plans/implementation/general-decision-model-framework/013c-qualification-gate-hardening-corrective.md. Planning source: work/plans-sdm-m013b-quality-gates-diagnostics@11ea106c9af3b1ec362a98e709b530cc0fa137d0; planning branch work/plans-sdm-m013c-qualification-gate-hardening. Historical M013b post-hoc diagnostic remains fixed; harden real confidence bounds/support, complete required family/control coverage, and repair meaningless negative-control comparison. Keep frozen M013a evaluation unchanged. No M013d/M014 model experiment is ready. Source integration PR after review, no auto-merge. Closure expected at plans/closure/general-decision-model-framework/013c-status.md.
+Plan: plans/implementation/general-decision-model-framework/013c-qualification-gate-hardening-corrective.md. Planning source: work/plans-sdm-m013b-quality-gates-diagnostics@11ea106c9af3b1ec362a98e709b530cc0fa137d0. Implementation branch: work/plans-sdm-m013c-qualification-gate-hardening. Closure evidence: plans/closure/general-decision-model-framework/013c-status.md.
+
+M013c is **conditionally closed**. It hardens the reusable gate logic: decisions come from the 95% paired-group interval bounds rather than a point mean, a critical negative requires the preregistered minimum of eligible independent groups, the declared Binary required families and Choice required OOD families are enumerated from the protocol rather than from whatever the report happens to contain, and all five declared negative controls are measured separately on the same answerable population with real paired learned-minus-control intervals. It also repaired a latent unsorted-quantile defect inherited from the M013b bootstrap without altering any frozen M013b file or recorded M013a/M013b result.
+
+**Defect-E follow-up (registered, not closed).** The M013b `group_bootstrap`/`quantile` ordering defect remains in `scripts/m013b_evaluator.py` because that file is frozen evidence and is hashed by the M013b sidecar. It is inert for every recorded M013a/M013b interval (the frozen M013a analyzer sorts correctly and the affected intervals are degenerate), but it is recorded here as a live defect in the reusable M013b module and must be fixed by a separate corrective before any new experiment relies on that module.
+
+Keep frozen M013a evaluation unchanged. No M013d/M014 model experiment is ready. Source integration PR after review, no auto-merge.
 
 ## M013b corrective handoff
 
 Plan: plans/implementation/general-decision-model-framework/013b-evaluation-gates-and-failure-diagnostics.md. Planning branch: work/plans-sdm-m013b-quality-gates-diagnostics; source predecessor work/plans-sdm-m013-predictive-quality-corrective@694da1a002cf29c62724be6ba881240f43aac9c2. Scope: corrected fixed-option counterfactual responsiveness, executable mandatory positive-quality gates, a source-backed M013a erratum sidecar, and train/dev-only Binary and Choice diagnostics. M013b corrected evaluation integrity and isolated both root causes; it did NOT qualify any candidate. Closure evidence: plans/closure/general-decision-model-framework/013b-status.md. No new qualifying held-out experiment is authorized. Source integration remains unmerged and requires a separately reviewed PR.
 
-## Future-plan readiness after M013b
+## Future-plan readiness after M013c
 
-M013b is **conditionally closed** (mechanical CI green on [38107890553](https://github.com/dbowm91/sdm/actions/runs/38107890553), but source remains outside main and evaluation-gate defects are registered as M013c). M013c is **ready** and is NOT a prospective predictive-quality experiment. A future quality successor may be registered after gate closure and prospective freeze but cannot be started as qualified work. M013b diagnostics isolated two testable mechanisms — a constant-feature hidden bias in Binary and a truth-independent interaction offset in Choice — and `scripts/validate_future_support.py` exists so any future protocol can verify eligible-subgroup support *before* final inference. A successor plan must prospectively seal its data, protocol and numeric thresholds, pass that validator, and use NEW independent frozen test groups. No M013a test row is qualification-eligible, no CodeGG model promotion is authorized, and crates.io publication stays behind its human/legal gate.
+M013c is **conditionally closed** — the four gate defects plus one latent bootstrap defect are closed on the source branch, but hosted CI and the main merge are outstanding. M013b remains **conditionally closed** and its reusable evaluator still carries the unsorted-quantile defect recorded above.
+
+**A successor predictive-quality milestone (M013d or M014) is NOT unblocked and is NOT registered ready.** Three things must happen first, in order:
+
+1. **Hosted CI green** on the M013/M013a/M013b/M013c stack, and a separately reviewed main-targeted PR merged. Until then the stack's mechanics are locally verified only.
+2. **The M013b quantile-ordering defect corrected** under its own narrow corrective. A new protocol may reuse `scripts/m013c_evaluator.py`, which sorts correctly; it may not reuse the M013b bootstrap path for a non-degenerate interval.
+3. **Prospective freeze before inference**: new independent frozen test groups, numeric thresholds and an alpha/multiple-comparison policy declared BEFORE the data are seen, and `scripts/validate_future_support.py` passing on the eligible subgroups.
+
+What M013c does unblock is *trustworthy gate machinery*: a future protocol can now be written against CI-bound, support-bounded, completeness-checked gates. That is a necessary precondition, not an authorization. M013b's train/dev diagnostics isolated two testable mechanisms — a constant-feature hidden bias in Binary and a truth-independent interaction offset in Choice — and either could seed a successor design, but selecting a remedy requires prospective evidence this repository does not yet have.
+
+No M013a test row is qualification-eligible, no CodeGG model promotion is authorized, and crates.io publication stays behind its human/legal gate.
 
 ## M013 quality-corrective handoff controls
 

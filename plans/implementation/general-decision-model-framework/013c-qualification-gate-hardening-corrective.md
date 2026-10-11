@@ -1,6 +1,6 @@
 # SDM M013c — Qualification-Gate Hardening Corrective
 
-Status: **ready** (implementation handoff only; no code change or experiment performed by planning commit)
+Status: **conditionally closed** — implemented and verified locally; hosted CI and the main merge are outstanding. Closure evidence: plans/closure/general-decision-model-framework/013c-status.md
 Class: infrastructure / evidence-integrity corrective
 Source baseline: dbowm91/sdm@11ea106c9af3b1ec362a98e709b530cc0fa137d0 on work/plans-sdm-m013b-quality-gates-diagnostics; re-audit current branch, CI and open PRs before implementing
 Planning branch: work/plans-sdm-m013c-qualification-gate-hardening

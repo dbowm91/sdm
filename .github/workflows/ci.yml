@@ -115,6 +115,48 @@ jobs:
           diagnostics = json.loads((out / "m013b-diagnostics.json").read_text())
           assert diagnostics["evidence_policy"]["partitions_forbidden"] == ["test"]
           PY
+      - name: Verify M013c qualification-gate hardening
+        if: hashFiles('target/m013a/*.report.json') != ''
+        run: |
+          # Same staging caveat as the M013b step: the shell redirections are
+          # evaluated before any script creates the directory.
+          mkdir -p target/m013c
+          # Constructed fixtures only: no training, no held-out selection loop,
+          # no M013a test feedback. These fail if a mandatory gate can be
+          # skipped, a critical n<minimum labels negative, a point mean
+          # masquerades as a confidence interval, or a control is omitted.
+          python3 -m unittest discover -s scripts -p 'test_m013c_*.py'
+          # Read-only retrospective gate-semantics correction over the unchanged
+          # saved reports. Writes only target/m013c/.
+          python3 scripts/m013c_qualification_audit.py > target/m013c/audit.stdout.json
+          python3 - <<'PY'
+          import json, pathlib, sys
+          out = pathlib.Path("target/m013c")
+          audit_path = out / "m013c-decision-audit.json"
+          if not audit_path.exists():
+              sys.exit("M013c decision audit sidecar missing")
+          audit = json.loads(audit_path.read_text())
+          assert audit["frozen_inputs_modified"] is False, "M013c must not modify frozen inputs"
+          # Historical dispositions must survive the hardening unchanged.
+          assert audit["retained_disposition"]["binary"] == "negative", audit["retained_disposition"]
+          assert audit["retained_disposition"]["choice"] == "indeterminate", audit["retained_disposition"]
+          assert audit["retained_disposition"]["binary_verdict_unchanged"] is True
+          assert audit["retained_disposition"]["choice_verdict_unchanged"] is True
+          # No gate may reach a supported critical negative below its minimum support.
+          minimum = audit["declared_required_sets"]["binary"]["minimum_independent_groups"]
+          for gate in audit["gate_verdicts"]["binary"]["gates"]:
+              if gate["status"] == "fail" and gate["critical"]:
+                  assert gate["evidence_count"] >= gate["minimum_group_support"] == minimum, gate
+          # Every declared negative control is measured, never replaced or dropped.
+          controls = audit["declared_required_sets"]
+          measured = {
+              gate["name"].split("::")[-1]
+              for gate in audit["gate_verdicts"]["choice"]["gates"]
+              if gate["name"].startswith("negative_control::measured::")
+          }
+          assert len(measured) == 5, f"expected 5 measured controls, got {sorted(measured)}"
+          assert controls["choice_required_ood_families"], "required OOD families must be enumerated"
+          PY
       - name: Capture runtime benchmark
         run: cargo run -p sdm-runtime --example benchmark -- fixtures/benchmark-rank-request.json artifacts/compatibility-rank-v1.json > benchmark-${{ matrix.name }}.json
       - name: Capture nonlinear runtime benchmark
@@ -145,6 +187,7 @@ jobs:
             target/m011-v2/
             target/m013a/
             target/m013b/
+            target/m013c/
   portability:
     needs: verify
     strategy:
