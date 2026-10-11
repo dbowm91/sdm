@@ -1,2 +1,6 @@
 /target/
 *.tmp
+__pycache__/
+*.py[cod]
+/examples/standalone-consumer/target/
+.DS_Store

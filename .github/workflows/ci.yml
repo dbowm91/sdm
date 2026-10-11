@@ -85,6 +85,33 @@ jobs:
           cargo run -q -p sdm-experiment --locked -- experiment run --config fixtures/m013a-choice-legacy-v1.experiment.json > target/m013a/choice-legacy.stdout.json
           cargo run -q -p sdm-experiment --locked -- experiment run --config fixtures/m013a-choice-cross-v1.experiment.json > target/m013a/choice-cross.stdout.json
           python3 scripts/analyze_m013a_quality.py > target/m013a/quality-analysis.stdout.json
+      - name: Verify M013b evaluation-integrity evaluator
+        if: hashFiles('target/m013a/*.report.json') != ''
+        run: |
+          # Unit tests run against constructed fixtures only: no training, no
+          # held-out model-selection loop, no M013a test feedback.
+          python3 -m unittest discover -s scripts -p 'test_m013b_*.py'
+          # Read-only retrospective erratum over the unchanged saved reports.
+          python3 scripts/m013b_audit_m013a.py > target/m013b/audit.stdout.json
+          # Train/dev-only diagnostics; never selects a model.
+          python3 scripts/m013b_diagnostics.py > target/m013b/diagnostics.stdout.json
+          # Confirm the frozen M013a disposition is preserved verbatim.
+          python3 - <<'PY'
+          import json, pathlib, sys
+          out = pathlib.Path("target/m013b")
+          if not (out / "m013a-audit-erratum.json").exists():
+              sys.exit("M013b audit sidecar missing")
+          if not (out / "m013b-diagnostics.json").exists():
+              sys.exit("M013b diagnostics missing")
+          erratum = json.loads((out / "m013a-audit-erratum.json").read_text())
+          assert erratum["frozen_inputs_modified"] is False
+          assert erratum["retained_disposition"]["binary"].startswith("negative")
+          assert erratum["retained_disposition"]["choice"].startswith("indeterminate")
+          assert erratum["gate_verdicts"]["choice"]["verdict"] == "indeterminate"
+          assert erratum["gate_verdicts"]["binary"]["verdict"] == "negative"
+          diagnostics = json.loads((out / "m013b-diagnostics.json").read_text())
+          assert diagnostics["evidence_policy"]["partitions_forbidden"] == ["test"]
+          PY
       - name: Capture runtime benchmark
         run: cargo run -p sdm-runtime --example benchmark -- fixtures/benchmark-rank-request.json artifacts/compatibility-rank-v1.json > benchmark-${{ matrix.name }}.json
       - name: Capture nonlinear runtime benchmark
@@ -114,6 +141,7 @@ jobs:
             target/experiments/
             target/m011-v2/
             target/m013a/
+            target/m013b/
   portability:
     needs: verify
     strategy:

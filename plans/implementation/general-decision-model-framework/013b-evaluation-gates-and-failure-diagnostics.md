@@ -1,6 +1,6 @@
 # SDM M013b — Evaluation-Gate Integrity and Model-Failure Diagnostics Corrective
 
-Status: **ready** (implementation handoff; no code or experiment run by this planning commit)
+Status: **conditionally closed** — implemented and mechanically verified; closure evidence at `plans/closure/general-decision-model-framework/013b-status.md`. This file is retained as the implementation handoff of record and is not rewritten to reflect later results.
 Class: infrastructure / evaluation-integrity corrective
 Planning baseline: `dbowm91/sdm@694da1a002cf29c62724be6ba881240f43aac9c2` on `work/plans-sdm-m013-predictive-quality-corrective`; implementation agents MUST recheck live head and CI
 Planning branch: `work/plans-sdm-m013b-quality-gates-diagnostics`; implementation agents branch from this registered planning commit and preserve prior history
@@ -10,6 +10,8 @@ Architectural authority: ADR-0001, ADR-0002, CodeGG ADR-0013 for consumer-owned 
 Predecessors (hard): M013 and M013a **conditionally closed** on the development branch, not merged into main
 External gates: **none** for this corrective; no approved CodeGG corpus, teacher service, human data, publication or release approval
 Closure destination: `plans/closure/general-decision-model-framework/013b-status.md`
+
+> **Implementation outcome summary.** The historical "raw target margin changes sign" counterfactual statistic was confirmed to be a label-alignment artifact, and on real frozen pairs the corrected fixed-option metric reports zero input response where the old metric reported a sign flip. The positive-quality gate is now executable and fail-closed; the historical Choice verdict is indeterminate with 10 blocking mandatory gates, and Binary remains negative. Train/dev-only diagnostics isolated both root causes: a fit-constant note-token offset of `-13.4437` for Binary, and a truth-independent interaction offset that stops the Choice gap from ever changing sign for Choice. Two competing hypotheses were falsified. No model is qualified, no frozen input was modified, and no M013a test row informed any decision.
 
 ## 1. Objective and success definition
 
