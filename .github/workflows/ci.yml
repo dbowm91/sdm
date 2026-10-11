@@ -48,6 +48,10 @@ jobs:
           cargo run -p sdm-experiment --locked -- experiment run --config fixtures/synthetic-binary-typed-v1.experiment.json
           cargo run -p sdm-experiment --locked -- experiment run --config fixtures/synthetic-choice-typed-v1.experiment.json
           cargo run -p sdm-experiment --locked -- experiment run --config fixtures/synthetic-score-typed-v1.experiment.json
+      - name: Train and reload the additive compositional Choice architecture
+        run: |
+          mkdir -p target/m014
+          cargo run -q -p sdm-experiment --locked -- experiment run --config fixtures/m014-compositional-choice.experiment.json > target/m014/choice-compositional.stdout.json
       - name: Run M011 generated held-out suites
         run: |
           mkdir -p target/m011-v2
@@ -213,6 +217,7 @@ jobs:
             target/experiments/
             target/m011-v2/
             target/m013a/
+            target/m014/
             target/m013b/
             target/m013c/
   portability:
@@ -261,9 +266,11 @@ jobs:
         with:
           name: benchmark-linux-x64
           path: shared-trained-artifact
-      - name: Benchmark identical trained Choice cross artifact
-        run: cargo run -p sdm-runtime --example benchmark_typed_choice --locked -- shared-trained-artifact/target/m013a/choice-cross.artifact.json fixtures/m013a-choice-v1.json > typed-choice-portability-${{ matrix.name }}.json
+      - name: Benchmark identical trained Choice artifacts
+        run: |
+          cargo run -p sdm-runtime --example benchmark_typed_choice --locked -- shared-trained-artifact/target/m013a/choice-cross.artifact.json fixtures/m013a-choice-v1.json > typed-choice-cross-portability-${{ matrix.name }}.json
+          cargo run -p sdm-runtime --example benchmark_typed_choice --locked -- shared-trained-artifact/target/m014/choice-compositional.artifact.json fixtures/synthetic-choice-typed-v1.json > typed-choice-compositional-portability-${{ matrix.name }}.json
       - uses: actions/upload-artifact@v4
         with:
           name: typed-choice-portability-${{ matrix.name }}
-          path: typed-choice-portability-${{ matrix.name }}.json
+          path: typed-choice-*-portability-${{ matrix.name }}.json

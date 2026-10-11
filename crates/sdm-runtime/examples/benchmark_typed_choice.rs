@@ -1,4 +1,4 @@
-//! Benchmark one frozen Linux-trained M013a Choice cross artifact on each host.
+//! Benchmark one Linux-trained typed Choice artifact on each host.
 use sdm_core::{DecisionOption, DecisionRequest, DecisionSpec, TypedRankProjectionV2};
 use sdm_runtime::{load_artifact, ArtifactEnvelopeV2, LoadedArtifact, TypedTaskRuntime};
 use std::{env, fs, time::Instant};
@@ -41,14 +41,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cold_load_micros = started.elapsed().as_micros();
     let envelope: ArtifactEnvelopeV2 = serde_json::from_slice(&bytes)?;
     let payload: serde_json::Value = serde_json::from_slice(&envelope.payload)?;
-    if envelope.architecture != "sdm-typed-choice-cross-v1" {
-        return Err("unexpected Choice architecture".into());
+    if ![
+        "sdm-typed-choice-cross-v1",
+        "sdm-typed-choice-compositional-v1",
+    ]
+    .contains(&envelope.architecture.as_str())
+    {
+        return Err("unexpected typed Choice architecture".into());
     }
     let trainable_parameters = payload["weights"].as_array().map_or(0, Vec::len)
         + payload["answerability_weights"]
             .as_array()
             .map_or(0, Vec::len)
         + payload["choice_cross_pairs"].as_array().map_or(0, Vec::len)
+        + payload["choice_compositional_triples"]
+            .as_array()
+            .map_or(0, Vec::len)
         + 2; // choice bias and answerability bias
     let bundle: serde_json::Value = serde_json::from_slice(&fs::read(&args[1])?)?;
     let example = &bundle["examples"][0];
@@ -97,7 +105,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         serde_json::to_string_pretty(&serde_json::json!({
             "architecture":envelope.architecture,"model_sha256":envelope.tensor_payload_sha256,
             "artifact_sha256":runtime.digest(),"artifact_bytes":bytes.len(),"trainable_parameters":trainable_parameters,
-            "cross_term_count":payload["choice_cross_pairs"].as_array().map_or(0,Vec::len),
+            "interaction_term_count":payload["choice_cross_pairs"].as_array().map_or_else(||payload["choice_compositional_triples"].as_array().map_or(0,Vec::len),Vec::len),
             "cold_load_micros":cold_load_micros,"peak_rss_bytes":peak_rss_bytes(),"invalid_artifact_rejected":invalid_rejected,
             "host":{"os":env::consts::OS,"arch":env::consts::ARCH},"latency":latencies
         }))?
