@@ -32,6 +32,9 @@ pub struct ExperimentSpec {
     pub quality_diagnostics: bool,
     #[serde(default)]
     pub seeded_epoch_order: bool,
+    /// Opt-in train-only removal of exactly constant encoded Binary coordinates.
+    #[serde(default)]
+    pub binary_constant_mask: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -84,6 +87,10 @@ pub struct SemanticExperimentRunManifest {
     pub abstentions: usize,
     pub outcomes: Vec<SemanticCaseOutcome>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub binary_masked_coordinates: Vec<usize>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub binary_training_policy: Option<BinaryTrainingPolicy>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub training_curve: Vec<TrainingEpochLoss>,
     pub verdict: String,
 }
@@ -93,6 +100,18 @@ pub struct TrainingEpochLoss {
     pub epoch: usize,
     pub train_loss: f64,
     pub dev_loss: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BinaryTrainingPolicy {
+    pub version: String,
+    pub variation_threshold: f64,
+    pub masked_coordinates: Vec<usize>,
+    pub retained_coordinates: Vec<usize>,
+    pub encoder_fingerprint: String,
+    pub training_fingerprint: String,
+    pub l2_weight_decay: f64,
+    pub intercept: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -495,7 +514,7 @@ fn train_typed_rank(
 fn semantic_task(architecture: &str) -> Option<&'static str> {
     match architecture {
         "typed-binary" => Some("binary"),
-        "typed-choice" | "typed-choice-cross" => Some("choice"),
+        "typed-choice" | "typed-choice-cross" | "typed-choice-compositional" => Some("choice"),
         "typed-score" => Some("score"),
         _ => None,
     }
@@ -511,6 +530,8 @@ type TypedTaskModel = (
     Option<f64>,
     f64,
     Option<Vec<(usize, usize)>>,
+    Option<Vec<(usize, usize, usize)>>,
+    Vec<usize>,
     Vec<TrainingEpochLoss>,
 );
 
@@ -525,6 +546,7 @@ fn prepare_typed_examples(
     examples: &[&DatasetExample],
     task: &str,
     choice_cross: bool,
+    compositional_triples: &[(usize, usize, usize)],
     cross_pairs: &[(usize, usize)],
 ) -> Result<Vec<PreparedTypedExample>, ExperimentError> {
     examples
@@ -539,8 +561,10 @@ fn prepare_typed_examples(
                 .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
             let mut standalone = context.clone();
             standalone.resize(
-                if task == "choice" && !choice_cross {
+                if task == "choice" && !choice_cross && compositional_triples.is_empty() {
                     context.len() * 3
+                } else if !compositional_triples.is_empty() {
+                    context.len() * 2 + compositional_triples.len()
                 } else {
                     context.len() * 2 + if choice_cross { cross_pairs.len() } else { 0 }
                 },
@@ -567,6 +591,12 @@ fn prepare_typed_examples(
                             .collect::<Vec<_>>();
                         if choice_cross {
                             vector.extend(cross_pairs.iter().map(|(c, o)| context[*c] * item[*o]));
+                        } else if !compositional_triples.is_empty() {
+                            vector.extend(
+                                compositional_triples
+                                    .iter()
+                                    .map(|(a, b, o)| context[*a] * context[*b] * item[*o]),
+                            );
                         } else {
                             vector.extend(context.iter().zip(&item).map(|(c, o)| c * o));
                         }
@@ -686,6 +716,8 @@ fn train_typed_task(
     epochs: usize,
     lr: f64,
     choice_cross: bool,
+    choice_compositional: bool,
+    binary_constant_mask: bool,
     seeded_epoch_order: bool,
     quality_diagnostics: bool,
 ) -> Result<TypedTaskModel, ExperimentError> {
@@ -724,20 +756,51 @@ fn train_typed_task(
     } else {
         Vec::new()
     };
+    let compositional_triples = if task == "choice" && choice_compositional {
+        bounded_nontext_choice_triples(&encoder)?
+    } else {
+        Vec::new()
+    };
     let dim = input_dim
-        * if task == "choice" && !choice_cross {
+        * if task == "choice" && !choice_cross && !choice_compositional {
             3
         } else {
             2
         }
-        + cross_pairs.len();
+        + cross_pairs.len()
+        + compositional_triples.len();
     let mut weights = vec![0.0; dim];
     let mut bias = 0.0;
     let mut answerability_weights = (task == "choice").then(|| vec![0.0; input_dim]);
     let mut answerability_bias = (task == "choice").then_some(0.0);
-    let train_prepared = prepare_typed_examples(&encoder, train, task, choice_cross, &cross_pairs)?;
-    let dev_prepared = prepare_typed_examples(&encoder, dev, task, choice_cross, &cross_pairs)?;
+    let train_prepared = prepare_typed_examples(
+        &encoder,
+        train,
+        task,
+        choice_cross,
+        &compositional_triples,
+        &cross_pairs,
+    )?;
+    let dev_prepared = prepare_typed_examples(
+        &encoder,
+        dev,
+        task,
+        choice_cross,
+        &compositional_triples,
+        &cross_pairs,
+    )?;
     let mut training_curve = Vec::new();
+    let masked_coordinates = if task == "binary" && binary_constant_mask {
+        (0..input_dim)
+            .filter(|j| {
+                train_prepared
+                    .iter()
+                    .all(|x| x.standalone[*j] == train_prepared[0].standalone[*j])
+            })
+            .collect::<Vec<_>>()
+    } else {
+        Vec::new()
+    };
     for epoch in 0..epochs {
         let order = training_order(train.len(), seed, epoch, seeded_epoch_order);
         for index in order {
@@ -749,8 +812,10 @@ fn train_typed_task(
                     let p = sigmoid(x.iter().zip(&weights).map(|(a, b)| a * b).sum::<f64>() + bias);
                     let error = f64::from(*y) - p;
                     bias += lr * error;
-                    for (w, x) in weights.iter_mut().zip(x) {
-                        *w += lr * error * x;
+                    for (j, (w, x)) in weights.iter_mut().zip(x).enumerate() {
+                        if !masked_coordinates.contains(&j) {
+                            *w += lr * error * x;
+                        }
                     }
                 }
                 (TargetLabel::Choice(target), sdm_core::DecisionSpec::Choice { options, .. })
@@ -905,6 +970,12 @@ fn train_typed_task(
         } else {
             None
         },
+        if choice_compositional {
+            Some(compositional_triples)
+        } else {
+            None
+        },
+        masked_coordinates,
         training_curve,
     ))
 }
@@ -946,12 +1017,55 @@ fn bounded_nontext_cross_pairs(
         .collect())
 }
 
+fn bounded_nontext_choice_triples(
+    encoder: &sdm_core::FittedFeatureEncoderV2,
+) -> Result<Vec<(usize, usize, usize)>, ExperimentError> {
+    let mut coordinates = Vec::new();
+    let mut offset = 0usize;
+    for field in &encoder.schema.fields {
+        let width = match field.value_type {
+            sdm_core::FeatureType::Text => 0,
+            sdm_core::FeatureType::Category => field.categories.len(),
+            _ => 1,
+        };
+        coordinates.extend(offset..offset + width);
+        offset += match field.value_type {
+            sdm_core::FeatureType::Text => {
+                encoder.text_vocabulary.get(&field.id).map_or(0, Vec::len)
+            }
+            sdm_core::FeatureType::Category => field.categories.len(),
+            _ => 1,
+        };
+    }
+    let count = coordinates
+        .len()
+        .checked_mul(coordinates.len() + 1)
+        .and_then(|n| n.checked_div(2))
+        .and_then(|n| n.checked_mul(coordinates.len()))
+        .ok_or_else(|| ExperimentError::Invalid("compositional term count overflow".into()))?;
+    if count == 0 || count > 4096 {
+        return Err(ExperimentError::Invalid(
+            "declared Choice compositional terms exceed 4096".into(),
+        ));
+    }
+    let mut triples = Vec::with_capacity(count);
+    for (i, a) in coordinates.iter().enumerate() {
+        for b in coordinates.iter().skip(i) {
+            for o in &coordinates {
+                triples.push((*a, *b, *o));
+            }
+        }
+    }
+    Ok(triples)
+}
+
 pub fn run_semantic(
     spec: &ExperimentSpec,
 ) -> Result<SemanticExperimentRunManifest, ExperimentError> {
     let task = semantic_task(&spec.architecture)
         .ok_or_else(|| ExperimentError::Invalid("not a typed non-Rank architecture".into()))?;
     let choice_cross = spec.architecture == "typed-choice-cross";
+    let choice_compositional = spec.architecture == "typed-choice-compositional";
     if choice_cross && task != "choice" {
         return Err(ExperimentError::Invalid(
             "cross architecture is Choice-only".into(),
@@ -1009,6 +1123,8 @@ pub fn run_semantic(
         answerability_bias,
         threshold,
         cross_pairs,
+        compositional_triples,
+        binary_masked_coordinates,
         training_curve,
     ) = train_typed_task(
         &train,
@@ -1018,11 +1134,45 @@ pub fn run_semantic(
         spec.epochs,
         spec.learning_rate,
         choice_cross,
+        choice_compositional,
+        spec.binary_constant_mask,
         spec.seeded_epoch_order,
         spec.quality_diagnostics,
     )?;
     let train_id = digest(&train.to_vec())?;
-    let envelope = if let Some(pairs) = cross_pairs {
+    let binary_training_policy = if task == "binary" && spec.binary_constant_mask {
+        let dimension = encoder
+            .dimension()
+            .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+        let masked: BTreeSet<_> = binary_masked_coordinates.iter().copied().collect();
+        Some(BinaryTrainingPolicy {
+            version: "binary-train-constant-mask-v1".into(),
+            variation_threshold: 0.0,
+            masked_coordinates: binary_masked_coordinates.clone(),
+            retained_coordinates: (0..dimension).filter(|i| !masked.contains(i)).collect(),
+            encoder_fingerprint: encoder.fingerprint.clone(),
+            training_fingerprint: train_id.clone(),
+            l2_weight_decay: 0.0,
+            intercept: "unpenalized-scalar-bias-v1".into(),
+        })
+    } else {
+        None
+    };
+    let envelope = if let Some(triples) = compositional_triples {
+        sdm_runtime::ArtifactEnvelopeV2::for_typed_choice_compositional(
+            &encoder,
+            weights,
+            bias,
+            answerability_weights.unwrap(),
+            answerability_bias.unwrap(),
+            triples,
+            threshold,
+            digest(&dev.to_vec())?,
+            train_id.clone(),
+            format!("{task}:{train_id}"),
+            sdm_core::MAX_OPTIONS,
+        )
+    } else if let Some(pairs) = cross_pairs {
         sdm_runtime::ArtifactEnvelopeV2::for_typed_choice_cross(
             &encoder,
             weights,
@@ -1298,10 +1448,15 @@ pub fn run_semantic(
         metrics,
         abstentions,
         outcomes,
+        binary_masked_coordinates,
+        binary_training_policy,
         training_curve,
         verdict: "synthetic-mechanics-only".into(),
     };
-    report.report_sha256 = if report.training_curve.is_empty() {
+    report.report_sha256 = if report.binary_training_policy.is_none()
+        && report.binary_masked_coordinates.is_empty()
+        && report.training_curve.is_empty()
+    {
         digest(&(
             &report.dataset_sha256,
             &report.split_fingerprint,
@@ -1311,6 +1466,19 @@ pub fn run_semantic(
             &report.metrics,
             &report.abstentions,
             &report.outcomes,
+        ))?
+    } else if report.binary_training_policy.is_none() && report.binary_masked_coordinates.is_empty()
+    {
+        digest(&(
+            &report.dataset_sha256,
+            &report.split_fingerprint,
+            &report.semantic,
+            &report.model_sha256,
+            &report.calibration_sha256,
+            &report.metrics,
+            &report.abstentions,
+            &report.outcomes,
+            &report.training_curve,
         ))?
     } else {
         digest(&(
@@ -1322,6 +1490,8 @@ pub fn run_semantic(
             &report.metrics,
             &report.abstentions,
             &report.outcomes,
+            &report.binary_masked_coordinates,
+            &report.binary_training_policy,
             &report.training_curve,
         ))?
     };
@@ -1574,6 +1744,7 @@ mod tests {
             provenance,
             quality_diagnostics: false,
             seeded_epoch_order: false,
+            binary_constant_mask: false,
         }
     }
     fn temp_root() -> std::path::PathBuf {
@@ -1949,6 +2120,67 @@ mod tests {
                 LoadedArtifact::TypedTaskV2(_)
             ));
         }
+        fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn m014_policies_emit_mask_provenance_and_compositional_artifacts() {
+        let root = temp_root();
+        let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../fixtures");
+        let bin_path = dir.join("synthetic-binary-typed-v1.json");
+        let bin_split = dir.join("synthetic-binary-typed-v1.split.json");
+        let bin_raw: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../fixtures/synthetic-binary-typed-v1.json"
+        ))
+        .unwrap();
+        let bin_provenance: Provenance =
+            serde_json::from_value(bin_raw["provenance"].clone()).unwrap();
+        let mut bin = spec(
+            &root,
+            "typed-binary",
+            &bin_path.display().to_string(),
+            &bin_split.display().to_string(),
+            "m014-binary",
+            bin_provenance,
+        );
+        bin.binary_constant_mask = true;
+        let binary = run_semantic(&bin).unwrap();
+        assert!(!binary.binary_masked_coordinates.is_empty());
+        let policy = binary.binary_training_policy.as_ref().unwrap();
+        assert_eq!(policy.version, "binary-train-constant-mask-v1");
+        assert_eq!(policy.intercept, "unpenalized-scalar-bias-v1");
+        assert!(policy
+            .masked_coordinates
+            .iter()
+            .all(|i| !policy.retained_coordinates.contains(i)));
+        assert!(policy.training_fingerprint.starts_with("sha256:"));
+
+        let choice_path = dir.join("synthetic-choice-typed-v1.json");
+        let choice_split = dir.join("synthetic-choice-typed-v1.split.json");
+        let choice_raw: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../fixtures/synthetic-choice-typed-v1.json"
+        ))
+        .unwrap();
+        let choice_provenance: Provenance =
+            serde_json::from_value(choice_raw["provenance"].clone()).unwrap();
+        let mut choice = spec(
+            &root,
+            "typed-choice-compositional",
+            &choice_path.display().to_string(),
+            &choice_split.display().to_string(),
+            "m014-choice",
+            choice_provenance,
+        );
+        choice.epochs = 5;
+        let result = run_semantic(&choice).unwrap();
+        assert_eq!(result.semantic, "choice");
+        let bytes = fs::read(root.join("m014-choice.artifact.json")).unwrap();
+        let envelope: sdm_runtime::ArtifactEnvelopeV2 = serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(envelope.architecture, "sdm-typed-choice-compositional-v1");
+        assert!(matches!(
+            load_artifact(&bytes).unwrap(),
+            LoadedArtifact::TypedTaskV2(_)
+        ));
         fs::remove_dir_all(root).unwrap();
     }
 

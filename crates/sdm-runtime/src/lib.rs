@@ -6,7 +6,7 @@ use sdm_core::{
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 pub const ARTIFACT_SCHEMA: u16 = 1;
 pub const RUNTIME_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -14,6 +14,27 @@ pub const MAX_ARTIFACT_BYTES: usize = 4 * 1024 * 1024;
 pub const ARTIFACT_ENVELOPE_V2: u16 = 2;
 pub const V2_MAX_ARTIFACT_BYTES: usize = 16 * 1024 * 1024;
 pub const V2_MAX_TENSOR_ELEMENTS: usize = 1_000_000;
+
+fn nontext_coordinates(encoder: &sdm_core::FittedFeatureEncoderV2) -> BTreeSet<usize> {
+    let mut coordinates = BTreeSet::new();
+    let mut offset = 0usize;
+    for field in &encoder.schema.fields {
+        let width = match field.value_type {
+            sdm_core::FeatureType::Text => 0,
+            sdm_core::FeatureType::Category => field.categories.len(),
+            _ => 1,
+        };
+        coordinates.extend(offset..offset + width);
+        offset += match field.value_type {
+            sdm_core::FeatureType::Text => {
+                encoder.text_vocabulary.get(&field.id).map_or(0, Vec::len)
+            }
+            sdm_core::FeatureType::Category => field.categories.len(),
+            _ => 1,
+        };
+    }
+    coordinates
+}
 
 /// Explicit additive envelope for architecture-specific payloads. Digests
 /// detect corruption and establish identity, not author authenticity.
@@ -98,6 +119,7 @@ impl ArtifactEnvelopeV2 {
             answerability_bias,
             training_fingerprint: training_fingerprint.into(),
             choice_cross_pairs: None,
+            choice_compositional_triples: None,
         })
         .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
         let calibration_payload = serde_json::to_vec(&TypedCalibration {
@@ -150,10 +172,13 @@ impl ArtifactEnvelopeV2 {
         let dim = encoder
             .dimension()
             .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let nontext = nontext_coordinates(encoder);
         if dim == 0
             || cross_pairs.is_empty()
             || cross_pairs.len() > 4096
-            || cross_pairs.iter().any(|(c, o)| *c >= dim || *o >= dim)
+            || cross_pairs.iter().any(|(c, o)| {
+                *c >= dim || *o >= dim || !nontext.contains(c) || !nontext.contains(o)
+            })
             || cross_pairs.windows(2).any(|w| w[0] >= w[1])
             || weights.len() != dim * 2 + cross_pairs.len()
             || answerability_weights.len() != dim
@@ -181,6 +206,7 @@ impl ArtifactEnvelopeV2 {
             answerability_bias: Some(answerability_bias),
             training_fingerprint: training_fingerprint.into(),
             choice_cross_pairs: Some(cross_pairs),
+            choice_compositional_triples: None,
         })
         .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
         let calibration_payload = serde_json::to_vec(&TypedCalibration {
@@ -192,6 +218,97 @@ impl ArtifactEnvelopeV2 {
         let envelope = Self {
             schema_version: ARTIFACT_ENVELOPE_V2,
             architecture: "sdm-typed-choice-cross-v1".into(),
+            model_id: model_id.into(),
+            required_feature_schema_sha256: encoder
+                .schema
+                .fingerprint()
+                .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?,
+            capabilities: vec!["choice".into()],
+            max_candidates,
+            parameter_count: payload.len(),
+            tensor_payload_sha256: format!("sha256:{:x}", Sha256::digest(&payload)),
+            calibration_sha256: format!("sha256:{:x}", Sha256::digest(&calibration_payload)),
+            calibration_payload,
+            license: "MIT".into(),
+            source: "sdm-experiment".into(),
+            payload,
+        };
+        envelope.validate()?;
+        Ok(envelope)
+    }
+
+    /// Build the bounded Choice context-conjunction × option architecture.
+    #[allow(clippy::too_many_arguments)]
+    pub fn for_typed_choice_compositional(
+        encoder: &sdm_core::FittedFeatureEncoderV2,
+        weights: Vec<f64>,
+        bias: f64,
+        answerability_weights: Vec<f64>,
+        answerability_bias: f64,
+        triples: Vec<(usize, usize, usize)>,
+        threshold: f64,
+        calibration_fingerprint: impl Into<String>,
+        training_fingerprint: impl Into<String>,
+        model_id: impl Into<String>,
+        max_candidates: usize,
+    ) -> Result<Self, RuntimeError> {
+        encoder
+            .validate()
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let dim = encoder
+            .dimension()
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let nontext = nontext_coordinates(encoder);
+        if dim == 0
+            || triples.is_empty()
+            || triples.len() > 4096
+            || triples.iter().any(|(a, b, o)| {
+                a > b
+                    || *b >= dim
+                    || *o >= dim
+                    || !nontext.contains(a)
+                    || !nontext.contains(b)
+                    || !nontext.contains(o)
+            })
+            || triples.windows(2).any(|w| w[0] >= w[1])
+            || weights.len() != dim * 2 + triples.len()
+            || answerability_weights.len() != dim
+            || weights
+                .iter()
+                .chain(&answerability_weights)
+                .any(|w| !w.is_finite() || w.abs() > 1_000_000.0)
+            || !bias.is_finite()
+            || bias.abs() > 1_000_000.0
+            || !answerability_bias.is_finite()
+            || answerability_bias.abs() > 1_000_000.0
+            || !threshold.is_finite()
+            || !(0.0..=1.0).contains(&threshold)
+        {
+            return Err(RuntimeError::InvalidArtifact(
+                "invalid bounded Choice compositional model".into(),
+            ));
+        }
+        let payload = serde_json::to_vec(&TypedTaskPayload {
+            task: "choice".into(),
+            encoder: encoder.clone(),
+            weights,
+            bias,
+            answerability_weights: Some(answerability_weights),
+            answerability_bias: Some(answerability_bias),
+            training_fingerprint: training_fingerprint.into(),
+            choice_cross_pairs: None,
+            choice_compositional_triples: Some(triples),
+        })
+        .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let calibration_payload = serde_json::to_vec(&TypedCalibration {
+            threshold,
+            dev_fingerprint: calibration_fingerprint.into(),
+            policy: "dev-answerability-v1".into(),
+        })
+        .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let envelope = Self {
+            schema_version: ARTIFACT_ENVELOPE_V2,
+            architecture: "sdm-typed-choice-compositional-v1".into(),
             model_id: model_id.into(),
             required_feature_schema_sha256: encoder
                 .schema
@@ -469,6 +586,8 @@ struct TypedTaskPayload {
     training_fingerprint: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     choice_cross_pairs: Option<Vec<(usize, usize)>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    choice_compositional_triples: Option<Vec<(usize, usize, usize)>>,
 }
 #[derive(Debug, Clone)]
 pub struct TypedTaskRuntime {
@@ -482,8 +601,12 @@ pub struct TypedTaskRuntime {
 impl TypedTaskRuntime {
     pub fn from_bytes(bytes: &[u8]) -> Result<Self, RuntimeError> {
         let envelope = ArtifactEnvelopeV2::from_bytes(bytes)?;
-        if !["sdm-typed-task-v1", "sdm-typed-choice-cross-v1"]
-            .contains(&envelope.architecture.as_str())
+        if ![
+            "sdm-typed-task-v1",
+            "sdm-typed-choice-cross-v1",
+            "sdm-typed-choice-compositional-v1",
+        ]
+        .contains(&envelope.architecture.as_str())
         {
             return Err(RuntimeError::InvalidArtifact(
                 "unsupported typed task architecture".into(),
@@ -499,12 +622,19 @@ impl TypedTaskRuntime {
             .encoder
             .dimension()
             .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let nontext = nontext_coordinates(&payload.encoder);
         if !["binary", "choice", "score"].contains(&payload.task.as_str())
             || envelope.capabilities != [payload.task.as_str()]
             || payload.weights.len()
-                != if envelope.architecture == "sdm-typed-choice-cross-v1" {
+                != if envelope.architecture != "sdm-typed-task-v1" {
                     dim.saturating_mul(2)
                         .saturating_add(payload.choice_cross_pairs.as_ref().map_or(0, Vec::len))
+                        .saturating_add(
+                            payload
+                                .choice_compositional_triples
+                                .as_ref()
+                                .map_or(0, Vec::len),
+                        )
                 } else {
                     dim.saturating_mul(if payload.task == "choice" { 3 } else { 2 })
                 }
@@ -531,9 +661,12 @@ impl TypedTaskRuntime {
                 RuntimeError::InvalidArtifact("Choice cross coordinates are missing".into())
             })?;
             if payload.task != "choice"
+                || payload.choice_compositional_triples.is_some()
                 || pairs.is_empty()
                 || pairs.len() > 4096
-                || pairs.iter().any(|(c, o)| *c >= dim || *o >= dim)
+                || pairs.iter().any(|(c, o)| {
+                    *c >= dim || *o >= dim || !nontext.contains(c) || !nontext.contains(o)
+                })
                 || pairs.windows(2).any(|w| w[0] >= w[1])
             {
                 return Err(RuntimeError::InvalidArtifact(
@@ -543,6 +676,38 @@ impl TypedTaskRuntime {
         } else if payload.choice_cross_pairs.is_some() {
             return Err(RuntimeError::InvalidArtifact(
                 "legacy typed task contains cross coordinates".into(),
+            ));
+        }
+        if envelope.architecture == "sdm-typed-choice-compositional-v1" {
+            let triples = payload
+                .choice_compositional_triples
+                .as_ref()
+                .ok_or_else(|| {
+                    RuntimeError::InvalidArtifact(
+                        "Choice compositional coordinates are missing".into(),
+                    )
+                })?;
+            if payload.task != "choice"
+                || payload.choice_cross_pairs.is_some()
+                || triples.is_empty()
+                || triples.len() > 4096
+                || triples.iter().any(|(a, b, o)| {
+                    a > b
+                        || *b >= dim
+                        || *o >= dim
+                        || !nontext.contains(a)
+                        || !nontext.contains(b)
+                        || !nontext.contains(o)
+                })
+                || triples.windows(2).any(|w| w[0] >= w[1])
+            {
+                return Err(RuntimeError::InvalidArtifact(
+                    "invalid Choice compositional coordinates".into(),
+                ));
+            }
+        } else if payload.choice_compositional_triples.is_some() {
+            return Err(RuntimeError::InvalidArtifact(
+                "unexpected Choice compositional coordinates".into(),
             ));
         }
         if payload.task == "choice" {
@@ -619,6 +784,12 @@ impl TypedTaskRuntime {
             if self.payload.task == "choice" {
                 if let Some(pairs) = &self.payload.choice_cross_pairs {
                     x.extend(pairs.iter().map(|(c, o)| context[*c] * item[*o]));
+                } else if let Some(triples) = &self.payload.choice_compositional_triples {
+                    x.extend(
+                        triples
+                            .iter()
+                            .map(|(a, b, o)| context[*a] * context[*b] * item[*o]),
+                    );
                 } else {
                     x.extend(context.iter().zip(&item).map(|(a, b)| a * b));
                 }
@@ -627,11 +798,15 @@ impl TypedTaskRuntime {
             x.resize(
                 if self.payload.task == "choice" {
                     context.len() * 2
-                        + self
-                            .payload
-                            .choice_cross_pairs
-                            .as_ref()
-                            .map_or(context.len(), Vec::len)
+                        + self.payload.choice_cross_pairs.as_ref().map_or_else(
+                            || {
+                                self.payload
+                                    .choice_compositional_triples
+                                    .as_ref()
+                                    .map_or(context.len(), Vec::len)
+                            },
+                            Vec::len,
+                        )
                 } else {
                     context.len() * 2
                 },
@@ -1175,8 +1350,12 @@ pub fn load_artifact(bytes: &[u8]) -> Result<LoadedArtifact, RuntimeError> {
             Ok(LoadedArtifact::TypedRankV2(TypedRankRuntime::from_bytes(
                 bytes,
             )?))
-        } else if ["sdm-typed-task-v1", "sdm-typed-choice-cross-v1"]
-            .contains(&envelope.architecture.as_str())
+        } else if [
+            "sdm-typed-task-v1",
+            "sdm-typed-choice-cross-v1",
+            "sdm-typed-choice-compositional-v1",
+        ]
+        .contains(&envelope.architecture.as_str())
         {
             Ok(LoadedArtifact::TypedTaskV2(TypedTaskRuntime::from_bytes(
                 bytes,
@@ -1496,6 +1675,127 @@ mod tests {
     }
 
     #[test]
+    fn compositional_choice_scores_full_two_rule_truth_table() {
+        use sdm_core::{
+            FeatureField, FeatureProjectionV2, FeatureSchemaField, FeatureSchemaV2, FeatureType,
+            FeatureValue, TypedRankProjectionV2,
+        };
+        let schema = FeatureSchemaV2 {
+            version: 2,
+            fields: vec![
+                FeatureSchemaField {
+                    id: "active".into(),
+                    value_type: FeatureType::Boolean,
+                    required: true,
+                    categories: vec![],
+                },
+                FeatureSchemaField {
+                    id: "rule_b".into(),
+                    value_type: FeatureType::Boolean,
+                    required: true,
+                    categories: vec![],
+                },
+                FeatureSchemaField {
+                    id: "role".into(),
+                    value_type: FeatureType::Category,
+                    required: true,
+                    categories: vec!["no".into(), "yes".into()],
+                },
+            ],
+        };
+        let project = |a: bool, r: bool, role: &str| FeatureProjectionV2 {
+            schema_version: 2,
+            schema_sha256: schema.fingerprint().unwrap(),
+            fields: vec![
+                FeatureField {
+                    id: "active".into(),
+                    required: true,
+                    value: Some(FeatureValue::Boolean(a)),
+                },
+                FeatureField {
+                    id: "rule_b".into(),
+                    required: true,
+                    value: Some(FeatureValue::Boolean(r)),
+                },
+                FeatureField {
+                    id: "role".into(),
+                    required: true,
+                    value: Some(FeatureValue::Category(role.into())),
+                },
+            ],
+        };
+        let encoder = sdm_core::FittedFeatureEncoderV2::fit(
+            &schema,
+            &[project(false, false, "no"), project(true, true, "yes")],
+        )
+        .unwrap();
+        // Canonical encoder order is active, role[no,yes], rule_b.
+        let triples = vec![(0, 0, 2), (0, 3, 2), (3, 3, 2)];
+        let mut weights = vec![0.0; 8 + triples.len()];
+        weights[6] = -1.0;
+        weights[8] = 2.0;
+        weights[9] = -4.0;
+        weights[10] = 2.0;
+        let env = ArtifactEnvelopeV2::for_typed_choice_compositional(
+            &encoder,
+            weights,
+            0.0,
+            vec![0.0; 4],
+            10.0,
+            triples,
+            0.0,
+            "sha256:dev",
+            "sha256:train",
+            "compositional-test",
+            2,
+        )
+        .unwrap();
+        let runtime = TypedTaskRuntime::from_bytes(&serde_json::to_vec(&env).unwrap()).unwrap();
+        let request = DecisionRequest {
+            request_id: "truth-table".into(),
+            schema_version: 1,
+            state: vec![],
+            spec: DecisionSpec::Choice {
+                question: "select".into(),
+                options: vec![
+                    sdm_core::DecisionOption {
+                        id: "opaque-q".into(),
+                        label: "first".into(),
+                    },
+                    sdm_core::DecisionOption {
+                        id: "opaque-z".into(),
+                        label: "second".into(),
+                    },
+                ],
+            },
+        };
+        for rule in [false, true] {
+            for active in [false, true] {
+                let features = TypedRankProjectionV2 {
+                    schema: schema.clone(),
+                    context: project(active, rule, "no"),
+                    candidates: BTreeMap::from([
+                        ("opaque-q".into(), project(active, rule, "no")),
+                        ("opaque-z".into(), project(active, rule, "yes")),
+                    ]),
+                };
+                let logits = runtime.choice_logits(&request, &features).unwrap();
+                assert_eq!(logits[1] > logits[0], active ^ rule);
+                let mut reversed = request.clone();
+                if let DecisionSpec::Choice { options, .. } = &mut reversed.spec {
+                    options.reverse();
+                }
+                let reversed_logits = runtime.choice_logits(&reversed, &features).unwrap();
+                assert_eq!(reversed_logits[0] > reversed_logits[1], active ^ rule);
+                let mut permuted = features.clone();
+                permuted.schema.fields.reverse();
+                let permuted_logits = runtime.choice_logits(&request, &permuted).unwrap();
+                assert_eq!(permuted_logits, logits);
+            }
+        }
+    }
+
+    #[test]
     fn choice_cross_contract_rejects_bad_pair_shapes_and_keeps_legacy_payload_shape() {
         let schema = sdm_core::FeatureSchemaV2 {
             version: 2,
@@ -1569,6 +1869,7 @@ mod tests {
             answerability_bias: Some(0.),
             training_fingerprint: "train".into(),
             choice_cross_pairs: None,
+            choice_compositional_triples: None,
         };
         let json = serde_json::to_value(payload).unwrap();
         assert!(json.get("choice_cross_pairs").is_none());

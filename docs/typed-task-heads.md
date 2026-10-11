@@ -28,6 +28,19 @@ is shared by training and runtime inference.
   architecture ID are serialized; malformed, duplicate, out-of-range, or
   oversized coordinates fail closed. Old typed Choice artifacts are never
   reinterpreted by this constructor.
+- `typed-choice-compositional` is an opt-in `sdm-typed-choice-compositional-v1`
+  contract. It adds an ordered list of at most 4,096 sparse nontext
+  `(context_i, context_j, option_k)` terms, with `i <= j`. It supports rules such
+  as the two-rule active-flip XOR/XNOR that are not separable by the old additive
+  pairwise option margin. Runtime loading validates every coordinate and never
+  reads text coordinates in a multilinear term.
+- Binary experiments may opt into `binary_constant_mask`. It computes exact
+  coordinate variation using train projections only, retains an explicit scalar
+  intercept, and holds invariant context weights at zero. The selected encoded
+  coordinates are reported with the run manifest; the shared v2 encoder and old
+  artifact format are unchanged. The manifest records the exact variation rule,
+  encoder and training fingerprints, retained/masked coordinates, zero L2 setting,
+  and unpenalized scalar intercept. The option defaults off for historical configs.
 - Choice normalizes probabilities over exactly the caller-supplied option IDs.
   A dev-selected confidence threshold may
   abstain. `Choice(None)` labels are never converted into a synthetic option;
@@ -45,3 +58,8 @@ evidence: its pair members differed in load as well as active. M013a uses a new
 seed, group split and frozen suite; neither result can promote an application
 model. The checked-in task suites are synthetic-only and provide no consumer
 authority, policy or actuation.
+
+M014 source-derived truth-table proof and implementation evidence are maintained in
+[`docs/m014-model-quality-research.md`](m014-model-quality-research.md). This
+mechanical architecture work does not change M013a's negative Binary or
+indeterminate Choice dispositions and does not qualify a model.

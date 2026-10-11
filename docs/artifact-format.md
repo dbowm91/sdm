@@ -46,3 +46,10 @@ cross-term cap and excludes text-vocabulary coordinates. Architecture dispatch
 preserves the old 3*D diagonal Choice loader and inference behavior. An enabled
 quality diagnostic report can record pre-threshold logits and probabilities
 without changing the serialized default M011 report format.
+
+`sdm-typed-choice-compositional-v1` is a separate additive Choice-only architecture
+for a declared list of up to 4,096 nontext `(context_i, context_j, option_k)`
+terms. Context coordinates are canonicalized so `i <= j`; list ordering, uniqueness,
+shape, bounds, schema digest and payload digest are validated. Text vocabulary is
+excluded from all three positions. The legacy diagonal and pairwise-cross artifact
+payloads retain their existing architecture identifiers and feature order.

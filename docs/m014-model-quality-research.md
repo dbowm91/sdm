@@ -37,3 +37,11 @@ Reuse the M013c CI-bound, full-required-family and named-control evaluator and M
 3. Choice: minimum sparse context-conjunction×option feature architecture, additive validated artifact; alternatively optimizer-only correction IF existing head proves fully expressive.
 4. One NEW prospective synthetic suite with structurally varied label generators, per-family eligible support, frozen protocol and exact one-time final-test procedure.
 5. Explicit task-specific positive/negative/indeterminate with no CodeGG model promotion and no broad architecture framework until M015.
+
+## 6. M014 implementation proof (2026-10-11)
+
+The full pairwise Choice hypothesis is **confirmed** by the frozen feature construction. `prepare_typed_examples` produces a context block, an option block, and context-coordinate × option-coordinate terms. On the supplied four-quadrant construction, the two option projections differ only in the semantic role coordinate; therefore context-only, shared option, and shared context×copied-context terms cancel in `score(yes)-score(no)`. The remaining role-dependent terms are affine in `active` and `rule_b`. The design matrix `[1,a,r]` has the left-nullspace vector `(1,-1,-1,1)` across rows `(00,10,01,11)`, while the XOR target requires a nonzero alternating sum. No choice of weights, SGD schedule, or regularization can meet all four strict inequalities.
+
+`scripts/test_m014_representability.py` captures this constructed full-table rank/separability proof and a fixed finite conjunction-weight control. It also keeps unavailable cases separate from option ranking. This is a mathematical and executable proof over the source-derived reduced design, not an optimizer run and not evidence from M013a test rows. The next implementation step is the bounded declared context-conjunction × option-coordinate architecture. The earlier M013b assertion that Choice capacity was not a blocker is superseded for this two-rule target; its train/dev finding about a truth-independent offset remains a separate optimizer diagnosis.
+
+Binary's train-constant-coordinate hypothesis remains to be measured on train/dev using the explicit M014 policy. No prospective test result is recorded here.

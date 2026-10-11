@@ -182,6 +182,8 @@ jobs:
       - name: Verify M013d bootstrap percentile repair
         if: hashFiles('target/m013a/*.report.json') != ''
         run: python3 -m unittest discover -s scripts -p 'test_m013d_*.py'
+      - name: Verify M014 representability proof
+        run: python3 -m unittest discover -s scripts -p 'test_m014_*.py'
       - name: Capture runtime benchmark
         run: cargo run -p sdm-runtime --example benchmark -- fixtures/benchmark-rank-request.json artifacts/compatibility-rank-v1.json > benchmark-${{ matrix.name }}.json
       - name: Capture nonlinear runtime benchmark

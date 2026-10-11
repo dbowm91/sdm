@@ -1,6 +1,6 @@
 # SDM M014 — Standalone Binary/Choice Predictive-Quality Recovery
 
-Status: **ready** (planning-only implementation handoff; no model or prospective final test run)
+Status: **active** (representability proof and bounded architecture/policy implementation underway; prospective quality qualification still pending)
 Primary class: capability / prospective qualification
 Workstream: general-decision-model-framework
 Baseline: `dbowm91/sdm@0e6c3cae5911681b18185673a30484a976cb3821` (`main`, PR #2 merged 2026-10-11)
@@ -10,6 +10,8 @@ Hard predecessors: M013–M013d source integrated into main, [merged-main CI 381
 External dependencies: NONE (no CodeGG corpus, external model service or publisher approval)
 Review material: `docs/m014-model-quality-research.md`, M013a/M013b/M013c closures and `docs/m013a-protocol-v1.md`
 Closure: `plans/closure/general-decision-model-framework/014-status.md`
+
+Implementation checkpoint: gate A's frozen-schema four-quadrant separability proof is recorded in `docs/m014-model-quality-research.md` and `scripts/test_m014_representability.py`. A new opt-in compositional Choice artifact architecture and train-only Binary exact-constant mask are implemented with constructed/runtime tests. Gates B/C still require the bounded train/dev candidate comparison, explicit gradient/finite-difference evidence, and diagnostics required below. Gates D/E (new suite, support proof, prospective freeze, one final evaluation, cross-host verification, and closure) remain outstanding; no quality outcome is claimed.
 
 ## 1. Outcome, success definition, and non-goals
 
