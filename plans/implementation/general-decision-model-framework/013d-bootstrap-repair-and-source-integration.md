@@ -1,6 +1,6 @@
 # M013d — Bootstrap Safety and M013–M013d Source Integration
 
-Status: **ready** (planning handoff only; no code or PR created)
+Status: **conditionally closed** (mechanics, provenance, and PR #2 are complete; hosted CI is green; reviewer approval/merge and merged-main verification remain separate operational gates; see `plans/closure/general-decision-model-framework/013d-status.md`)
 Class: infrastructure / evidence-integrity corrective and release source integration
 Baseline: dbowm91/sdm@03c4a982219ffa830b7c0aba9dbb19a541cae56c on `work/plans-sdm-m013c-qualification-gate-hardening`; recheck head and main before execution
 Target: `main` (at planning: `2bd0d5af16d143828dcbce77f411b8f3b675e7be`)
