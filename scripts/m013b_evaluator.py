@@ -103,13 +103,23 @@ def mean(values: Sequence[float]) -> float | None:
     return sum(values) / len(values) if values else None
 
 
-def quantile(sorted_values: Sequence[float], probability: float) -> float:
-    position = (len(sorted_values) - 1) * probability
+def quantile(values: Sequence[float], probability: float) -> float:
+    """Return a linearly interpolated quantile, independent of input ordering.
+
+    A sorted copy is used so callers can safely pass RNG-ordered bootstrap
+    draws and their sequence is never mutated. The interpolation convention is
+    the same as the frozen M013a analyzer and M013c evaluator.
+    """
+    if isinstance(values, (str, bytes)) or not isinstance(values, Sequence) or not values:
+        raise _reject("empty_population", "quantile requires a non-empty numeric sequence")
+    probability = require_probability(probability, "invalid_probability", "quantile probability")
+    ordered = sorted(require_finite(value, "non_finite_statistic", "quantile value") for value in values)
+    position = (len(ordered) - 1) * probability
     low = math.floor(position)
     high = math.ceil(position)
     if low == high:
-        return float(sorted_values[low])
-    return sorted_values[low] + (sorted_values[high] - sorted_values[low]) * (position - low)
+        return ordered[low]
+    return ordered[low] + (ordered[high] - ordered[low]) * (position - low)
 
 
 def group_bootstrap(
@@ -126,14 +136,30 @@ def group_bootstrap(
     replicate, matching the frozen M013a protocol. Returns an explicit
     ``groups`` count so denominators are never implicit.
     """
+    if isinstance(seed, bool) or not isinstance(seed, int):
+        raise _reject("invalid_bootstrap_seed", "seed must be an integer")
+    if isinstance(replicates, bool) or not isinstance(replicates, int) or not 1 <= replicates <= 1_000_000:
+        raise _reject("invalid_bootstrap_replicates", "replicates must be an integer in [1, 1000000]")
+    confidence = require_finite(confidence, "invalid_bootstrap_confidence", "confidence")
+    if not 0.0 < confidence < 1.0:
+        raise _reject("invalid_bootstrap_confidence", "confidence must be strictly between 0 and 1")
+
     groups: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
     for row in rows:
-        groups[row["leakage_group"]].append(row)
+        if not isinstance(row, Mapping):
+            raise _reject("invalid_bootstrap_row", "each bootstrap row must be a mapping")
+        key = row.get("leakage_group")
+        if not isinstance(key, str) or not key:
+            raise _reject("invalid_bootstrap_group", f"invalid leakage group id: {key!r}")
+        groups[key].append(row)
     per_group = {}
     for key, members in groups.items():
-        value = statistic(members)
+        try:
+            value = statistic(members)
+        except Exception as exc:
+            raise _reject("invalid_bootstrap_statistic", f"statistic failed for leakage group {key!r}: {exc}") from exc
         if value is not None:
-            per_group[key] = value
+            per_group[key] = require_finite(value, "non_finite_statistic", f"statistic for leakage group {key!r}")
     keys = sorted(per_group)
     if not keys:
         return {"groups": 0, "replicates": replicates, "confidence": confidence, "lower": None, "upper": None}
