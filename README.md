@@ -26,6 +26,14 @@ projection, disclosure, capture consent, and causal-frontier behavior stay in Co
 - `sdm-experiment`: explicit-input Rank orchestration, frozen-split training,
   dev-only threshold selection, runtime reload and held-out reporting.
 
+Publication-facing package metadata is set per crate with the verified
+repository/homepage and crate-specific docs.rs destinations. The checked-in
+[standalone quickstart](docs/standalone-quickstart.md) covers the experiment,
+packaged consumer boundary, compatibility and quality limits. The locked
+[third-party inventory](docs/third-party-license-inventory.json) is metadata
+evidence only; see its [review status](docs/third-party-licenses.md) before any
+registry distribution.
+
 Legacy linear and pairwise Rank artifacts remain supported. Additive typed artifact
 versions also serve Binary, Choice, Score, and typed Rank heads. Multiple relevant
 Rank candidates remain independent labels. Applications still own policy, authority,

@@ -7,6 +7,8 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 rust-version = "1.89"
+homepage = "https://github.com/dbowm91/sdm"
+repository = "https://github.com/dbowm91/sdm"
 
 [workspace.dependencies]
 serde = { version = "1", features = ["derive"] }

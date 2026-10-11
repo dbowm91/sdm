@@ -74,6 +74,16 @@ jobs:
         run: cargo run -p sdm-runtime --example benchmark_nonlinear -- target/experiments/nonlinear.artifact.json > nonlinear-benchmark-${{ matrix.name }}.json
       - name: Compile public standalone library consumer
         run: cargo check --manifest-path examples/standalone-consumer/Cargo.toml --locked
+      - name: Verify release metadata, package contents, and license inventory
+        run: |
+          cargo package --workspace --locked
+          cargo package --workspace --locked --list > target/package-list.txt
+          python3 scripts/audit_package_contents.py target/package-files.json
+          diff -u docs/package-files.json target/package-files.json
+          python3 scripts/check_staged_consumer.py
+          cargo metadata --locked --format-version 1 > target/cargo-metadata.json
+          python3 scripts/audit_cargo_licenses.py target/cargo-metadata.json target/third-party-license-inventory.json
+          diff -u docs/third-party-license-inventory.json target/third-party-license-inventory.json
       - uses: actions/upload-artifact@v4
         with:
           name: benchmark-${{ matrix.name }}

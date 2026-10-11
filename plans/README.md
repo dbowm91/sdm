@@ -23,7 +23,7 @@ All four milestones are SDM-owned, use explicitly provided synthetic data, prese
 
 ## Current corrective handoff
 
-**[M012 — post-M011 release reconciliation](implementation/general-decision-model-framework/012-post-m011-release-reconciliation-corrective.md)** is ready. This plan is limited to reviewing the M001-M011 branch ancestry, source/PR integration, complete Cargo package metadata and package contents, dependency license/legal review gates, documentation/API compatibility, CI/MSRV/portability and a reviewed merge handoff. Publication, tagging, merging, model quality promotion and CodeGG pin updates require separate decisions. M012 closure evidence belongs in closure/general-decision-model-framework/012-status.md.
+**[M012 — post-M011 release reconciliation](implementation/general-decision-model-framework/012-post-m011-release-reconciliation-corrective.md)** is active. This plan is limited to reviewing the M001-M011 branch ancestry, source/PR integration, complete Cargo package metadata and package contents, dependency license/legal review gates, documentation/API compatibility, CI/MSRV/portability and a reviewed merge handoff. Publication, tagging, merging, model quality promotion and CodeGG pin updates require separate decisions. M012 closure evidence belongs in closure/general-decision-model-framework/012-status.md.
 
 Research and predecessor evidence are recorded in [docs/general-framework-research-2026-10.md](../docs/general-framework-research-2026-10.md).
 

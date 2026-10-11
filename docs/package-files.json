@@ -1,0 +1,60 @@
+{
+  "sdm-core": [
+    ".cargo_vcs_info.json",
+    "Cargo.lock",
+    "Cargo.toml",
+    "Cargo.toml.orig",
+    "src/lib.rs"
+  ],
+  "sdm-data": [
+    ".cargo_vcs_info.json",
+    "Cargo.lock",
+    "Cargo.toml",
+    "Cargo.toml.orig",
+    "src/bin/sdm-dataset.rs",
+    "src/lib.rs"
+  ],
+  "sdm-eval": [
+    ".cargo_vcs_info.json",
+    "Cargo.lock",
+    "Cargo.toml",
+    "Cargo.toml.orig",
+    "src/bin/sdm-qualify.rs",
+    "src/lib.rs"
+  ],
+  "sdm-experiment": [
+    ".cargo_vcs_info.json",
+    "Cargo.lock",
+    "Cargo.toml",
+    "Cargo.toml.orig",
+    "examples/standalone_consumer.rs",
+    "src/lib.rs",
+    "src/main.rs"
+  ],
+  "sdm-nonlinear": [
+    ".cargo_vcs_info.json",
+    "Cargo.lock",
+    "Cargo.toml",
+    "Cargo.toml.orig",
+    "examples/interaction_ablation.rs",
+    "src/lib.rs"
+  ],
+  "sdm-runtime": [
+    ".cargo_vcs_info.json",
+    "Cargo.lock",
+    "Cargo.toml",
+    "Cargo.toml.orig",
+    "examples/benchmark.rs",
+    "examples/benchmark_nonlinear.rs",
+    "src/lib.rs"
+  ],
+  "sdm-training": [
+    ".cargo_vcs_info.json",
+    "Cargo.lock",
+    "Cargo.toml",
+    "Cargo.toml.orig",
+    "src/bin/sdm-check-compat.rs",
+    "src/bin/sdm-train.rs",
+    "src/lib.rs"
+  ]
+}
