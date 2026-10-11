@@ -89,6 +89,14 @@ pub struct SemanticCaseOutcome {
     pub target: serde_json::Value,
     pub prediction: serde_json::Value,
     pub score: Option<f64>,
+    #[serde(default)]
+    pub raw_probabilities: Option<Vec<f64>>,
+    #[serde(default)]
+    pub raw_logits: Option<Vec<f64>>,
+    #[serde(default)]
+    pub answerability_probability: Option<f64>,
+    #[serde(default)]
+    pub abstained: bool,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -468,7 +476,7 @@ fn train_typed_rank(
 fn semantic_task(architecture: &str) -> Option<&'static str> {
     match architecture {
         "typed-binary" => Some("binary"),
-        "typed-choice" => Some("choice"),
+        "typed-choice" | "typed-choice-cross" => Some("choice"),
         "typed-score" => Some("score"),
         _ => None,
     }
@@ -478,6 +486,7 @@ fn typed_task_vector(
     example: &DatasetExample,
     item: Option<&str>,
     task: &str,
+    cross_pairs: Option<&[(usize, usize)]>,
 ) -> Result<Vec<f64>, ExperimentError> {
     let binding = example
         .typed_rank_features
@@ -488,7 +497,14 @@ fn typed_task_vector(
         .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
     let Some(id) = item else {
         let mut v = context.clone();
-        v.resize(context.len() * if task == "choice" { 3 } else { 2 }, 0.0);
+        v.resize(
+            if task == "choice" && cross_pairs.is_none() {
+                context.len() * 3
+            } else {
+                context.len() * 2 + cross_pairs.map_or(0, |p| p.len())
+            },
+            0.0,
+        );
         return Ok(v);
     };
     let candidate =
@@ -503,7 +519,11 @@ fn typed_task_vector(
         .chain(candidate.iter().copied())
         .collect::<Vec<_>>();
     if task == "choice" {
-        vector.extend(context.iter().zip(&candidate).map(|(a, b)| a * b));
+        if let Some(pairs) = cross_pairs {
+            vector.extend(pairs.iter().map(|(c, o)| context[*c] * candidate[*o]));
+        } else {
+            vector.extend(context.iter().zip(&candidate).map(|(a, b)| a * b));
+        }
     }
     Ok(vector)
 }
@@ -517,6 +537,7 @@ type TypedTaskModel = (
     Option<Vec<f64>>,
     Option<f64>,
     f64,
+    Option<Vec<(usize, usize)>>,
 );
 
 fn train_typed_task(
@@ -526,6 +547,7 @@ fn train_typed_task(
     seed: u64,
     epochs: usize,
     lr: f64,
+    choice_cross: bool,
 ) -> Result<TypedTaskModel, ExperimentError> {
     let first = train
         .first()
@@ -557,7 +579,18 @@ fn train_typed_task(
     let input_dim = encoder
         .dimension()
         .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
-    let dim = input_dim * if task == "choice" { 3 } else { 2 };
+    let cross_pairs = if task == "choice" && choice_cross {
+        bounded_nontext_cross_pairs(&encoder)?
+    } else {
+        Vec::new()
+    };
+    let dim = input_dim
+        * if task == "choice" && !choice_cross {
+            3
+        } else {
+            2
+        }
+        + cross_pairs.len();
     let mut weights = vec![0.0; dim];
     let mut bias = 0.0;
     let mut answerability_weights = (task == "choice").then(|| vec![0.0; input_dim]);
@@ -566,7 +599,7 @@ fn train_typed_task(
         for e in train {
             match (&e.label, &e.request.spec) {
                 (TargetLabel::Binary(y), sdm_core::DecisionSpec::Binary { .. }) => {
-                    let x = typed_task_vector(&encoder, e, None, task)?;
+                    let x = typed_task_vector(&encoder, e, None, task, None)?;
                     let p = sigmoid(x.iter().zip(&weights).map(|(a, b)| a * b).sum::<f64>() + bias);
                     let error = f64::from(*y) - p;
                     bias += lr * error;
@@ -600,7 +633,15 @@ fn train_typed_task(
                     }
                     let xs = options
                         .iter()
-                        .map(|o| typed_task_vector(&encoder, e, Some(&o.id), task))
+                        .map(|o| {
+                            typed_task_vector(
+                                &encoder,
+                                e,
+                                Some(&o.id),
+                                task,
+                                choice_cross.then_some(cross_pairs.as_slice()),
+                            )
+                        })
                         .collect::<Result<Vec<_>, _>>()?;
                     let scores: Vec<_> = xs
                         .iter()
@@ -632,7 +673,7 @@ fn train_typed_task(
                         minimum, maximum, ..
                     },
                 ) => {
-                    let x = typed_task_vector(&encoder, e, None, task)?;
+                    let x = typed_task_vector(&encoder, e, None, task, None)?;
                     let target = (*y - *minimum) / (*maximum - *minimum);
                     let z = x.iter().zip(&weights).map(|(a, b)| a * b).sum::<f64>() + bias;
                     let p = sigmoid(z);
@@ -654,7 +695,7 @@ fn train_typed_task(
     for e in dev {
         match (&e.label, &e.request.spec) {
             (TargetLabel::Binary(y), sdm_core::DecisionSpec::Binary { .. }) if task == "binary" => {
-                let x = typed_task_vector(&encoder, e, None, task)?;
+                let x = typed_task_vector(&encoder, e, None, task, None)?;
                 let p = sigmoid(x.iter().zip(&weights).map(|(a, b)| a * b).sum::<f64>() + bias);
                 obs.push((p.max(1.0 - p), (p >= 0.5) == *y));
             }
@@ -705,7 +746,49 @@ fn train_typed_task(
         answerability_weights,
         answerability_bias,
         threshold,
+        if choice_cross {
+            Some(cross_pairs)
+        } else {
+            None
+        },
     ))
+}
+
+fn bounded_nontext_cross_pairs(
+    encoder: &sdm_core::FittedFeatureEncoderV2,
+) -> Result<Vec<(usize, usize)>, ExperimentError> {
+    let mut coordinates = Vec::new();
+    let mut offset = 0usize;
+    for field in &encoder.schema.fields {
+        let width = match field.value_type {
+            sdm_core::FeatureType::Text => 0,
+            sdm_core::FeatureType::Category => field.categories.len(),
+            _ => 1,
+        };
+        if width > 0 {
+            coordinates.extend(offset..offset + width);
+        }
+        offset += match field.value_type {
+            sdm_core::FeatureType::Text => {
+                encoder.text_vocabulary.get(&field.id).map_or(0, Vec::len)
+            }
+            sdm_core::FeatureType::Category => field.categories.len(),
+            _ => 1,
+        };
+    }
+    let count = coordinates
+        .len()
+        .checked_mul(coordinates.len())
+        .ok_or_else(|| ExperimentError::Invalid("cross term count overflow".into()))?;
+    if count == 0 || count > 4096 {
+        return Err(ExperimentError::Invalid(
+            "declared Choice cross terms exceed 4096".into(),
+        ));
+    }
+    Ok(coordinates
+        .iter()
+        .flat_map(|c| coordinates.iter().map(move |o| (*c, *o)))
+        .collect())
 }
 
 pub fn run_semantic(
@@ -713,6 +796,12 @@ pub fn run_semantic(
 ) -> Result<SemanticExperimentRunManifest, ExperimentError> {
     let task = semantic_task(&spec.architecture)
         .ok_or_else(|| ExperimentError::Invalid("not a typed non-Rank architecture".into()))?;
+    let choice_cross = spec.architecture == "typed-choice-cross";
+    if choice_cross && task != "choice" {
+        return Err(ExperimentError::Invalid(
+            "cross architecture is Choice-only".into(),
+        ));
+    }
     if spec.epochs == 0
         || spec.epochs > 10_000
         || !spec.learning_rate.is_finite()
@@ -757,7 +846,7 @@ pub fn run_semantic(
             ));
         }
     }
-    let (encoder, weights, bias, answerability_weights, answerability_bias, threshold) =
+    let (encoder, weights, bias, answerability_weights, answerability_bias, threshold, cross_pairs) =
         train_typed_task(
             &train,
             &dev,
@@ -765,21 +854,38 @@ pub fn run_semantic(
             spec.seed,
             spec.epochs,
             spec.learning_rate,
+            choice_cross,
         )?;
     let train_id = digest(&train.to_vec())?;
-    let envelope = sdm_runtime::ArtifactEnvelopeV2::for_typed_task(
-        task,
-        &encoder,
-        weights,
-        bias,
-        answerability_weights,
-        answerability_bias,
-        threshold,
-        digest(&dev.to_vec())?,
-        train_id.clone(),
-        format!("{task}:{train_id}"),
-        sdm_core::MAX_OPTIONS,
-    )
+    let envelope = if let Some(pairs) = cross_pairs {
+        sdm_runtime::ArtifactEnvelopeV2::for_typed_choice_cross(
+            &encoder,
+            weights,
+            bias,
+            answerability_weights.unwrap(),
+            answerability_bias.unwrap(),
+            pairs,
+            threshold,
+            digest(&dev.to_vec())?,
+            train_id.clone(),
+            format!("{task}:{train_id}"),
+            sdm_core::MAX_OPTIONS,
+        )
+    } else {
+        sdm_runtime::ArtifactEnvelopeV2::for_typed_task(
+            task,
+            &encoder,
+            weights,
+            bias,
+            answerability_weights,
+            answerability_bias,
+            threshold,
+            digest(&dev.to_vec())?,
+            train_id.clone(),
+            format!("{task}:{train_id}"),
+            sdm_core::MAX_OPTIONS,
+        )
+    }
     .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
     let artifact = serde_json::to_vec(&envelope)?;
     let model_sha = envelope.tensor_payload_sha256.clone();
@@ -819,6 +925,10 @@ pub fn run_semantic(
                         target: serde_json::json!(y),
                         prediction: serde_json::json!(probs >= 0.5),
                         score: Some(probs),
+                        raw_probabilities: Some(vec![probs]),
+                        raw_logits: None,
+                        answerability_probability: None,
+                        abstained: r.answer.is_none(),
                     });
                 }
                 SemanticMetrics::Binary(
@@ -853,6 +963,16 @@ pub fn run_semantic(
                                 .map_err(|e| ExperimentError::Invalid(e.to_string()))?,
                         );
                     }
+                    let raw_probs = runtime
+                        .choice_probabilities(&e.request, b)
+                        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                    let raw_logits = runtime
+                        .choice_logits(&e.request, b)
+                        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                    let answerability = runtime
+                        .choice_answerability_probability(&e.request, b)
+                        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                    let abstained = r.answer.is_none();
                     let predicted = match r.answer {
                         Some(sdm_core::DecisionAnswer::Choice { option_id, .. }) => {
                             serde_json::Value::String(option_id)
@@ -865,6 +985,10 @@ pub fn run_semantic(
                         target: serde_json::json!(target),
                         prediction: predicted,
                         score: None,
+                        raw_probabilities: Some(raw_probs),
+                        raw_logits: Some(raw_logits),
+                        answerability_probability: Some(answerability),
+                        abstained,
                     });
                 }
                 SemanticMetrics::Choice(
@@ -907,6 +1031,10 @@ pub fn run_semantic(
                             target: serde_json::json!(y),
                             prediction: serde_json::json!(value),
                             score: Some(value),
+                            raw_probabilities: None,
+                            raw_logits: None,
+                            answerability_probability: None,
+                            abstained: false,
                         });
                     } else {
                         abstentions += 1;
@@ -916,6 +1044,10 @@ pub fn run_semantic(
                             target: serde_json::json!(y),
                             prediction: serde_json::Value::Null,
                             score: None,
+                            raw_probabilities: None,
+                            raw_logits: None,
+                            answerability_probability: None,
+                            abstained: true,
                         });
                     }
                 }
@@ -1222,6 +1354,47 @@ mod tests {
         ));
         fs::create_dir_all(&p).unwrap();
         p
+    }
+    #[test]
+    fn diagonal_choice_head_cannot_represent_active_candidate_kind_flip() {
+        // Context [active, available, choice-category, yes-category, no-category].
+        // Each candidate shares active/available and changes only its kind.
+        let diagonal_delta = |active: f64| {
+            let context = [active, 1.0, 1.0, 0.0, 0.0];
+            let yes = [active, 1.0, 0.0, 1.0, 0.0];
+            let no = [active, 1.0, 0.0, 0.0, 1.0];
+            let vector = |item: &[f64]| {
+                context
+                    .iter()
+                    .copied()
+                    .chain(item.iter().copied())
+                    .chain(context.iter().zip(item).map(|(a, b)| a * b))
+                    .collect::<Vec<_>>()
+            };
+            let weights: Vec<f64> = (0..vector(&yes).len())
+                .map(|i| (i as f64 + 1.0) / 10.0)
+                .collect();
+            let dot = |x: Vec<f64>| x.iter().zip(&weights).map(|(a, b)| a * b).sum::<f64>();
+            dot(vector(&yes)) - dot(vector(&no))
+        };
+        let inactive_delta = diagonal_delta(0.0);
+        let active_delta = diagonal_delta(1.0);
+        assert!((inactive_delta - active_delta).abs() < 1e-12);
+
+        // The declared (active, candidate-kind) crosses can encode the rule.
+        let crossed_delta = |active: f64| active * 1.0 - active * 0.0 - (1.0 - active) * 1.0;
+        assert!(crossed_delta(0.0) < 0.0);
+        assert!(crossed_delta(1.0) > 0.0);
+        // Truth table includes both availability states; answerability is a
+        // separate context head and does not change conditional option scores.
+        for available in [false, true] {
+            for active in [false, true] {
+                let target_is_yes = active;
+                assert_eq!(crossed_delta(f64::from(active)) > 0.0, target_is_yes);
+                let is_answerable = available;
+                assert_eq!(is_answerable, available);
+            }
+        }
     }
     #[test]
     fn both_architectures_train_package_reload_and_evaluate_exact_candidates() {

@@ -97,6 +97,7 @@ impl ArtifactEnvelopeV2 {
             answerability_weights,
             answerability_bias,
             training_fingerprint: training_fingerprint.into(),
+            choice_cross_pairs: None,
         })
         .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
         let calibration_payload = serde_json::to_vec(&TypedCalibration {
@@ -114,6 +115,89 @@ impl ArtifactEnvelopeV2 {
                 .fingerprint()
                 .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?,
             capabilities: vec![task.into()],
+            max_candidates,
+            parameter_count: payload.len(),
+            tensor_payload_sha256: format!("sha256:{:x}", Sha256::digest(&payload)),
+            calibration_sha256: format!("sha256:{:x}", Sha256::digest(&calibration_payload)),
+            calibration_payload,
+            license: "MIT".into(),
+            source: "sdm-experiment".into(),
+            payload,
+        };
+        envelope.validate()?;
+        Ok(envelope)
+    }
+    /// Build the additive bounded Choice architecture. `cross_pairs` contains
+    /// ordered (context-coordinate, option-coordinate) pairs and is part of
+    /// the artifact contract.
+    #[allow(clippy::too_many_arguments)]
+    pub fn for_typed_choice_cross(
+        encoder: &sdm_core::FittedFeatureEncoderV2,
+        weights: Vec<f64>,
+        bias: f64,
+        answerability_weights: Vec<f64>,
+        answerability_bias: f64,
+        cross_pairs: Vec<(usize, usize)>,
+        threshold: f64,
+        calibration_fingerprint: impl Into<String>,
+        training_fingerprint: impl Into<String>,
+        model_id: impl Into<String>,
+        max_candidates: usize,
+    ) -> Result<Self, RuntimeError> {
+        encoder
+            .validate()
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let dim = encoder
+            .dimension()
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        if dim == 0
+            || cross_pairs.is_empty()
+            || cross_pairs.len() > 4096
+            || cross_pairs.iter().any(|(c, o)| *c >= dim || *o >= dim)
+            || cross_pairs.windows(2).any(|w| w[0] >= w[1])
+            || weights.len() != dim * 2 + cross_pairs.len()
+            || answerability_weights.len() != dim
+            || weights
+                .iter()
+                .chain(&answerability_weights)
+                .any(|w| !w.is_finite() || w.abs() > 1_000_000.0)
+            || !bias.is_finite()
+            || bias.abs() > 1_000_000.0
+            || !answerability_bias.is_finite()
+            || answerability_bias.abs() > 1_000_000.0
+            || !threshold.is_finite()
+            || !(0.0..=1.0).contains(&threshold)
+        {
+            return Err(RuntimeError::InvalidArtifact(
+                "invalid bounded Choice cross model".into(),
+            ));
+        }
+        let payload = serde_json::to_vec(&TypedTaskPayload {
+            task: "choice".into(),
+            encoder: encoder.clone(),
+            weights,
+            bias,
+            answerability_weights: Some(answerability_weights),
+            answerability_bias: Some(answerability_bias),
+            training_fingerprint: training_fingerprint.into(),
+            choice_cross_pairs: Some(cross_pairs),
+        })
+        .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let calibration_payload = serde_json::to_vec(&TypedCalibration {
+            threshold,
+            dev_fingerprint: calibration_fingerprint.into(),
+            policy: "dev-answerability-v1".into(),
+        })
+        .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let envelope = Self {
+            schema_version: ARTIFACT_ENVELOPE_V2,
+            architecture: "sdm-typed-choice-cross-v1".into(),
+            model_id: model_id.into(),
+            required_feature_schema_sha256: encoder
+                .schema
+                .fingerprint()
+                .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?,
+            capabilities: vec!["choice".into()],
             max_candidates,
             parameter_count: payload.len(),
             tensor_payload_sha256: format!("sha256:{:x}", Sha256::digest(&payload)),
@@ -383,6 +467,8 @@ struct TypedTaskPayload {
     #[serde(default)]
     answerability_bias: Option<f64>,
     training_fingerprint: String,
+    #[serde(default)]
+    choice_cross_pairs: Option<Vec<(usize, usize)>>,
 }
 #[derive(Debug, Clone)]
 pub struct TypedTaskRuntime {
@@ -396,7 +482,9 @@ pub struct TypedTaskRuntime {
 impl TypedTaskRuntime {
     pub fn from_bytes(bytes: &[u8]) -> Result<Self, RuntimeError> {
         let envelope = ArtifactEnvelopeV2::from_bytes(bytes)?;
-        if envelope.architecture != "sdm-typed-task-v1" {
+        if !["sdm-typed-task-v1", "sdm-typed-choice-cross-v1"]
+            .contains(&envelope.architecture.as_str())
+        {
             return Err(RuntimeError::InvalidArtifact(
                 "unsupported typed task architecture".into(),
             ));
@@ -414,7 +502,12 @@ impl TypedTaskRuntime {
         if !["binary", "choice", "score"].contains(&payload.task.as_str())
             || envelope.capabilities != [payload.task.as_str()]
             || payload.weights.len()
-                != dim.saturating_mul(if payload.task == "choice" { 3 } else { 2 })
+                != if envelope.architecture == "sdm-typed-choice-cross-v1" {
+                    dim.saturating_mul(2)
+                        .saturating_add(payload.choice_cross_pairs.as_ref().map_or(0, Vec::len))
+                } else {
+                    dim.saturating_mul(if payload.task == "choice" { 3 } else { 2 })
+                }
             || payload
                 .weights
                 .iter()
@@ -431,6 +524,25 @@ impl TypedTaskRuntime {
         {
             return Err(RuntimeError::InvalidArtifact(
                 "invalid typed task payload".into(),
+            ));
+        }
+        if envelope.architecture == "sdm-typed-choice-cross-v1" {
+            let pairs = payload.choice_cross_pairs.as_ref().ok_or_else(|| {
+                RuntimeError::InvalidArtifact("Choice cross coordinates are missing".into())
+            })?;
+            if payload.task != "choice"
+                || pairs.is_empty()
+                || pairs.len() > 4096
+                || pairs.iter().any(|(c, o)| *c >= dim || *o >= dim)
+                || pairs.windows(2).any(|w| w[0] >= w[1])
+            {
+                return Err(RuntimeError::InvalidArtifact(
+                    "invalid Choice cross coordinates".into(),
+                ));
+            }
+        } else if payload.choice_cross_pairs.is_some() {
+            return Err(RuntimeError::InvalidArtifact(
+                "legacy typed task contains cross coordinates".into(),
             ));
         }
         if payload.task == "choice" {
@@ -505,11 +617,24 @@ impl TypedTaskRuntime {
             let item = self.payload.encoder.encode(p)?;
             x.extend(item.iter().copied());
             if self.payload.task == "choice" {
-                x.extend(context.iter().zip(&item).map(|(a, b)| a * b));
+                if let Some(pairs) = &self.payload.choice_cross_pairs {
+                    x.extend(pairs.iter().map(|(c, o)| context[*c] * item[*o]));
+                } else {
+                    x.extend(context.iter().zip(&item).map(|(a, b)| a * b));
+                }
             }
         } else {
             x.resize(
-                context.len() * if self.payload.task == "choice" { 3 } else { 2 },
+                if self.payload.task == "choice" {
+                    context.len() * 2
+                        + self
+                            .payload
+                            .choice_cross_pairs
+                            .as_ref()
+                            .map_or(context.len(), Vec::len)
+                } else {
+                    context.len() * 2
+                },
                 0.0,
             );
         }
@@ -531,6 +656,19 @@ impl TypedTaskRuntime {
             .exp())
     }
     pub fn choice_probabilities(
+        &self,
+        request: &DecisionRequest,
+        features: &sdm_core::TypedRankProjectionV2,
+    ) -> Result<Vec<f64>, DecisionError> {
+        let scores = self.choice_logits(request, features)?;
+        let max = scores.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+        let exps: Vec<_> = scores.iter().map(|x| (x - max).exp()).collect();
+        let sum = exps.iter().sum::<f64>();
+        Ok(exps.into_iter().map(|x| x / sum).collect())
+    }
+    /// Unnormalized per-option scores, in request option order, before
+    /// answerability thresholding. Useful for diagnostics and calibration.
+    pub fn choice_logits(
         &self,
         request: &DecisionRequest,
         features: &sdm_core::TypedRankProjectionV2,
@@ -567,10 +705,24 @@ impl TypedTaskRuntime {
             .iter()
             .map(|o| self.score(&context, Some(&features.candidates[&o.id])))
             .collect::<Result<Vec<_>, _>>()?;
-        let max = scores.iter().copied().fold(f64::NEG_INFINITY, f64::max);
-        let exps: Vec<_> = scores.iter().map(|x| (x - max).exp()).collect();
-        let sum = exps.iter().sum::<f64>();
-        Ok(exps.into_iter().map(|x| x / sum).collect())
+        Ok(scores)
+    }
+    /// Answerability score before the calibrated abstention cutoff.
+    pub fn choice_answerability_probability(
+        &self,
+        request: &DecisionRequest,
+        features: &sdm_core::TypedRankProjectionV2,
+    ) -> Result<f64, DecisionError> {
+        request.validate()?;
+        if self.payload.task != "choice"
+            || features.schema.fingerprint()? != self.payload.encoder.schema.fingerprint()?
+        {
+            return Err(DecisionError::InvalidRequest(
+                "choice task or schema mismatch".into(),
+            ));
+        }
+        let context = self.payload.encoder.encode(&features.context)?;
+        Ok(self.answerability(&context))
     }
     pub fn decide_typed(
         &self,
@@ -1024,6 +1176,10 @@ pub fn load_artifact(bytes: &[u8]) -> Result<LoadedArtifact, RuntimeError> {
                 bytes,
             )?))
         } else if envelope.architecture == "sdm-typed-task-v1" {
+            Ok(LoadedArtifact::TypedTaskV2(TypedTaskRuntime::from_bytes(
+                bytes,
+            )?))
+        } else if envelope.architecture == "sdm-typed-choice-cross-v1" {
             Ok(LoadedArtifact::TypedTaskV2(TypedTaskRuntime::from_bytes(
                 bytes,
             )?))
