@@ -2,7 +2,7 @@
 
 This directory follows the CodeGG planning and handoff convention as adapted in [003-planning-process.md](003-planning-process.md).
 
-**Start here:** [Registry](registry.md) -> [General decision-model framework roadmap](subsystems/general-decision-model-framework-roadmap.md) -> **[M013b closure evidence](closure/general-decision-model-framework/013b-status.md) (closing)**. CodeGG M005 remains externally deferred. The [framework boundary ADR](adrs/ADR-0001-general-framework-and-model-boundaries.md) governs the milestone plans.
+**Start here:** [Registry](registry.md) -> [General decision-model framework roadmap](subsystems/general-decision-model-framework-roadmap.md) -> **[M013b closure evidence](closure/general-decision-model-framework/013b-status.md) (closed)**. CodeGG M005 remains externally deferred. The [framework boundary ADR](adrs/ADR-0001-general-framework-and-model-boundaries.md) governs the milestone plans.
 
 ## Completed handoffs
 
@@ -23,7 +23,7 @@ All four milestones are SDM-owned, use explicitly provided synthetic data, prese
 
 ## Current corrective handoff
 
-**[M012 — post-M011 release reconciliation](implementation/general-decision-model-framework/012-post-m011-release-reconciliation-corrective.md)** is conditionally closed: source [PR #1](https://github.com/dbowm91/sdm/pull/1) is merged into main; crates.io publication remains blocked pending human/legal license review. **M013 and M013a are conditionally closed** on an unmerged development branch; their invalid/negative/indeterminate results remain visible. **[M013b](closure/general-decision-model-framework/013b-status.md) is closing** as a bounded evaluator corrective; it qualified no model. CodeGG M005 remains externally deferred.
+**[M012 — post-M011 release reconciliation](implementation/general-decision-model-framework/012-post-m011-release-reconciliation-corrective.md)** is conditionally closed: source [PR #1](https://github.com/dbowm91/sdm/pull/1) is merged into main; crates.io publication remains blocked pending human/legal license review. **M013 and M013a are conditionally closed** on an unmerged development branch; their invalid/negative/indeterminate results remain visible. **[M013b](closure/general-decision-model-framework/013b-status.md) is closed** as a bounded evaluator corrective; it qualified no model. CodeGG M005 remains externally deferred.
 
 Research and predecessor evidence are recorded in [docs/general-framework-research-2026-10.md](../docs/general-framework-research-2026-10.md).
 

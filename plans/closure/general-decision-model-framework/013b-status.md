@@ -6,7 +6,11 @@ Plan: `plans/implementation/general-decision-model-framework/013b-evaluation-gat
 Planning baseline: `dbowm91/sdm@694da1a002cf29c62724be6ba881240f43aac9c2` (`work/plans-sdm-m013-predictive-quality-corrective`; main remains `2bd0d5af16d143828dcbce77f411b8f3b675e7be`)
 Implementation branch: `work/plans-sdm-m013b-quality-gates-diagnostics`, branched from the registered planning commit `6c78731e21a56fb6bb1582ea101577a82f3b0d63`
 Implementation commit: recorded below in §Merge and source status
-Closure destination status: `closing` in `plans/registry.md`; promoted to `closed` once this commit is verified on hosted CI
+Implementation branch: `work/plans-sdm-m013b-quality-gates-diagnostics`, branched from registered planning commit `6c78731e21a56fb6bb1582ea101577a82f3b0d63`.
+Implementation commit: `b1f196f` (CI fix on top of the corrective commit `9f68b9b`).
+Hosted CI: run [38107604379](https://github.com/dbowm91/sdm/actions/runs/38107604379) — green on all 10 jobs.
+No main-targeted PR has been opened yet; opening and merging it remains a separate human-reviewed action.
+Closure destination status: `closed` in `plans/registry.md` (hosted CI verified).
 Class: infrastructure / evaluation-integrity corrective
 
 ## 1. What changed and what did not
@@ -191,7 +195,9 @@ Properties proven rather than asserted:
 | `python3 scripts/check_m011_frozen_reports.py` | Binary and choice identities preserved. **Score differs locally** (`6ab8093b…` vs `1a62724e…`) — this is the pre-existing host float difference already recorded in the M013a closure; the check is gated to `linux-x64` in CI and no Linux fingerprint was substituted. |
 | `cargo package --workspace --locked --no-verify` | **Blocked in this environment.** Fails with `no matching package named sdm-core found; location searched: crates.io index`. Verified **pre-existing and unrelated**: the identical failure reproduces on a clean worktree of the untouched planning baseline, and M013b changes no packaging-relevant file. Local `crates.io` API access returns HTTP 403. CI is the authoritative check. |
 
-Hosted CI (Rust 1.89 MSRV job; linux-x64, linux-arm64, macos-arm64; cross-Choice artifact portability; frozen SHA checks; staged consumer; license and package audits) has **not** been run for this commit at the time of writing. Run 38105314254 belongs to the M013a baseline and is not M013b evidence. The status stays `closing` until hosted CI is green.
+Hosted CI run **[38107604379](https://github.com/dbowm91/sdm/actions/runs/38107604379)** on implementation commit `b1f196f` is **green across all 10 jobs**: the Rust 1.89 MSRV job; `verify` on linux-x64, linux-arm64 and macos-arm64; both `portability` matrices; and all three `choice-portability` jobs consuming the same Linux-trained cross artifact. The new `Verify M013b evaluation-integrity evaluator` step passed on all three `verify` targets. Run 38106646219 belonged to the planning commits and is not M013b evidence.
+
+One CI defect was found and fixed during implementation: the first push (`9f68b9b`, run 38107462623) failed because the step redirected stdout into `target/m013b/` before any script created that directory. Shell redirection is evaluated first, so the step aborted with `No such file or directory`. Fixed in `b1f196f` by creating the directory explicitly; the failure was in the harness, not in any M013b metric, gate or diagnostic.
 
 ## 9. Compatibility, security, privacy and resource audit
 
@@ -225,7 +231,7 @@ Writing this recommendation does not register M013c or M014 as ready. No CodeGG 
 
 ## 11. Merge and source status
 
-Implementation branch: `work/plans-sdm-m013b-quality-gates-diagnostics`, branched from registered planning commit `6c78731e21a56fb6bb1582ea101577a82f3b0d63`. Implementation commit SHA and hosted CI run URL are recorded here once the branch is pushed and CI completes. Main remains `2bd0d5af16d143828dcbce77f411b8f3b675e7be`; no main merge, tag or publication is authorized by this closure.
+Implementation branch `work/plans-sdm-m013b-quality-gates-diagnostics` is pushed and green: corrective commit `9f68b9b`, CI fix `b1f196f`, hosted CI run [38107604379](https://github.com/dbowm91/sdm/actions/runs/38107604379) successful on all 10 jobs. Main remains `2bd0d5af16d143828dcbce77f411b8f3b675e7be`; no main merge, tag or publication is authorized by this closure. Opening the reviewable main-targeted PR that carries M013 + M013a + M013b is the outstanding integration handoff (§2 D4).
 
 ## 12. Input and output provenance
 

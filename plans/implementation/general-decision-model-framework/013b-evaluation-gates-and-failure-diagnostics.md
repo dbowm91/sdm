@@ -1,6 +1,6 @@
 # SDM M013b — Evaluation-Gate Integrity and Model-Failure Diagnostics Corrective
 
-Status: **conditionally closed** — implemented and mechanically verified; closure evidence at `plans/closure/general-decision-model-framework/013b-status.md`. This file is retained as the implementation handoff of record and is not rewritten to reflect later results.
+Status: **conditionally closed** — implemented and verified; hosted CI run [38107604379](https://github.com/dbowm91/sdm/actions/runs/38107604379) green on all 10 jobs; implementation commits `9f68b9b` (corrective) and `b1f196f` (CI fix) on `work/plans-sdm-m013b-quality-gates-diagnostics`. Closure evidence at `plans/closure/general-decision-model-framework/013b-status.md`. This file is retained as the implementation handoff of record and is not rewritten to reflect later results.
 Class: infrastructure / evaluation-integrity corrective
 Planning baseline: `dbowm91/sdm@694da1a002cf29c62724be6ba881240f43aac9c2` on `work/plans-sdm-m013-predictive-quality-corrective`; implementation agents MUST recheck live head and CI
 Planning branch: `work/plans-sdm-m013b-quality-gates-diagnostics`; implementation agents branch from this registered planning commit and preserve prior history
