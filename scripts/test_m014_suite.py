@@ -56,6 +56,10 @@ class M014SuiteTests(unittest.TestCase):
         self.assertEqual(first["groups"], 12)
         self.assertEqual(first["estimate"], 1.0)
 
+    def test_answerable_top1_is_scored_even_when_decision_abstains(self):
+        self.assertTrue(analysis.choice_top1_correct("yes-id", ["yes-id", "no-id"], [0.9, 0.1]))
+        self.assertFalse(analysis.choice_top1_correct("yes-id", ["yes-id", "no-id"], [0.2, 0.8]))
+
 
 if __name__ == "__main__":
     unittest.main()
