@@ -92,7 +92,7 @@ Completed milestones: [M008](plans/closure/general-decision-model-framework/008-
 [M009](plans/closure/general-decision-model-framework/009-status.md),
 [M010 Binary/Choice/Score trainable model heads](plans/closure/general-decision-model-framework/010-status.md), and
 [M011 standalone held-out release qualification](plans/closure/general-decision-model-framework/011-status.md).
-**M012 source/review handoff:** [M012 post-M011 release reconciliation](plans/closure/general-decision-model-framework/012-status.md) is conditionally closed with [PR #1](https://github.com/dbowm91/sdm/pull/1) open for review. The source integration remains unmerged and unpublished; crates.io publication is blocked pending human/legal license sign-off. M005 remains externally deferred until an approved CodeGG corpus and consumer-owned evidence exist.
+**M012 source/review handoff (historical record):** [M012 post-M011 release reconciliation](plans/closure/general-decision-model-framework/012-status.md) is conditionally closed and [PR #1](https://github.com/dbowm91/sdm/pull/1) is merged into main. Source is integrated but unpublished; crates.io publication is blocked pending human/legal license sign-off. M005 remains externally deferred until an approved CodeGG corpus and consumer-owned evidence exist.
 [ADR-0002](plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md)
 defers CodeGG-specific effectiveness (M005) until an approved independent corpus exists;
 **M008-M011 do not require CodeGG data or a CodeGG checkout**.
@@ -129,3 +129,7 @@ and the numbered closure record in
 [`plans/closure/general-decision-model-framework/011-status.md`](plans/closure/general-decision-model-framework/011-status.md).
 A separate consumer crate can be compiled with
 `cargo check --manifest-path examples/standalone-consumer/Cargo.toml --locked`.
+
+## Next implementation: M013 (planned, not landed)
+
+[M013 predictive-quality corrective](plans/implementation/general-decision-model-framework/013-predictive-quality-corrective-and-independent-qualification.md) is registered ready on a planning work branch. It targets the known negative Binary OOD quality and Choice counterfactual/abstention failures with independent prospectively frozen synthetic evidence. No learned model is qualified or promoted by this planning-only registration. CodeGG M005 remains deferred on an approved corpus.

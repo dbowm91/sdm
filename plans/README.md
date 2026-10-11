@@ -28,3 +28,5 @@ All four milestones are SDM-owned, use explicitly provided synthetic data, prese
 Research and predecessor evidence are recorded in [docs/general-framework-research-2026-10.md](../docs/general-framework-research-2026-10.md).
 
 Handoff rule: one implementation agent takes one **ready** milestone; re-audit the source head; update registry on state transition; write a requirement-to-evidence closure file in plans/closure/general-decision-model-framework/NNN-status.md before unblocking the next plan. Preserve old CodeGG experiments and existing artifact/fixture digests. Do not update CodeGG or claim neural model promotion from these SDM planning changes.
+
+M013 handoff: [Predictive-quality corrective and independent qualification](implementation/general-decision-model-framework/013-predictive-quality-corrective-and-independent-qualification.md), informed by [diagnostic baseline](../docs/m013-quality-diagnostic-baseline.md). M012 PR #1 has merged; crates.io publication remains separately gated. M013 requires no CodeGG corpus.

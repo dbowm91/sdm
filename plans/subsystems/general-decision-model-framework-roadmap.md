@@ -1,6 +1,6 @@
 # General Decision-Model Framework and First Consumer Roadmap
 
-Status: M001-M012 source/review handoff evidence retained; M012 conditionally closed; M005 deferred
+Status: M012 merged; M013 ready for implementation; M005 externally deferred; crates.io publication gated
 Audit baseline: dbowm91/sdm@8139b064bdcf3212e8f6fd912e801a479b55751c (2026-10-05)
 Planning date: 2026-10-10
 Primary decisions: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md; plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md
@@ -103,7 +103,7 @@ Complete train/package/infer/evaluate paths for every declared semantic family u
 Class: capability/release infrastructure. Status: closed; evidence: plans/closure/general-decision-model-framework/011-status.md. Plan: plans/implementation/general-decision-model-framework/011-standalone-release-qualification.md.
 Frozen held-out suites, positive/negative/indeterminate gates, the same trained artifact on three targets, Rust 1.89, independent consumer compilation, documentation, dependency/license metadata and package verification are recorded. Binary OOD evidence is negative; Choice quality and some OOD slices are indeterminate. This is a mechanics/release candidate only and does not qualify CodeGG or auto-publish.
 
-Dependency graph: M008 -> M009 -> M010 -> M011 is complete; M012 is conditionally closed for source integration/review handoff. Registry publication is blocked pending human/legal sign-off and PR merge remains pending human review. Existing milestones retain numbered closure evidence and registry state. CodeGG M005 remains deferred on a separate external gate.
+Dependency graph: M008 -> M009 -> M010 -> M011 -> M012 source integration is complete; M012 publication qualification remains conditional on human/legal license review. PR #1 is merged. M013 follows on the independent model-quality line, not CodeGG M005. Existing milestones retain numbered closure evidence and registry state. CodeGG M005 remains deferred on a separate external gate.
 
 ### M012 — Release and branch reconciliation corrective
 Class: corrective infrastructure/release readiness. Status: **conditionally closed**.
@@ -112,6 +112,17 @@ Planning baseline: f9ce89765a1cb07ce23100177d8f56c30e52777d; integration target 
 Scope: review full M001-M011 ancestry into main, resolve all seven crate manifests' missing registry metadata, verify package contents and an independent consumer, record third-party SPDX/license obligations for human review, reconcile documentation and artifact trust boundaries, rerun Rust 1.89/three-platform and frozen compatibility checks, and prepare a reviewable PR. No implicit merge, crates.io publish, tag, or CodeGG pin change.
 Retain the synthetic predictive limitations reported by M011, notably negative Binary OOD performance and Choice's zero response changes to its tested target-flipping counterfactuals. Those belong in a separate future model-quality line, not as a premise to weaken release mechanics gates.
 Required closure: plans/closure/general-decision-model-framework/012-status.md, including PR URL/state, exact source/head/merge-base, CI logs, package inventory and license-review disposition. A publication blocker can remain when a reviewed source PR is ready; the two decisions must be stated separately.
+
+### M013 — Binary/Choice predictive-quality corrective and independent qualification
+Class: capability/evidence corrective. Status: **ready**, planning only.
+Plan: plans/implementation/general-decision-model-framework/013-predictive-quality-corrective-and-independent-qualification.md.
+Research: docs/m013-quality-diagnostic-baseline.md.
+Planning source baseline: main@2bd0d5af16d143828dcbce77f411b8f3b675e7be; M011 closure and M012 merged source are hard predecessors.
+External dependencies: none for standalone work; no approved CodeGG corpus required.
+
+Resolve model-quality failures without weakening integrity gates: prove or disprove the diagonal Choice interaction representability hypothesis, measure raw scores versus abstained decisions, isolate Binary load/text nuisance sensitivity under constant label rules, and implement only bounded versioned backward-compatible model/feature corrections justified by observed mechanisms. Freeze independent M013 synthetic groups, ID and distinct OOD shifts, no-answer slices and counterfactuals, with preregistered clustered uncertainty and baseline comparisons before FINAL inference. Preserve M011 negative/indeterminate records unchanged. Completion records mechanical and predictive verdicts separately and cannot promote CodeGG models or authorize crates.io publication.
+
+M013 -> possible later M014 architecture comparison is a soft successor only. M005 remains independent, deferred, and is not a gate on M013.
 
 ## 7. Cross-cutting requirements
 
@@ -140,4 +151,4 @@ Create plans/closure/general-decision-model-framework/NNN-status.md for each mil
 
 ## 10. Readiness
 
-M001-M011 outcomes are retained under plans/closure/general-decision-model-framework/. M005 stays indeterminate because no approved independent CodeGG corpus or consumer adapter exists. The v1 consumer contract remains unchanged and no CodeGG model is promoted. M012 is conditionally closed for packaging, documentation, and source/PR handoff; registry publication remains blocked pending human/legal license sign-off. M005 remains externally deferred. No further ready/eligible implementation plan is registered.
+M001-M011 outcomes are retained under plans/closure/general-decision-model-framework/. M005 stays indeterminate because no approved independent CodeGG corpus or consumer adapter exists. The v1 consumer contract remains unchanged and no CodeGG model is promoted. M012 source was merged via PR #1; its publication/legal qualification remains conditional. M013 is the next **ready** standalone implementation plan for Binary/Choice failures and prospective quality evidence. M005 remains externally deferred. No model or package publication is authorized.
