@@ -1,0 +1,23 @@
+{
+  "artifact_path": "artifacts/m014/choice-cross-v1.artifact.json",
+  "dataset_path": "target/m014b/choice.json",
+  "expected_architecture": "typed-choice-cross",
+  "expected_artifact_architecture": "sdm-typed-choice-cross-v1",
+  "expected_artifact_sha256": "sha256:ba17c92979e0365999721822b5b9af6cfb8b2a1a8c2de0405635bc099dad514e",
+  "expected_calibration_sha256": "sha256:3152ec4a0115f52e6f1763805a9cd6024025435afdbff7e47425d5dcdd20a1f7",
+  "expected_dataset_sha256": "sha256:081730bf1696578e26b69f22e862830c53c73fa10b86bfae783fb290ffa8e900",
+  "expected_feature_schema_sha256": "sha256:a959af2515ff4182fbe552e31b03e3daf443cb7cfda078be6775e3b915b95075",
+  "expected_split_fingerprint": "sha256:8179f672d864122323d76a6dc9c80f1f5226c352ba4dea4dfaecfc180346ece2",
+  "expected_test_membership_sha256": "sha256:05d432b6a01f72e2206c9b21722c527f3ddd8ece4cf2ab874550967b115b9c68",
+  "freeze_sha256": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "protocol_sha256": "sha256:3cea183188f3672cc7d58ed21aa195c899d6f333faea518067392fe3733df407",
+  "provenance": {
+    "consent_scope": "synthetic-only; no human or application data",
+    "label_lineage": "scripts/generate_m014b_suite.py sha256:5167a16d4cd6c2d44277b5df207b056d5792dba0cabcfee9bed58b33c239412e; seed=140142; groups=570; NEW Binary (AND XOR rule_b) and Choice XNOR truth functions; distinct from M014 AND/XOR and canary",
+    "license": "MIT",
+    "redistributable": true,
+    "source": "SDM M014b independent prospective quality suite v1"
+  },
+  "report_path": "target/m014b/final/choice-cross.report.json",
+  "split_path": "fixtures/m014b-choice-v1.split.json"
+}

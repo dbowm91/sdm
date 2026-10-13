@@ -1170,9 +1170,15 @@ def qualify(manifest_path: str, dataset_binary: str, split_binary: str,
         overall = VERDICT_POSITIVE
     else:
         overall = VERDICT_INDETERMINATE
+    # Cohort hashes, fingerprints, evaluator SHA for C2 (each report includes evaluator SHA).
+    try:
+        _eval_sha = "sha256:" + __import__("hashlib").sha256(Path(__file__).read_bytes()).hexdigest()
+    except Exception:
+        _eval_sha = "sha256:" + "0" * 64
     # Cohort hashes, fingerprints.
     result = {
         "evaluator": EVALUATOR_VERSION,
+        "evaluator_sha256": _eval_sha,
         "manifest_id": manifest.get("manifest_id"),
         "protocol": manifest.get("manifest_id"),
         "multiplicity": f"one-sided Bonferroni alpha={alpha} (base {manifest['bootstrap'].get('base_alpha', alpha*manifest['bootstrap'].get('comparisons', 1))}/{manifest['bootstrap'].get('comparisons', 1)}); paired leakage-group percentile bootstrap {replicates} draws seed {seed}",
