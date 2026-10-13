@@ -1,6 +1,6 @@
 # SDM Planning Registry
 
-Status: **M014c fully closed and integrated (PR #3, merged-main green)**; M014b synthetic predictive verdict negative with historical final immutable. **M015 TinyChoice implementation active but incomplete** (generator/oracle and partition checks implemented; existing typed learned baselines not integrated; see `docs/m015-dev-results.md`). M016 and M017 remain blocked. CodeGG M005 and crates.io remain separately gated.
+Status: **M014c fully closed and integrated (PR #3, merged-main green)**; M014b synthetic predictive verdict negative with historical final immutable. **M015 conditionally closed on its implementation branch; reviewed merge and merged-main CI pending** (see `docs/m015-dev-results.md` and `plans/closure/general-decision-model-framework/015-status.md`). M016 and M017 remain blocked. CodeGG M005 and crates.io remain separately gated.
 Governance: plans/003-planning-process.md
 Current planning baseline: main@c048189d7026d723c7da584d7429cb275c714d23 (2026-10-13) / planning branch work/plans-sdm-m015-m017-tinychoice-research; M014c source/prerequisites integrated, historical M014b final consumed and unchanged. Previous full integration evidence: PR #3, merged-main CI 38424519807 and current main CI 38426232250 green (11/11).
 Accepted architecture: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md
@@ -12,7 +12,7 @@ States: proposed, ready, active, blocked, closing, closed, conditionally closed,
 
 | Subsystem | Status | Next handoff | Blockers |
 | --- | --- | --- | --- |
-| Standalone general decision-model framework | M014c integrated; **M015 active/incomplete**; M016 and M017 dependency-blocked | [M015 corpus + oracle](plans/implementation/general-decision-model-framework/015-tinychoice-corpus-and-research-foundation.md) | M015 still needs a repeatable existing-model train/dev baseline harness; M016 needs accepted M015 closure; M017 needs M016; no CodeGG corpus dependency |
+| Standalone general decision-model framework | M014c integrated; **M015 conditionally closed (integration pending)**; M016 and M017 dependency-blocked | [M015 closure](plans/closure/general-decision-model-framework/015-status.md) | M015 awaits reviewed merge and merged-main CI; M016 needs accepted M015 closure + merged source; M017 needs M016; no CodeGG corpus dependency |
 | CodeGG consumer-specific effectiveness (M005) | deferred / indeterminate | independent CodeGG-owned evidence, unscheduled | No approved corpus; does not block M008-M011 |
 
 ## Registered milestone plans
@@ -41,16 +41,16 @@ States: proposed, ready, active, blocked, closing, closed, conditionally closed,
 | M014b | **closed (source merged via PR #3; Binary/Choice/overall negative, local, consumed; original-byte ledger)** | capability/prospective qualification | plans/implementation/general-decision-model-framework/014b-independent-frozen-qualification.md | Final cohort consumed; NO rerun; M014c closure 014c-status.md + ledger; merged-main green |
 | M014c | **closed (C1–C12 pass; PR #3 merged 91b0c3b, merged-main 38424519807 green)** | infrastructure/evidence-integrity closure corrective | plans/implementation/general-decision-model-framework/014c-closure-evidence-reconciliation.md | Implementation af74c01 + fix d60d9c0 + docs 3d8db08; closure plans/closure/general-decision-model-framework/014c-status.md; no new experiment; no promotion |
 
-| M015 | **active, incomplete** (research/corpus foundation) | capability / research infrastructure | plans/implementation/general-decision-model-framework/015-tinychoice-corpus-and-research-foundation.md | Existing typed learned baselines and experiment harness not integrated; see docs/m015-dev-results.md |
+| M015 | **conditionally closed on branch; integration pending** (research/corpus foundation) | capability / research infrastructure | plans/implementation/general-decision-model-framework/015-tinychoice-corpus-and-research-foundation.md | Reviewed merge and merged-main CI; see plans/closure/general-decision-model-framework/015-status.md |
 | M016 | **blocked** (registered future) | capability | plans/implementation/general-decision-model-framework/016-tinychoice-mlp-and-baseline-comparison.md | M015 accepted closure + merged-main CI |
 | M017 | **blocked** (registered future) | capability / prospective evidence | plans/implementation/general-decision-model-framework/017-tinychoice-prospective-qualification-and-portability.md | M015 and M016 accepted closures; new prospective freeze, support, CI |
 
-## M015–M017 new standalone TinyChoice research handoff (registered 2026-10-13; M015 implementation active)
+## M015–M017 standalone TinyChoice research handoff (registered 2026-10-13; M015 implementation conditionally closed)
 
 Current planning branch: `work/plans-sdm-m015-m017-tinychoice-research`, based on `main@c048189d7026d723c7da584d7429cb275c714d23`. Research: `docs/m015-small-model-research.md`.
-M015 implementation now includes a source-defined generator, independent oracle, deterministic TRAIN/DEV outputs and grouped diagnostics. `docs/m015-dev-results.md` records exact hashes and the outstanding gate: existing typed learned baselines are unsupported until the corpus is projected into the current schema and run through the experiment harness. **M015 is not closed; M016 remains blocked.** M016 requires a native Choice-only shared scorer + separately supervised answerability and dev-only comparison with existing heads and isolated shallow-tree baseline; Choice requests continue requiring 2..128 options. **M017 remains blocked:** new frozen prospective synthetic qualification, acyclic two-phase SHA binding and single inference-only final; same-byte three-host CANARY parity, original-byte final ledger.
+M015 implementation includes a source-defined generator, independent oracle, deterministic TRAIN/DEV outputs, grouped counterfactual diagnostics, and a repeatable existing-model baseline harness. Local gates pass; reviewed merge and merged-main CI remain required for integration closure. **M016 remains blocked until that integration closes.** M016 requires a native Choice-only shared scorer + separately supervised answerability and dev-only comparison with existing heads and isolated shallow-tree baseline; Choice requests continue requiring 2..128 options. **M017 remains blocked:** new frozen prospective synthetic qualification, acyclic two-phase SHA binding and single inference-only final; same-byte three-host CANARY parity, original-byte final ledger.
 
-Neither a synthetic positive result nor an implementation milestone opens CodeGG M005 or permits crates.io publication. The earlier M014b result is specifically on changed conditional labels without a new observable rule selector; this must not be called a fixed-rule OOD failure. Historical M014b final inputs/configs/results cannot be rerun or rewritten. M015/16/17 states describe PLANNED work, not implementation or quality.
+Neither a synthetic positive result nor an implementation milestone opens CodeGG M005 or permits crates.io publication. The earlier M014b result is specifically on changed conditional labels without a new observable rule selector; this must not be called a fixed-rule OOD failure. Historical M014b final inputs/configs/results cannot be rerun or rewritten. M015 has implementation evidence but no model-quality qualification or consumer promotion; M016/17 remain planned and blocked.
 
 ## Interface and operational dependencies
 

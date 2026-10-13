@@ -10,10 +10,10 @@ The causal graph is `rule + context + candidate semantics -> candidate satisfact
 
 ## Rule grammar
 
-The independent checker and labeling implementation support five source-defined rule families: `all_required` (conjunction), `any_required` (disjunction), `exclusive` (exactly one required feature), `threshold` (numeric feature at or above a bounded threshold), and `category_and_flag` (categorical equality and a boolean flag). Each rule descriptor names the rule and its required operands/threshold. Unknown names, missing operands, extra operands, invalid types, and out-of-range thresholds are errors; there is no default rule.
+The independent checker and labeling implementation support five source-defined rule families: `all_required` (conjunction), `any_required` (disjunction), `exclusive` (XOR or XNOR, selected by the visible `invert` operand), `threshold` (numeric feature at or above a bounded threshold), and `category_and_flag` (categorical equality, boolean flag, and numeric minimum as a mixed constraint). Each rule descriptor names the rule and its required operands/threshold. Unknown names, missing operands, extra operands, invalid types, and out-of-range thresholds are errors; there is no default rule.
 
 The corpus includes both positive and negative candidates, randomized candidate cardinalities from 2 through 8, answerable and unavailable instances, candidate ID renaming/order reversal controls, nuisance-preserving counterfactuals, and causal flips. Groups and paired instances stay wholly in TRAIN or DEV. Group membership is determined before rows are emitted.
 
 ## Bounds and exclusions
 
-The CLI accepts only 2,000, 10,000, or 50,000 independent groups, explicit seed, and an explicit output path. It streams bounded JSONL, writes through a temporary file and atomically replaces only an absent output or an output with the same digest. It does not construct any M017 final cohort. Historical M013/M014 data and identifiers are not inputs.
+The CLI accepts 2,000, 10,000, or 50,000 TRAIN groups, adds a disjoint 10% DEV group set, and accepts an explicit seed and output path. It streams bounded JSONL, writes through a temporary file and atomically replaces only an absent output or an output with the same digest. It does not construct any M017 final cohort. Historical M013/M014 data and identifiers are not inputs.

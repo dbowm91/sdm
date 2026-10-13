@@ -18,13 +18,20 @@ class M015SuiteTests(unittest.TestCase):
         cases = {
             "all_required": ({"features": ["alpha", "beta"]}, False),
             "any_required": ({"features": ["alpha", "beta"]}, True),
-            "exclusive": ({"features": ["alpha", "beta"]}, True),
+            "exclusive": ({"features": ["alpha", "beta"], "invert": False}, True),
             "threshold": ({"feature": "capacity", "minimum": 5}, True),
-            "category_and_flag": ({"category_feature": "kind", "category": "primary", "flag_feature": "enabled"}, True),
+            "category_and_flag": ({"category_feature": "kind", "category": "primary", "flag_feature": "enabled", "numeric_feature": "capacity", "minimum": 5}, True),
         }
         for name, (operands, expected) in cases.items():
             with self.subTest(name=name):
                 self.assertEqual(m015.rule_label({"name": name, "operands": operands}, {}, c), expected)
+
+    def test_xor_and_xnor_truth_tables_with_visible_inversion(self):
+        for alpha in (False, True):
+            for beta in (False, True):
+                candidate = {"alpha": alpha, "beta": beta}
+                self.assertEqual(m015.rule_label({"name": "exclusive", "operands": {"features": ["alpha", "beta"], "invert": False}}, {}, candidate), alpha != beta)
+                self.assertEqual(m015.rule_label({"name": "exclusive", "operands": {"features": ["alpha", "beta"], "invert": True}}, {}, candidate), alpha == beta)
 
     def test_unknown_or_malformed_rule_fails_closed(self):
         for rule in ({"name": "typo", "operands": {}}, {"name": "threshold", "operands": {}}, {"name": "all_required", "operands": {"features": ["alpha"], "fallback": True}}):
@@ -68,6 +75,9 @@ class M015SuiteTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp)
             manifest = m015.generate(out, 2_000, 991)
+            self.assertEqual(manifest["train_groups"], 2_000)
+            self.assertEqual(manifest["dev_groups"], 200)
+            self.assertEqual(manifest["independent_groups"], 2_200)
             self.assertEqual(m015.generate(out, 2_000, 991), manifest)
             with self.assertRaises(FileExistsError):
                 m015.generate(out, 2_000, 992)
@@ -86,9 +96,23 @@ class M015SuiteTests(unittest.TestCase):
         report = score_rows(train, dev)
         self.assertEqual(report["oracle_disagreements"], 0)
         self.assertEqual(report["dev_groups"], 5)
+        self.assertEqual(set(report["tracks"]), {"fixed_rule", "rule_conditioned"})
         leaked = dict(dev[0]); leaked["split"] = "train"
         with self.assertRaises(ValueError):
             score_rows(train + [leaked], dev)
+
+    def test_analyzer_rejects_swapped_oracle_label_and_undeclared_pair_change(self):
+        groups = [m015.make_group(i, 33) for i in range(20)]
+        train = [row for pair in groups for row in pair if row["split"] == "train"]
+        dev = [row for pair in groups for row in pair if row["split"] == "dev"]
+        corrupted = [dict(row) for row in dev]
+        corrupted[0]["label"] = "wrong-option"
+        with self.assertRaises(ValueError):
+            score_rows(train, corrupted)
+        corrupted = [dict(row) for row in dev]
+        corrupted[0]["context"] = dict(corrupted[0]["context"], available=not corrupted[0]["context"]["available"])
+        with self.assertRaises(ValueError):
+            score_rows(train, corrupted)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # SDM M015 — TinyChoice research protocol and oracle-audited corpus foundation
 
-Status: **ready for implementation** (planning only; not started).
+Status: **conditionally closed on implementation branch; integration pending** (local acceptance evidence recorded; hosted CI, reviewed merge, and merged-main CI remain required for full integration closure).
 Class: capability / research infrastructure.
 Planning baseline: dbowm91/sdm@c048189d7026d723c7da584d7429cb275c714d23 (2026-10-13); re-audit remote main and implementation branch before coding.
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md.

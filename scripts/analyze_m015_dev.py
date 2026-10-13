@@ -62,16 +62,36 @@ def score_rows(train, dev):
         if len(pair) != 2:
             raise ValueError(f"counterfactual pair {pair_id} has {len(pair)} rows")
         left, right = pair
-        if left["split"] != right["split"] or left["label"] != right["label"]:
-            raise ValueError(f"pair split/label mismatch: {pair_id}")
+        pair_type = left["pair_type"]
+        if left["split"] != right["split"] or right["pair_type"] != pair_type:
+            raise ValueError(f"pair split/type mismatch: {pair_id}")
+        if pair_type == "nuisance":
+            if left["label"] != right["label"]:
+                raise ValueError(f"nuisance pair target changed: {pair_id}")
+            allowed_context_changes = {"load", "note", "memo"}
+            for key in set(left["context"]) | set(right["context"]):
+                if key not in allowed_context_changes and left["context"].get(key) != right["context"].get(key):
+                    raise ValueError(f"undeclared context change within nuisance pair: {pair_id}:{key}")
+        elif pair_type == "causal_flip":
+            if left["label"] == right["label"] or left["context"] != right["context"]:
+                raise ValueError(f"causal pair failed to flip only target semantics: {pair_id}")
+        else:
+            raise ValueError(f"unknown pair type: {pair_type}")
         if {o["id"] for o in left["options"]} != {o["id"] for o in right["options"]}:
             raise ValueError(f"candidate identity changed within nuisance pair: {pair_id}")
         left_semantics = {o["id"]: o["semantics"] for o in left["options"]}
         right_semantics = {o["id"]: o["semantics"] for o in right["options"]}
-        if left_semantics != right_semantics:
-            raise ValueError(f"causal candidate semantics changed within nuisance pair: {pair_id}")
-        if [o["id"] for o in left["options"]] == [o["id"] for o in right["options"]]:
-            raise ValueError(f"option order did not change within pair: {pair_id}")
+        if pair_type == "nuisance":
+            if left_semantics != right_semantics:
+                raise ValueError(f"candidate semantics changed within nuisance pair: {pair_id}")
+            if [o["id"] for o in left["options"]] == [o["id"] for o in right["options"]]:
+                raise ValueError(f"option order did not change within nuisance pair: {pair_id}")
+            if left["context"].get("load") == right["context"].get("load") or left["context"].get("note") == right["context"].get("note"):
+                raise ValueError(f"declared nuisance perturbation missing within pair: {pair_id}")
+        else:
+            differences = [(option_id, key) for option_id in left_semantics for key in set(left_semantics[option_id]) | set(right_semantics[option_id]) if left_semantics[option_id].get(key) != right_semantics[option_id].get(key)]
+            if len(differences) != 1 or differences[0][1] != left["causal_feature"] or [o["id"] for o in left["options"]] != [o["id"] for o in right["options"]]:
+                raise ValueError(f"causal pair changed undeclared candidate fields: {pair_id}")
 
     def none(_row): return None
     def first(row): return row["options"][0]["id"] if row["context"]["available"] else None
@@ -89,10 +109,11 @@ def score_rows(train, dev):
         "train_groups": len({r["group_id"] for r in train}), "dev_groups": len({r["group_id"] for r in dev}),
         "oracle_disagreements": 0,
         "families": {name: sum(r["family"] == name for r in dev) for name in sorted({r["family"] for r in dev})},
+        "tracks": {name: {"rows": sum(r["track"] == name for r in dev), "groups": len({r["group_id"] for r in dev if r["track"] == name}), "families": sorted({r["family"] for r in dev if r["track"] == name})} for name in sorted({r["track"] for r in dev})},
         "answerability_by_family": {name: {"groups": len({r["group_id"] for r in dev if r["family"] == name}), "answerable_groups": len({r["group_id"] for r in dev if r["family"] == name and r["context"]["available"]}), "no_answer_groups": len({r["group_id"] for r in dev if r["family"] == name and not r["context"]["available"]})} for name in sorted({r["family"] for r in dev})},
         "dev_accuracy": {name: {"value": accuracy(dev, fn), "group_bootstrap_95_ci": bootstrap_group_ci(dev, fn)} for name, fn in controls.items()},
-        "learned_baselines": {"typed_linear": "unsupported: M015 rule descriptor uses a new schema not represented by the frozen typed-task-v1 candidate artifacts", "typed_cross": "unsupported for same schema reason", "typed_compositional": "unsupported for same schema reason"},
-        "pair_controls": {"paired_rows": len([p for p in pairs.values() if p[0]["split"] == "dev"]), "id_sets_preserved": True, "candidate_semantics_preserved": True, "option_order_reversed": True, "nuisance_fields_perturbed": all(p[0]["context"] != p[1]["context"] for p in pairs.values())},
+        "learned_baselines": {"typed_linear": "run by scripts/run_m015_baselines.py on the identical M015 TRAIN/DEV typed corpus", "typed_cross": "run by scripts/run_m015_baselines.py on the identical M015 TRAIN/DEV typed corpus", "typed_compositional": "run by scripts/run_m015_baselines.py on the identical M015 TRAIN/DEV typed corpus"},
+        "pair_controls": {"nuisance_pairs": sum(p[0]["split"] == "dev" and p[0]["pair_type"] == "nuisance" for p in pairs.values()), "causal_flip_pairs": sum(p[0]["split"] == "dev" and p[0]["pair_type"] == "causal_flip" for p in pairs.values()), "id_sets_preserved": True, "candidate_semantics_preserved_for_nuisance": True, "option_order_reversed_for_nuisance": True, "nuisance_fields_perturbed": True, "causal_pairs_change_one_declared_candidate_feature": True},
         "selection_policy": "No candidate or threshold selected. M017 final is not constructed.",
     }
     return report
