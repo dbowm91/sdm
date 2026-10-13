@@ -1,0 +1,4114 @@
+{
+  "artifact_sha256": "sha256:453f9ea708bb67734c9bfc9fe5552baca7cf03ad5c8459dc8e3ca1b98281a9b3",
+  "contract": "choice-final-v2",
+  "dataset_sha256": "sha256:f0d614db315836c41f2a79f998aed47331f0fc234c0e2a3b516638d9ebd702a9",
+  "rows": [
+    {
+      "case_id": "m015-g000055-causal-before",
+      "expected_answerability": 0.9997053917550649,
+      "expected_predicted": "tc-11b2f20a72",
+      "expected_probs": [
+        0.9999999987944332,
+        7.706614415535465e-10,
+        4.349052294884019e-10
+      ],
+      "features": {
+        "candidates": {
+          "tc-11b2f20a72": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 3.0
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "optional"
+                }
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "causal control"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "all_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 0
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          },
+          "tc-5fecd51325": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 3.0
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "optional"
+                }
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "causal control"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "all_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 1
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          },
+          "tc-c24a2faa3e": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 3.0
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "optional"
+                }
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "causal control"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "all_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 2
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          }
+        },
+        "context": {
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 3.0
+              }
+            },
+            {
+              "id": "memo",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "optional"
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "causal control"
+              }
+            },
+            {
+              "id": "rule_family",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "all_required"
+              }
+            },
+            {
+              "id": "rule_invert",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "alpha",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "beta",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "capacity",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 0.0
+              }
+            },
+            {
+              "id": "enabled",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "other"
+              }
+            }
+          ],
+          "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+          "schema_version": 2
+        },
+        "schema": {
+          "fields": [
+            {
+              "categories": [],
+              "id": "active",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "available",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "load",
+              "required": true,
+              "value_type": "number"
+            },
+            {
+              "categories": [],
+              "id": "memo",
+              "required": false,
+              "value_type": "text"
+            },
+            {
+              "categories": [],
+              "id": "note",
+              "required": false,
+              "value_type": "text"
+            },
+            {
+              "categories": [
+                "all_required",
+                "any_required",
+                "exclusive",
+                "threshold",
+                "category_and_flag"
+              ],
+              "id": "rule_family",
+              "required": true,
+              "value_type": "category"
+            },
+            {
+              "categories": [],
+              "id": "rule_invert",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "alpha",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "beta",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "capacity",
+              "required": true,
+              "value_type": "number"
+            },
+            {
+              "categories": [],
+              "id": "enabled",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [
+                "other",
+                "primary"
+              ],
+              "id": "kind",
+              "required": true,
+              "value_type": "category"
+            }
+          ],
+          "version": 2
+        }
+      },
+      "request": {
+        "request_id": "m015-g000055-causal-before-request",
+        "schema_version": 1,
+        "spec": {
+          "kind": "choice",
+          "options": [
+            {
+              "id": "tc-11b2f20a72",
+              "label": "Candidate 0"
+            },
+            {
+              "id": "tc-5fecd51325",
+              "label": "Candidate 1"
+            },
+            {
+              "id": "tc-c24a2faa3e",
+              "label": "Candidate 2"
+            }
+          ],
+          "question": "Choose the candidate satisfying the visible rule and context."
+        },
+        "state": []
+      }
+    },
+    {
+      "case_id": "m015-g000055-n0",
+      "expected_answerability": 0.9999990780612518,
+      "expected_predicted": "tc-11b2f20a72",
+      "expected_probs": [
+        0.9999999988586392,
+        7.251509923909851e-10,
+        4.162098235366165e-10
+      ],
+      "features": {
+        "candidates": {
+          "tc-11b2f20a72": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 0.235
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "optional"
+                }
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "routine status record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "all_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 0
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          },
+          "tc-5fecd51325": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 0.235
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "optional"
+                }
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "routine status record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "all_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 1
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          },
+          "tc-c24a2faa3e": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 0.235
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "optional"
+                }
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "routine status record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "all_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 2
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          }
+        },
+        "context": {
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 0.235
+              }
+            },
+            {
+              "id": "memo",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "optional"
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "routine status record"
+              }
+            },
+            {
+              "id": "rule_family",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "all_required"
+              }
+            },
+            {
+              "id": "rule_invert",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "alpha",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "beta",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "capacity",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 0.0
+              }
+            },
+            {
+              "id": "enabled",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "other"
+              }
+            }
+          ],
+          "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+          "schema_version": 2
+        },
+        "schema": {
+          "fields": [
+            {
+              "categories": [],
+              "id": "active",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "available",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "load",
+              "required": true,
+              "value_type": "number"
+            },
+            {
+              "categories": [],
+              "id": "memo",
+              "required": false,
+              "value_type": "text"
+            },
+            {
+              "categories": [],
+              "id": "note",
+              "required": false,
+              "value_type": "text"
+            },
+            {
+              "categories": [
+                "all_required",
+                "any_required",
+                "exclusive",
+                "threshold",
+                "category_and_flag"
+              ],
+              "id": "rule_family",
+              "required": true,
+              "value_type": "category"
+            },
+            {
+              "categories": [],
+              "id": "rule_invert",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "alpha",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "beta",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "capacity",
+              "required": true,
+              "value_type": "number"
+            },
+            {
+              "categories": [],
+              "id": "enabled",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [
+                "other",
+                "primary"
+              ],
+              "id": "kind",
+              "required": true,
+              "value_type": "category"
+            }
+          ],
+          "version": 2
+        }
+      },
+      "request": {
+        "request_id": "m015-g000055-n0-request",
+        "schema_version": 1,
+        "spec": {
+          "kind": "choice",
+          "options": [
+            {
+              "id": "tc-11b2f20a72",
+              "label": "Candidate 0"
+            },
+            {
+              "id": "tc-5fecd51325",
+              "label": "Candidate 1"
+            },
+            {
+              "id": "tc-c24a2faa3e",
+              "label": "Candidate 2"
+            }
+          ],
+          "question": "Choose the candidate satisfying the visible rule and context."
+        },
+        "state": []
+      }
+    },
+    {
+      "case_id": "m015-g000055-n1",
+      "expected_answerability": 0.9999990718002045,
+      "expected_predicted": "tc-11b2f20a72",
+      "expected_probs": [
+        4.091023360138518e-10,
+        7.075804208564943e-10,
+        0.9999999988833173
+      ],
+      "features": {
+        "candidates": {
+          "tc-11b2f20a72": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 17.278
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": null
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "quartz basalt record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "all_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 0
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          },
+          "tc-5fecd51325": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 17.278
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": null
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "quartz basalt record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "all_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 1
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          },
+          "tc-c24a2faa3e": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 17.278
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": null
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "quartz basalt record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "all_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 2
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          }
+        },
+        "context": {
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 17.278
+              }
+            },
+            {
+              "id": "memo",
+              "required": false,
+              "value": null
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "quartz basalt record"
+              }
+            },
+            {
+              "id": "rule_family",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "all_required"
+              }
+            },
+            {
+              "id": "rule_invert",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "alpha",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "beta",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "capacity",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 0.0
+              }
+            },
+            {
+              "id": "enabled",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "other"
+              }
+            }
+          ],
+          "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+          "schema_version": 2
+        },
+        "schema": {
+          "fields": [
+            {
+              "categories": [],
+              "id": "active",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "available",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "load",
+              "required": true,
+              "value_type": "number"
+            },
+            {
+              "categories": [],
+              "id": "memo",
+              "required": false,
+              "value_type": "text"
+            },
+            {
+              "categories": [],
+              "id": "note",
+              "required": false,
+              "value_type": "text"
+            },
+            {
+              "categories": [
+                "all_required",
+                "any_required",
+                "exclusive",
+                "threshold",
+                "category_and_flag"
+              ],
+              "id": "rule_family",
+              "required": true,
+              "value_type": "category"
+            },
+            {
+              "categories": [],
+              "id": "rule_invert",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "alpha",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "beta",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "capacity",
+              "required": true,
+              "value_type": "number"
+            },
+            {
+              "categories": [],
+              "id": "enabled",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [
+                "other",
+                "primary"
+              ],
+              "id": "kind",
+              "required": true,
+              "value_type": "category"
+            }
+          ],
+          "version": 2
+        }
+      },
+      "request": {
+        "request_id": "m015-g000055-n1-request",
+        "schema_version": 1,
+        "spec": {
+          "kind": "choice",
+          "options": [
+            {
+              "id": "tc-c24a2faa3e",
+              "label": "Candidate 0"
+            },
+            {
+              "id": "tc-5fecd51325",
+              "label": "Candidate 1"
+            },
+            {
+              "id": "tc-11b2f20a72",
+              "label": "Candidate 2"
+            }
+          ],
+          "question": "Choose the candidate satisfying the visible rule and context."
+        },
+        "state": []
+      }
+    },
+    {
+      "case_id": "m015-g000056-causal-before",
+      "expected_answerability": 0.999793115492962,
+      "expected_predicted": "tc-cc97512c79",
+      "expected_probs": [
+        0.9999974146273385,
+        2.5853726615872154e-06
+      ],
+      "features": {
+        "candidates": {
+          "tc-cc97512c79": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 3.0
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "optional"
+                }
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "causal control"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "any_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 0
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          },
+          "tc-e7f0d55daa": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 3.0
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "optional"
+                }
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "causal control"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "any_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 1
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          }
+        },
+        "context": {
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 3.0
+              }
+            },
+            {
+              "id": "memo",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "optional"
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "causal control"
+              }
+            },
+            {
+              "id": "rule_family",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "any_required"
+              }
+            },
+            {
+              "id": "rule_invert",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "alpha",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "beta",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "capacity",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 0.0
+              }
+            },
+            {
+              "id": "enabled",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "other"
+              }
+            }
+          ],
+          "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+          "schema_version": 2
+        },
+        "schema": {
+          "fields": [
+            {
+              "categories": [],
+              "id": "active",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "available",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "load",
+              "required": true,
+              "value_type": "number"
+            },
+            {
+              "categories": [],
+              "id": "memo",
+              "required": false,
+              "value_type": "text"
+            },
+            {
+              "categories": [],
+              "id": "note",
+              "required": false,
+              "value_type": "text"
+            },
+            {
+              "categories": [
+                "all_required",
+                "any_required",
+                "exclusive",
+                "threshold",
+                "category_and_flag"
+              ],
+              "id": "rule_family",
+              "required": true,
+              "value_type": "category"
+            },
+            {
+              "categories": [],
+              "id": "rule_invert",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "alpha",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "beta",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "capacity",
+              "required": true,
+              "value_type": "number"
+            },
+            {
+              "categories": [],
+              "id": "enabled",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [
+                "other",
+                "primary"
+              ],
+              "id": "kind",
+              "required": true,
+              "value_type": "category"
+            }
+          ],
+          "version": 2
+        }
+      },
+      "request": {
+        "request_id": "m015-g000056-causal-before-request",
+        "schema_version": 1,
+        "spec": {
+          "kind": "choice",
+          "options": [
+            {
+              "id": "tc-cc97512c79",
+              "label": "Candidate 0"
+            },
+            {
+              "id": "tc-e7f0d55daa",
+              "label": "Candidate 1"
+            }
+          ],
+          "question": "Choose the candidate satisfying the visible rule and context."
+        },
+        "state": []
+      }
+    },
+    {
+      "case_id": "m015-g000000-n0",
+      "expected_answerability": 8.233953803849088e-05,
+      "expected_predicted": null,
+      "expected_probs": [
+        0.9999999987895434,
+        7.857985308826017e-10,
+        4.2465798489860077e-10
+      ],
+      "features": {
+        "candidates": {
+          "tc-70ee028891": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 1.525
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "optional"
+                }
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "routine status record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "all_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 0
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          },
+          "tc-99a5d181fb": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 1.525
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "optional"
+                }
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "routine status record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "all_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 2
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          },
+          "tc-a8c73ee51e": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 1.525
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "optional"
+                }
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "routine status record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "all_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 1
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          }
+        },
+        "context": {
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 1.525
+              }
+            },
+            {
+              "id": "memo",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "optional"
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "routine status record"
+              }
+            },
+            {
+              "id": "rule_family",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "all_required"
+              }
+            },
+            {
+              "id": "rule_invert",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "alpha",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "beta",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "capacity",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 0.0
+              }
+            },
+            {
+              "id": "enabled",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "other"
+              }
+            }
+          ],
+          "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+          "schema_version": 2
+        },
+        "schema": {
+          "fields": [
+            {
+              "categories": [],
+              "id": "active",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "available",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "load",
+              "required": true,
+              "value_type": "number"
+            },
+            {
+              "categories": [],
+              "id": "memo",
+              "required": false,
+              "value_type": "text"
+            },
+            {
+              "categories": [],
+              "id": "note",
+              "required": false,
+              "value_type": "text"
+            },
+            {
+              "categories": [
+                "all_required",
+                "any_required",
+                "exclusive",
+                "threshold",
+                "category_and_flag"
+              ],
+              "id": "rule_family",
+              "required": true,
+              "value_type": "category"
+            },
+            {
+              "categories": [],
+              "id": "rule_invert",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "alpha",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "beta",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "capacity",
+              "required": true,
+              "value_type": "number"
+            },
+            {
+              "categories": [],
+              "id": "enabled",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [
+                "other",
+                "primary"
+              ],
+              "id": "kind",
+              "required": true,
+              "value_type": "category"
+            }
+          ],
+          "version": 2
+        }
+      },
+      "request": {
+        "request_id": "m015-g000000-n0-request",
+        "schema_version": 1,
+        "spec": {
+          "kind": "choice",
+          "options": [
+            {
+              "id": "tc-70ee028891",
+              "label": "Candidate 0"
+            },
+            {
+              "id": "tc-a8c73ee51e",
+              "label": "Candidate 1"
+            },
+            {
+              "id": "tc-99a5d181fb",
+              "label": "Candidate 2"
+            }
+          ],
+          "question": "Choose the candidate satisfying the visible rule and context."
+        },
+        "state": []
+      }
+    },
+    {
+      "case_id": "m015-g000000-n1",
+      "expected_answerability": 8.916002091918718e-05,
+      "expected_predicted": null,
+      "expected_probs": [
+        5.236368653677597e-10,
+        9.575006625169227e-10,
+        0.9999999985188626
+      ],
+      "features": {
+        "candidates": {
+          "tc-70ee028891": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 15.347
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": null
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "quartz basalt record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "all_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 0
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          },
+          "tc-99a5d181fb": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 15.347
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": null
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "quartz basalt record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "all_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 2
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          },
+          "tc-a8c73ee51e": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 15.347
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": null
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "quartz basalt record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "all_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 1
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          }
+        },
+        "context": {
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 15.347
+              }
+            },
+            {
+              "id": "memo",
+              "required": false,
+              "value": null
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "quartz basalt record"
+              }
+            },
+            {
+              "id": "rule_family",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "all_required"
+              }
+            },
+            {
+              "id": "rule_invert",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "alpha",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "beta",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "capacity",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 0.0
+              }
+            },
+            {
+              "id": "enabled",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "other"
+              }
+            }
+          ],
+          "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+          "schema_version": 2
+        },
+        "schema": {
+          "fields": [
+            {
+              "categories": [],
+              "id": "active",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "available",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "load",
+              "required": true,
+              "value_type": "number"
+            },
+            {
+              "categories": [],
+              "id": "memo",
+              "required": false,
+              "value_type": "text"
+            },
+            {
+              "categories": [],
+              "id": "note",
+              "required": false,
+              "value_type": "text"
+            },
+            {
+              "categories": [
+                "all_required",
+                "any_required",
+                "exclusive",
+                "threshold",
+                "category_and_flag"
+              ],
+              "id": "rule_family",
+              "required": true,
+              "value_type": "category"
+            },
+            {
+              "categories": [],
+              "id": "rule_invert",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "alpha",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "beta",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "capacity",
+              "required": true,
+              "value_type": "number"
+            },
+            {
+              "categories": [],
+              "id": "enabled",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [
+                "other",
+                "primary"
+              ],
+              "id": "kind",
+              "required": true,
+              "value_type": "category"
+            }
+          ],
+          "version": 2
+        }
+      },
+      "request": {
+        "request_id": "m015-g000000-n1-request",
+        "schema_version": 1,
+        "spec": {
+          "kind": "choice",
+          "options": [
+            {
+              "id": "tc-99a5d181fb",
+              "label": "Candidate 0"
+            },
+            {
+              "id": "tc-a8c73ee51e",
+              "label": "Candidate 1"
+            },
+            {
+              "id": "tc-70ee028891",
+              "label": "Candidate 2"
+            }
+          ],
+          "question": "Choose the candidate satisfying the visible rule and context."
+        },
+        "state": []
+      }
+    },
+    {
+      "case_id": "m015-g000001-n0",
+      "expected_answerability": 1.4097988609805677e-05,
+      "expected_predicted": null,
+      "expected_probs": [
+        0.999994027955701,
+        3.939354012723372e-06,
+        2.0326902863493974e-06
+      ],
+      "features": {
+        "candidates": {
+          "tc-712750d78d": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 8.139
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "optional"
+                }
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "routine status record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "any_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 1
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          },
+          "tc-b8f4bf4101": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 8.139
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "optional"
+                }
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "routine status record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "any_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 2
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          },
+          "tc-f2410d7267": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 8.139
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "optional"
+                }
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "routine status record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "any_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 0
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          }
+        },
+        "context": {
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 8.139
+              }
+            },
+            {
+              "id": "memo",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "optional"
+              }
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "routine status record"
+              }
+            },
+            {
+              "id": "rule_family",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "any_required"
+              }
+            },
+            {
+              "id": "rule_invert",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "alpha",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "beta",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "capacity",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 0.0
+              }
+            },
+            {
+              "id": "enabled",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "other"
+              }
+            }
+          ],
+          "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+          "schema_version": 2
+        },
+        "schema": {
+          "fields": [
+            {
+              "categories": [],
+              "id": "active",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "available",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "load",
+              "required": true,
+              "value_type": "number"
+            },
+            {
+              "categories": [],
+              "id": "memo",
+              "required": false,
+              "value_type": "text"
+            },
+            {
+              "categories": [],
+              "id": "note",
+              "required": false,
+              "value_type": "text"
+            },
+            {
+              "categories": [
+                "all_required",
+                "any_required",
+                "exclusive",
+                "threshold",
+                "category_and_flag"
+              ],
+              "id": "rule_family",
+              "required": true,
+              "value_type": "category"
+            },
+            {
+              "categories": [],
+              "id": "rule_invert",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "alpha",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "beta",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "capacity",
+              "required": true,
+              "value_type": "number"
+            },
+            {
+              "categories": [],
+              "id": "enabled",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [
+                "other",
+                "primary"
+              ],
+              "id": "kind",
+              "required": true,
+              "value_type": "category"
+            }
+          ],
+          "version": 2
+        }
+      },
+      "request": {
+        "request_id": "m015-g000001-n0-request",
+        "schema_version": 1,
+        "spec": {
+          "kind": "choice",
+          "options": [
+            {
+              "id": "tc-f2410d7267",
+              "label": "Candidate 0"
+            },
+            {
+              "id": "tc-712750d78d",
+              "label": "Candidate 1"
+            },
+            {
+              "id": "tc-b8f4bf4101",
+              "label": "Candidate 2"
+            }
+          ],
+          "question": "Choose the candidate satisfying the visible rule and context."
+        },
+        "state": []
+      }
+    },
+    {
+      "case_id": "m015-g000001-n1",
+      "expected_answerability": 1.4883154975337687e-05,
+      "expected_predicted": null,
+      "expected_probs": [
+        2.529815777758916e-06,
+        4.814890583121666e-06,
+        0.9999926552936391
+      ],
+      "features": {
+        "candidates": {
+          "tc-712750d78d": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 22.908
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": null
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "quartz basalt record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "any_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 1
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          },
+          "tc-b8f4bf4101": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 22.908
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": null
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "quartz basalt record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "any_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 2
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          },
+          "tc-f2410d7267": {
+            "fields": [
+              {
+                "id": "active",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "available",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "load",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 22.908
+                }
+              },
+              {
+                "id": "memo",
+                "required": false,
+                "value": null
+              },
+              {
+                "id": "note",
+                "required": false,
+                "value": {
+                  "type": "text",
+                  "value": "quartz basalt record"
+                }
+              },
+              {
+                "id": "rule_family",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "any_required"
+                }
+              },
+              {
+                "id": "rule_invert",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "alpha",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": true
+                }
+              },
+              {
+                "id": "beta",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "capacity",
+                "required": true,
+                "value": {
+                  "type": "number",
+                  "value": 0
+                }
+              },
+              {
+                "id": "enabled",
+                "required": true,
+                "value": {
+                  "type": "boolean",
+                  "value": false
+                }
+              },
+              {
+                "id": "kind",
+                "required": true,
+                "value": {
+                  "type": "category",
+                  "value": "other"
+                }
+              }
+            ],
+            "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+            "schema_version": 2
+          }
+        },
+        "context": {
+          "fields": [
+            {
+              "id": "active",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": true
+              }
+            },
+            {
+              "id": "available",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "load",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 22.908
+              }
+            },
+            {
+              "id": "memo",
+              "required": false,
+              "value": null
+            },
+            {
+              "id": "note",
+              "required": false,
+              "value": {
+                "type": "text",
+                "value": "quartz basalt record"
+              }
+            },
+            {
+              "id": "rule_family",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "any_required"
+              }
+            },
+            {
+              "id": "rule_invert",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "alpha",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "beta",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "capacity",
+              "required": true,
+              "value": {
+                "type": "number",
+                "value": 0.0
+              }
+            },
+            {
+              "id": "enabled",
+              "required": true,
+              "value": {
+                "type": "boolean",
+                "value": false
+              }
+            },
+            {
+              "id": "kind",
+              "required": true,
+              "value": {
+                "type": "category",
+                "value": "other"
+              }
+            }
+          ],
+          "schema_sha256": "sha256:f0a4736b75a752d3a60702c3ed3601e575f8cd0525a6058f67bbfee14cc700e3",
+          "schema_version": 2
+        },
+        "schema": {
+          "fields": [
+            {
+              "categories": [],
+              "id": "active",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "available",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "load",
+              "required": true,
+              "value_type": "number"
+            },
+            {
+              "categories": [],
+              "id": "memo",
+              "required": false,
+              "value_type": "text"
+            },
+            {
+              "categories": [],
+              "id": "note",
+              "required": false,
+              "value_type": "text"
+            },
+            {
+              "categories": [
+                "all_required",
+                "any_required",
+                "exclusive",
+                "threshold",
+                "category_and_flag"
+              ],
+              "id": "rule_family",
+              "required": true,
+              "value_type": "category"
+            },
+            {
+              "categories": [],
+              "id": "rule_invert",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "alpha",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "beta",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [],
+              "id": "capacity",
+              "required": true,
+              "value_type": "number"
+            },
+            {
+              "categories": [],
+              "id": "enabled",
+              "required": true,
+              "value_type": "boolean"
+            },
+            {
+              "categories": [
+                "other",
+                "primary"
+              ],
+              "id": "kind",
+              "required": true,
+              "value_type": "category"
+            }
+          ],
+          "version": 2
+        }
+      },
+      "request": {
+        "request_id": "m015-g000001-n1-request",
+        "schema_version": 1,
+        "spec": {
+          "kind": "choice",
+          "options": [
+            {
+              "id": "tc-b8f4bf4101",
+              "label": "Candidate 0"
+            },
+            {
+              "id": "tc-712750d78d",
+              "label": "Candidate 1"
+            },
+            {
+              "id": "tc-f2410d7267",
+              "label": "Candidate 2"
+            }
+          ],
+          "question": "Choose the candidate satisfying the visible rule and context."
+        },
+        "state": []
+      }
+    }
+  ],
+  "schema": "sdm-m016-parity-v1",
+  "split_fingerprint": "sha256:7f0e872990247cd21a45a6f7d3c2f08728272fc99763fa7c886eda53dd008e69"
+}

@@ -448,23 +448,21 @@ impl TinyMlpChoiceRuntime {
         let answer = if a < self.threshold {
             None
         } else {
-            // Deterministic tie-break: higher score wins, then smaller ID wins
-            // (mirrors TypedTaskRuntime max_by with reversed ID cmp for stability).
+            // Deterministic argmax: higher score wins, ties resolve to the
+            // smaller option ID (same pattern as legacy TypedTaskRuntime).
             let probs = {
                 let max = scores.iter().copied().fold(f64::NEG_INFINITY, f64::max);
                 let exps: Vec<_> = scores.iter().map(|x| (x - max).exp()).collect();
                 let sum: f64 = exps.iter().sum();
                 exps.into_iter().map(|x| x / sum).collect::<Vec<_>>()
             };
-            let mut best = 0usize;
-            for (i, s) in scores.iter().enumerate() {
-                let ord = s
-                    .total_cmp(&scores[best])
-                    .then_with(|| options[best].id.cmp(&options[i].id));
-                if ord == std::cmp::Ordering::Less {
-                    best = i;
-                }
-            }
+            let best = (0..options.len())
+                .max_by(|x, y| {
+                    scores[*x]
+                        .total_cmp(&scores[*y])
+                        .then_with(|| options[*y].id.cmp(&options[*x].id))
+                })
+                .unwrap_or(0);
             Some(DecisionAnswer::Choice {
                 option_id: options[best].id.clone(),
                 probability: Some(probs[best]),
@@ -689,6 +687,128 @@ mod tests {
         let mut p4 = tiny_payload(&encoder, 32);
         p4.task = "binary".into();
         assert!(p4.validate_shapes().is_err());
+    }
+
+    #[test]
+    fn tinymlp_decide_picks_maximum_score_option() {
+        // Regression: decide_typed must answer the argmax-logit option when
+        // answerable (an inverted comparison once returned the minimum).
+        let (rt, request, features) = tiny_fixture(32);
+        let logits = rt.choice_logits(&request, &features).unwrap();
+        let probs = rt.choice_probabilities(&request, &features).unwrap();
+        let a = rt
+            .choice_answerability_probability(&request, &features)
+            .unwrap();
+        assert!(a >= 0.5, "fixture must be answerable, got {a}");
+        let resp = rt.decide_typed(&request, &features).unwrap();
+        let expected_best = logits
+            .iter()
+            .enumerate()
+            .max_by(|a, b| a.1.total_cmp(b.1))
+            .map(|x| x.0)
+            .unwrap();
+        let sdm_core::DecisionSpec::Choice { options, .. } = &request.spec else {
+            panic!("fixture must be Choice");
+        };
+        match resp.answer {
+            Some(sdm_core::DecisionAnswer::Choice {
+                option_id,
+                probability,
+            }) => {
+                assert_eq!(option_id, options[expected_best].id);
+                assert!((probability.unwrap() - probs[expected_best]).abs() < 1e-12);
+            }
+            other => panic!("expected answered Choice, got {other:?}"),
+        }
+        // Three-option fixture: the winner must be the unique max, not min.
+        let mut three = request.clone();
+        if let DecisionSpec::Choice { options, .. } = &mut three.spec {
+            options.push(DecisionOption {
+                id: "gamma".into(),
+                label: "third".into(),
+            });
+        }
+        let mut feat3 = features.clone();
+        feat3
+            .candidates
+            .insert("gamma".into(), proj(&tiny_schema(), false, "no"));
+        let logits3 = rt.choice_logits(&three, &feat3).unwrap();
+        assert_eq!(logits3.len(), 3);
+        let resp3 = rt.decide_typed(&three, &feat3).unwrap();
+        let best3 = logits3
+            .iter()
+            .enumerate()
+            .max_by(|a, b| a.1.total_cmp(b.1))
+            .map(|x| x.0)
+            .unwrap();
+        let sdm_core::DecisionSpec::Choice { options: opts3, .. } = &three.spec else {
+            panic!("fixture must be Choice");
+        };
+        match resp3.answer {
+            Some(sdm_core::DecisionAnswer::Choice { option_id, .. }) => {
+                assert_eq!(option_id, opts3[best3].id);
+            }
+            other => panic!("expected answered Choice, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn tinymlp_fixture_parity() {
+        // M16-7 same-artifact cross-host parity: the committed M016 selected
+        // artifact must decide identically on every host over a fixed DEV
+        // sample. Decisions match exactly; probabilities use 1e-9 tolerance
+        // for libm variation. Fails closed when fixtures are absent.
+        let art_path = concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../fixtures/m016-tinymlp-selected.artifact.json"
+        );
+        let sample_path = concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../fixtures/m016-parity-sample.json"
+        );
+        let bytes = std::fs::read(art_path).expect("m016 fixture artifact missing");
+        let rt = TinyMlpChoiceRuntime::from_bytes(&bytes).expect("fixture must load");
+        let sample: serde_json::Value = serde_json::from_slice(
+            &std::fs::read(sample_path).expect("m016 parity sample missing"),
+        )
+        .unwrap();
+        assert_eq!(sample["schema"], "sdm-m016-parity-v1");
+        let rows = sample["rows"].as_array().unwrap();
+        assert!(!rows.is_empty(), "parity sample must not be empty");
+        for row in rows {
+            let case_id = row["case_id"].as_str().unwrap();
+            let request: DecisionRequest = serde_json::from_value(row["request"].clone()).unwrap();
+            let features: TypedRankProjectionV2 =
+                serde_json::from_value(row["features"].clone()).unwrap();
+            let resp = rt.decide_typed(&request, &features).unwrap();
+            let predicted = match resp.answer {
+                Some(sdm_core::DecisionAnswer::Choice { option_id, .. }) => {
+                    serde_json::Value::from(option_id)
+                }
+                None => serde_json::Value::Null,
+                _ => panic!("{case_id}: non-Choice answer"),
+            };
+            assert_eq!(
+                predicted, row["expected_predicted"],
+                "{case_id}: decision parity"
+            );
+            let probs = rt.choice_probabilities(&request, &features).unwrap();
+            let expected = row["expected_probs"].as_array().unwrap();
+            assert_eq!(probs.len(), expected.len(), "{case_id}: prob length");
+            for (p, e) in probs.iter().zip(expected) {
+                assert!(
+                    (p - e.as_f64().unwrap()).abs() <= 1e-9,
+                    "{case_id}: prob parity {p} vs {e}"
+                );
+            }
+            let a = rt
+                .choice_answerability_probability(&request, &features)
+                .unwrap();
+            assert!(
+                (a - row["expected_answerability"].as_f64().unwrap()).abs() <= 1e-9,
+                "{case_id}: answerability parity"
+            );
+        }
     }
 
     #[test]

@@ -289,6 +289,36 @@ jobs:
           test -f target/m015a/typed-choice-compositional.sidecar.json
       - name: Enforce M015a CI ordering (regression)
         run: python3 scripts/check_m015a_ci_order.py
+      - name: Run M016 TinyMLP comparison (TRAIN/DEV only, release)
+        if: matrix.name == 'linux-x64'
+        run: |
+          # Bounded 36-config grid + three legacy heads + isolated tree +
+          # v2 replays + paired diffs. Never trains/evaluates test/FINAL.
+          python3 scripts/run_m016_comparison.py --out target/m016 --epochs 20 > target/m016-stdout.json
+          python3 - <<'PY'
+          import json, hashlib, pathlib
+          comp = json.load(open('target/m016/m016-comparison.json'))
+          assert comp['partition'] == 'DEV only', comp['partition']
+          assert comp['test_evaluation_performed'] is False
+          assert comp['grid_size'] == 36, comp['grid_size']
+          assert comp['build_profile'] == 'release', comp.get('build_profile')
+          assert set(comp['models']) == {'typed-choice', 'typed-choice-cross', 'typed-choice-compositional', 'typed-choice-tinymlp', 'tree'}, set(comp['models'])
+          tiny = comp['models']['typed-choice-tinymlp']
+          assert tiny['dev_conditional_argmax_accuracy_v2'] == 1.0, tiny
+          assert tiny['dev_false_abstention_rate_v2'] <= 1/3, tiny
+          # Byte-exact reproducibility: the hosted release run must reproduce
+          # the committed selected artifact, or fail (explicit re-freeze needed).
+          rep = json.load(open('target/m016/train/m016-train-report.json'))
+          art = pathlib.Path(rep['selected_artifact_path'])
+          fixture = pathlib.Path('fixtures/m016-tinymlp-selected.artifact.json')
+          got = 'sha256:' + hashlib.sha256(art.read_bytes()).hexdigest()
+          want = 'sha256:' + hashlib.sha256(fixture.read_bytes()).hexdigest()
+          assert got == want, f'M016 selected bytes drift: {got} != {want}'
+          assert comp['disposition'] in ('positive-dev-only', 'needs-review'), comp['disposition']
+          print('M016 comparison verified: disposition=' + comp['disposition'])
+          PY
+      - name: Verify M016 same-artifact parity sample (all hosts)
+        run: cargo test -p sdm-runtime --locked tinymlp_fixture_parity
       - name: Generate M014a DEV-CANARY (provision artifacts before dependent tests)
         run: |
           # Deterministically creates target/m014a/canary/* on every matrix host.
@@ -407,6 +437,7 @@ jobs:
             target/m014b/
             target/m015/
             target/m015-baselines/
+            target/m016/
             target/m013b/
             target/m013c/
       - uses: actions/upload-artifact@v4

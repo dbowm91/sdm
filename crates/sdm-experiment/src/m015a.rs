@@ -91,6 +91,11 @@ pub struct M015aReplaySpec {
     pub expected_corpus_dev_sha256: String,
     pub architecture: String,
     pub provenance: Provenance,
+    /// Opt-in per-case emission for paired comparison tooling (M016). Default
+    /// false preserves the exact historical sidecar bytes; excluded from the
+    /// report digest either way.
+    #[serde(default)]
+    pub include_cases: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -126,6 +131,10 @@ pub struct M015aSidecar {
     pub legacy_comparison: BTreeMap<String, serde_json::Value>,
     pub bootstrap: BTreeMap<String, serde_json::Value>,
     pub report_sha256: String,
+    /// Opt-in evaluated DEV cases (present only when requested; never part of
+    /// the report digest).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cases: Option<Vec<ChoiceFinalCase>>,
 }
 
 fn validate_sha_format(value: &str, what: &str) -> Result<(), ExperimentError> {
@@ -177,6 +186,7 @@ pub fn run_m015a_replay(spec: &M015aReplaySpec) -> Result<M015aSidecar, Experime
     if spec.architecture != "typed-choice"
         && spec.architecture != "typed-choice-cross"
         && spec.architecture != "typed-choice-compositional"
+        && spec.architecture != "typed-choice-tinymlp"
     {
         return Err(ExperimentError::Invalid(
             "m015a replay supports typed-choice heads only".into(),
@@ -275,11 +285,31 @@ pub fn run_m015a_replay(spec: &M015aReplaySpec) -> Result<M015aSidecar, Experime
     }
     let loaded =
         load_artifact(&artifact_bytes).map_err(|e| ExperimentError::Invalid(e.to_string()))?;
-    let sdm_runtime::LoadedArtifact::TypedTaskV2(runtime) = loaded else {
-        return Err(ExperimentError::Invalid(
-            "m015a replay requires typed Choice artifact".into(),
-        ));
+    // M016 TinyMLP artifacts dispatch to a separate runtime with the same
+    // four Choice methods; legacy heads share TypedTaskV2.
+    enum ReplayRuntime {
+        Legacy(sdm_runtime::TypedTaskRuntime),
+        TinyMlp(sdm_runtime::tinymlp::TinyMlpChoiceRuntime),
+    }
+    let runtime = match loaded {
+        sdm_runtime::LoadedArtifact::TypedTaskV2(rt) => ReplayRuntime::Legacy(rt),
+        sdm_runtime::LoadedArtifact::TinyMlpChoiceV2(rt) => ReplayRuntime::TinyMlp(rt),
+        _ => {
+            return Err(ExperimentError::Invalid(
+                "m015a replay requires typed Choice artifact".into(),
+            ))
+        }
     };
+    if matches!(runtime, ReplayRuntime::TinyMlp(_)) && spec.architecture != "typed-choice-tinymlp" {
+        return Err(ExperimentError::Invalid(
+            "tinymlp artifact requires typed-choice-tinymlp architecture".into(),
+        ));
+    }
+    if matches!(runtime, ReplayRuntime::Legacy(_)) && spec.architecture == "typed-choice-tinymlp" {
+        return Err(ExperimentError::Invalid(
+            "typed-choice-tinymlp requires tinymlp artifact".into(),
+        ));
+    }
     let envelope: sdm_runtime::ArtifactEnvelopeV2 = serde_json::from_slice(&artifact_bytes)
         .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
 
@@ -367,27 +397,56 @@ pub fn run_m015a_replay(spec: &M015aReplaySpec) -> Result<M015aSidecar, Experime
                 "Choice request missing options".into(),
             ));
         };
-        let response = runtime
-            .decide_typed(&ex.request, binding)
-            .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
-        let predicted = match response.answer {
-            Some(sdm_core::DecisionAnswer::Choice { option_id, .. }) => Some(option_id),
-            None => None,
-            _ => {
-                return Err(ExperimentError::Invalid(
-                    "unexpected non-Choice answer".into(),
-                ))
+        let (predicted, probs, logits, answerability) = match &runtime {
+            ReplayRuntime::Legacy(rt) => {
+                let response = rt
+                    .decide_typed(&ex.request, binding)
+                    .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                let predicted = match response.answer {
+                    Some(sdm_core::DecisionAnswer::Choice { option_id, .. }) => Some(option_id),
+                    None => None,
+                    _ => {
+                        return Err(ExperimentError::Invalid(
+                            "unexpected non-Choice answer".into(),
+                        ))
+                    }
+                };
+                let probs = rt
+                    .choice_probabilities(&ex.request, binding)
+                    .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                let logits = rt
+                    .choice_logits(&ex.request, binding)
+                    .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                let answerability = rt
+                    .choice_answerability_probability(&ex.request, binding)
+                    .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                (predicted, probs, logits, answerability)
+            }
+            ReplayRuntime::TinyMlp(rt) => {
+                let response = rt
+                    .decide_typed(&ex.request, binding)
+                    .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                let predicted = match response.answer {
+                    Some(sdm_core::DecisionAnswer::Choice { option_id, .. }) => Some(option_id),
+                    None => None,
+                    _ => {
+                        return Err(ExperimentError::Invalid(
+                            "unexpected non-Choice answer".into(),
+                        ))
+                    }
+                };
+                let probs = rt
+                    .choice_probabilities(&ex.request, binding)
+                    .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                let logits = rt
+                    .choice_logits(&ex.request, binding)
+                    .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                let answerability = rt
+                    .choice_answerability_probability(&ex.request, binding)
+                    .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                (predicted, probs, logits, answerability)
             }
         };
-        let probs = runtime
-            .choice_probabilities(&ex.request, binding)
-            .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
-        let logits = runtime
-            .choice_logits(&ex.request, binding)
-            .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
-        let answerability = runtime
-            .choice_answerability_probability(&ex.request, binding)
-            .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
         let corpus = corpus_by_case.get(case_id.as_str()).ok_or_else(|| {
             ExperimentError::Invalid(format!("dev case {case_id} missing from corpus"))
         })?;
@@ -518,6 +577,7 @@ pub fn run_m015a_replay(spec: &M015aReplaySpec) -> Result<M015aSidecar, Experime
         legacy_comparison: BTreeMap::new(),
         bootstrap,
         report_sha256: String::new(),
+        cases: spec.include_cases.then(|| cases.clone()),
     };
     let digest = format!(
         "sha256:{:x}",
@@ -606,6 +666,7 @@ mod tests {
                 label_lineage: "l".into(),
                 redistributable: true,
             },
+            include_cases: false,
         };
         assert!(run_m015a_replay(&spec).is_err());
     }
