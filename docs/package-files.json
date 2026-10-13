@@ -20,6 +20,7 @@
     "Cargo.toml",
     "Cargo.toml.orig",
     "src/bin/sdm-qualify.rs",
+    "src/choice_final_v2.rs",
     "src/lib.rs"
   ],
   "sdm-experiment": [
@@ -29,6 +30,7 @@
     "Cargo.toml.orig",
     "examples/standalone_consumer.rs",
     "src/lib.rs",
+    "src/m015a.rs",
     "src/main.rs"
   ],
   "sdm-nonlinear": [
