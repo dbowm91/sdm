@@ -1112,7 +1112,8 @@ pub fn run_semantic(
         return Err(ExperimentError::Invalid(
             "typed-choice-tinymlp trains only via experiment m016-train (bounded grid)".into(),
         ));
-    }    let task = semantic_task(&spec.architecture)
+    }
+    let task = semantic_task(&spec.architecture)
         .ok_or_else(|| ExperimentError::Invalid("not a typed non-Rank architecture".into()))?;
     let choice_cross = spec.architecture == "typed-choice-cross";
     let choice_compositional = spec.architecture == "typed-choice-compositional";
@@ -2417,9 +2418,7 @@ pub fn run_evaluate(spec: &EvaluateSpec) -> Result<SemanticEvaluateManifest, Exp
                         raw_logits,
                         answerability_probability: answerability,
                         nuisance_probabilities: None,
-                        option_ids: Some(
-                            options.iter().map(|o| o.id.clone()).collect(),
-                        ),
+                        option_ids: Some(options.iter().map(|o| o.id.clone()).collect()),
                         abstained,
                     });
                 }
