@@ -2,7 +2,7 @@
 
 This directory follows the CodeGG planning and handoff convention as adapted in [003-planning-process.md](003-planning-process.md).
 
-**Start here:** [Registry](registry.md) -> [General decision-model framework roadmap](subsystems/general-decision-model-framework-roadmap.md) -> **[M014b independent frozen qualification](implementation/general-decision-model-framework/014b-independent-frozen-qualification.md) (active)**; [M014a](implementation/general-decision-model-framework/014a-frozen-artifact-and-evaluator-integrity.md) closed (`014a-status.md`). CodeGG M005 remains externally deferred. The [framework boundary ADR](adrs/ADR-0001-general-framework-and-model-boundaries.md) governs the milestone plans.
+**Start here:** [Registry](registry.md) -> [General decision-model framework roadmap](subsystems/general-decision-model-framework-roadmap.md) -> M014a closed (`014a-status.md`), M014b closed (`014b-status.md`, negative honest, no rerun). No ready plans (M015 unregistered soft successor, M005 externally deferred). The [framework boundary ADR](adrs/ADR-0001-general-framework-and-model-boundaries.md) governs the milestone plans.
 
 ## Completed handoffs
 

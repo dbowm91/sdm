@@ -1,6 +1,6 @@
 # M014b — New independent qualification with frozen artifact inference
 
-Status: **active** — M014a G1–G10 + DEV-CANARY complete, predecessor closed; implementation underway on work/plans-sdm-m014a-m014b-qualification-recovery
+Status: **closed** — mechanical Q1–Q10 met, quality negative/negative/negative (honest, no rerun); freeze 9cc80f0 + one-time final via evaluate-only; closure plans/closure/general-decision-model-framework/014b-status.md. This file is retained as the implementation handoff of record.
 Primary class: capability / prospective synthetic qualification
 Planning baseline: dbowm91/sdm@7b9bb3c929db2c9d492a1b86b54a4f57c61a9e37
 Hard predecessor: M014a must CLOSE with all G1–G10 and development canary proof

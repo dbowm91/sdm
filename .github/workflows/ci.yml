@@ -216,6 +216,31 @@ jobs:
           assert qual['overall_verdict'] == 'indeterminate'
           print("M014a DEV-CANARY verified: Binary positive, Choice indeterminate, all gates present")
           PY
+      - name: Verify M014b prospective freeze (no final rerun)
+        run: |
+          # Regenerate M014b cohort deterministically and verify freeze SHAs,
+          # support, and candidate loading WITHOUT running final inference
+          # (one-time final already consumed locally; CI must not rerun it).
+          python3 scripts/generate_m014b_suite.py > target/m014b-generator.json
+          cargo run -q -p sdm-data --bin sdm-dataset --locked -- split target/m014b/binary.json 140142 target/m014b/binary.split.json --test-family m014b-binary-id-a-v1 --test-family m014b-binary-id-b-v1 --test-family m014b-binary-text-shift-v1 --test-family m014b-binary-combined-shift-v1 --test-family m014b-binary-load-shift-v1 --test-family m014b-binary-unknown-vocab-v1
+          cargo run -q -p sdm-data --bin sdm-dataset --locked -- split target/m014b/choice.json 140142 target/m014b/choice.split.json --test-family m014b-choice-id-a-v1 --test-family m014b-choice-id-b-v1 --test-family m014b-choice-text-shift-v1 --test-family m014b-choice-combined-shift-v1 --test-family m014b-choice-load-shift-v1 --test-family m014b-choice-unknown-vocab-v1
+          cmp fixtures/m014b-binary-v1.split.json target/m014b/binary.split.json
+          cmp fixtures/m014b-choice-v1.split.json target/m014b/choice.split.json
+          python3 scripts/validate_future_support.py --dataset target/m014b/binary.json --split target/m014b/binary.split.json --task binary --required-family m014b-binary-id-a-v1 --required-family m014b-binary-id-b-v1 --required-family m014b-binary-text-shift-v1 --required-family m014b-binary-combined-shift-v1 --required-family m014b-binary-load-shift-v1 --required-family m014b-binary-unknown-vocab-v1 --out target/m014b/binary-support.json
+          python3 scripts/validate_future_support.py --dataset target/m014b/choice.json --split target/m014b/choice.split.json --task choice --required-family m014b-choice-id-a-v1 --required-family m014b-choice-id-b-v1 --required-family m014b-choice-text-shift-v1 --required-family m014b-choice-combined-shift-v1 --required-family m014b-choice-load-shift-v1 --required-family m014b-choice-unknown-vocab-v1 --out target/m014b/choice-support.json
+          python3 - <<'PY'
+          import json, hashlib, pathlib
+          def file_sha(p): return "sha256:"+hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
+          freeze = json.loads(pathlib.Path("docs/m014b-freeze-v1.json").read_text())
+          assert file_sha(pathlib.Path("scripts/generate_m014b_suite.py")) == freeze["generator_sha256"], "generator SHA mismatch"
+          assert file_sha(pathlib.Path("docs/m014b-protocol-v1.json")) == freeze["protocol_sha256"], "protocol SHA mismatch"
+          assert file_sha(pathlib.Path("scripts/qualify_semantic_v2.py")) == freeze["evaluator_sha256"], "evaluator SHA mismatch"
+          assert file_sha(pathlib.Path("target/m014b/binary.json")) == freeze["datasets"]["target/m014b/binary.json"], "binary dataset SHA mismatch"
+          assert file_sha(pathlib.Path("target/m014b/choice.json")) == freeze["datasets"]["target/m014b/choice.json"], "choice dataset SHA mismatch"
+          for rel, expected in freeze["final_configs"].items():
+              assert file_sha(pathlib.Path(rel)) == expected, f"final config {rel} SHA mismatch"
+          print("M014b freeze verified (no final rerun); support pass; candidates load via evaluate SHA checks (final already consumed, do not rerun).")
+          PY
       - name: Capture runtime benchmark
         run: cargo run -p sdm-runtime --example benchmark -- fixtures/benchmark-rank-request.json artifacts/compatibility-rank-v1.json > benchmark-${{ matrix.name }}.json
       - name: Capture nonlinear runtime benchmark
@@ -247,6 +272,7 @@ jobs:
             target/m013a/
             target/m014/
             target/m014a/
+            target/m014b/
             target/m013b/
             target/m013c/
   portability:
