@@ -97,7 +97,10 @@ def make_group(group_id, seed):
             cand = {"capacity": i, "kind": "other", "enabled": False, "alpha": i == 0, "beta": False}
         candidates.append(cand)
         semantic_roles.append(i == 0)
-    available = group_id % 5 != 0
+    # Stratify answerability independently within every five-family block so
+    # it cannot be decoded from family and each family has both classes.
+    block = group_id // len(RULES)
+    available = (block // 10) % 5 != 0
     # Paired rows differ only in a nuisance perturbation; causal values are shared.
     pair_id = f"m015-g{group_id:06d}"
     rows = []

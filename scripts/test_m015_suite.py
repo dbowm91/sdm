@@ -45,6 +45,12 @@ class M015SuiteTests(unittest.TestCase):
         self.assertIn(2, counts)
         self.assertIn(8, counts)
         self.assertTrue(any(m015.make_group(i, 7)[0]["label"] is None for i in range(20)))
+        family_support = {}
+        for i in range(500):
+            row = m015.make_group(i, 7)[0]
+            values = family_support.setdefault(row["family"], set())
+            values.add(row["context"]["available"])
+        self.assertTrue(all(values == {True, False} for values in family_support.values()))
 
     def test_generated_pairs_are_oracle_correct_and_grouped(self):
         for group in range(200):

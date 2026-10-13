@@ -89,6 +89,7 @@ def score_rows(train, dev):
         "train_groups": len({r["group_id"] for r in train}), "dev_groups": len({r["group_id"] for r in dev}),
         "oracle_disagreements": 0,
         "families": {name: sum(r["family"] == name for r in dev) for name in sorted({r["family"] for r in dev})},
+        "answerability_by_family": {name: {"groups": len({r["group_id"] for r in dev if r["family"] == name}), "answerable_groups": len({r["group_id"] for r in dev if r["family"] == name and r["context"]["available"]}), "no_answer_groups": len({r["group_id"] for r in dev if r["family"] == name and not r["context"]["available"]})} for name in sorted({r["family"] for r in dev})},
         "dev_accuracy": {name: {"value": accuracy(dev, fn), "group_bootstrap_95_ci": bootstrap_group_ci(dev, fn)} for name, fn in controls.items()},
         "learned_baselines": {"typed_linear": "unsupported: M015 rule descriptor uses a new schema not represented by the frozen typed-task-v1 candidate artifacts", "typed_cross": "unsupported for same schema reason", "typed_compositional": "unsupported for same schema reason"},
         "pair_controls": {"paired_rows": len([p for p in pairs.values() if p[0]["split"] == "dev"]), "id_sets_preserved": True, "candidate_semantics_preserved": True, "option_order_reversed": True, "nuisance_fields_perturbed": all(p[0]["context"] != p[1]["context"] for p in pairs.values())},

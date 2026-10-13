@@ -222,6 +222,7 @@ jobs:
           assert report['dev_groups'] == 200
           assert report['partition'] == 'DEV only'
           assert 'unsupported' in report['learned_baselines']['typed_cross']
+          assert all(s['answerable_groups'] > 0 and s['no_answer_groups'] > 0 for s in report['answerability_by_family'].values())
           PY
       - name: Generate M014a DEV-CANARY (provision artifacts before dependent tests)
         run: |
