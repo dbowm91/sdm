@@ -1,8 +1,8 @@
 # SDM Planning Registry
 
-Status: M014 original final indeterminate; **M014a closed** (G1–G10 + DEV-CANARY, Binary positive / Choice indeterminate canary); **M014b closed** (mechanical Q1–Q10 met, quality negative/negative/negative on new AND-XOR/XNOR cohort with old bytes, honest). M013–M013d integrated. CodeGG M005 and crates.io publishing separately gated. No ready plans (M015 unregistered, M005 deferred).
+Status: **M014c ready** (hosted CI failure and evidence/portability reconciliation). M014a/M014b implementation present but **closing/CI-evidence-blocked**, not fully mechanically closed or main-integrated: run 38408167153 FAILED. M014b original local synthetic result negative/negative/negative, consumed and unrerunnable; historic output hash provenance incomplete. M015 unregistered; M005 and crates.io separately gated.
 Governance: plans/003-planning-process.md
-Current planning baseline: main@7b9bb3c929db2c9d492a1b86b54a4f57c61a9e37 (latest successful 10-job CI 38117915516).
+Current planning baseline: M014a/b source branch@c27724746ebc674919aff32a93d6baf74e104e13; main@7b9bb3c929db2c9d492a1b86b54a4f57c61a9e37. Latest source CI 38408167153 FAILURE; earlier successful 38399878048 was planning-only.
 Accepted architecture: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md
 
@@ -12,7 +12,7 @@ States: proposed, ready, active, blocked, closing, closed, conditionally closed,
 
 | Subsystem | Status | Next handoff | Blockers |
 | --- | --- | --- | --- |
-| Standalone general decision-model framework | M014 final indeterminate; **M014a closed**, **M014b closed (negative, honest)** | No active handoff; M015 future unregistered | M014a/b complete; M014 consumed cohort never rerun; M014b new AND-XOR/XNOR cohort consumed once (negative/negative/negative with old bytes, no retuning) |
+| Standalone general decision-model framework | M014a/M014b closing (hosted CI FAILED; historic M014b quality negative, evidence limited); **M014c ready** | Correct test ordering, measured 3-host parity, honest freeze/output attestation; reviewed M014a–c PR | Do not rerun consumed final; old freeze SHA placeholder and missing original output SHAs require explicit errata |
 | CodeGG consumer-specific effectiveness (M005) | deferred / indeterminate | independent CodeGG-owned evidence, unscheduled | No approved corpus; does not block M008-M011 |
 
 ## Registered milestone plans
@@ -37,8 +37,9 @@ States: proposed, ready, active, blocked, closing, closed, conditionally closed,
 | M013c | **closed** (source merged; evaluation integrity only) | infrastructure / evidence-integrity corrective | plans/implementation/general-decision-model-framework/013c-qualification-gate-hardening-corrective.md | CI-bound decisions, support-bounded critical negatives, complete family/control coverage implemented; CI 38112863529 passed on merged main; historical closure retained at plans/closure/general-decision-model-framework/013c-status.md |
 | M013d | **closed** (source merged; CI 10/10) | infrastructure / evidence integrity and source integration | plans/implementation/general-decision-model-framework/013d-bootstrap-repair-and-source-integration.md | PR #2 merged as 0e6c3cae5911681b18185673a30484a976cb3821; main CI 38112863529 passed; publication still separately gated; historical closure remains intact |
 | M014 | **blocked; consumed final, indeterminate** | capability / prospective quality corrective | plans/implementation/general-decision-model-framework/014-standalone-binary-choice-quality-recovery.md | Choice capacity gap proven; additive compositional architecture and Binary constant mask implemented. Final run record: plans/closure/general-decision-model-framework/014-status.md. Binary artifact identity mismatch and evaluator failure prevent qualification; new independent cohort required for any further attempt |
-| M014a | **closed** (G1–G10 + DEV-CANARY proven; Binary positive / Choice indeterminate canary) | infrastructure/evidence-integrity corrective | plans/implementation/general-decision-model-framework/014a-frozen-artifact-and-evaluator-integrity.md | Implementation 6139806 on work/plans-sdm-m014a-m014b-qualification-recovery; closure plans/closure/general-decision-model-framework/014a-status.md; no frozen M014 inputs rewritten; no new final cohort |
-| M014b | **closed** (mechanical Q1–Q10 met; quality negative/negative/negative, honest; no rerun) | capability/prospective qualification | plans/implementation/general-decision-model-framework/014b-independent-frozen-qualification.md | Freeze 9cc80f0 + final one-time inference via evaluate-only; closure plans/closure/general-decision-model-framework/014b-status.md; new AND-XOR/XNOR cohort consumed; no retuning; M015 NOT unblocked (soft successor unregistered) |
+| M014a | **closing** (implementation + local DEV-CANARY recorded; hosted 38408167153 FAILED) | infrastructure/evidence-integrity corrective | plans/implementation/general-decision-model-framework/014a-frozen-artifact-and-evaluator-integrity.md | Hosted 3-host canary/test order and real parity currently unsatisfied; M014c ready closure corrective |
+| M014b | **closing** (local one-time FINAL negative/negative/negative recorded; Q8 hosted failed; historic SHA evidence limited) | capability/prospective qualification | plans/implementation/general-decision-model-framework/014b-independent-frozen-qualification.md | Final cohort consumed; NO rerun; M014c for evidence/CI and source integration |
+| M014c | **ready** | infrastructure/evidence-integrity closure corrective | plans/implementation/general-decision-model-framework/014c-closure-evidence-reconciliation.md | M014a/b code and local evidence exist; no new experiment; must pass C1–C10 before PR/close |
 
 ## Interface and operational dependencies
 
@@ -47,6 +48,10 @@ CodeGG historically pins SDM commit 8139b064bdcf3212e8f6fd912e801a479b55751c per
 ## Standalone successor handoff
 
 Accepted boundary: plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md. M008-M011 are closed in plans/closure/general-decision-model-framework/. All four are SDM-only and independent of the unavailable CodeGG corpus; no change to CodeGG's immutable SDM pin or production policy is authorized. M011 provides a reviewable release candidate, not automatic merge, publication or deployment. **M012 remains conditionally closed** for release/publication qualification, but its source PR #1 is now merged into main. Crates.io publication is blocked pending human/legal license review. **M013 and M013a are conditionally closed**; see their closure records for the invalid M013 suite and M013a's valid negative/indeterminate evidence. These milestones do not rewrite M011's positive, negative, or indeterminate model evidence. M005 continues to await an approved independent CodeGG corpus and consumer-owned evidence.
+
+## M014c closure corrective (current ready handoff)
+
+**Only ready plan:** plans/implementation/general-decision-model-framework/014c-closure-evidence-reconciliation.md, audit docs/m014c-closure-audit.md. Planning successor branch work/plans-sdm-m014c-closure-evidence-reconciliation from c27724746ebc674919aff32a93d6baf74e104e13; main unchanged. Source CI run 38408167153 FAILED because tests ran before generating their canary inputs. Local M014a/b closure records overclaim hosted evidence and three-host parity; the M014b five final configs contain a placeholder freeze SHA and original ignored final report SHA ledger is incomplete. M014c fixes CI, adds REAL same-artifact cross-host attestation, and appends read-only evidence errata without touching or rerunning original M014b held-out cohort. M014b's local negative outcome remains historically reported but not fully independently audited. Integration requires ONE reviewed main PR after green implementation-hosted CI; no crates.io/CodeGG or M015 model promotion.
 
 ## M014a/M014b corrective handoff
 

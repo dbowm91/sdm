@@ -1,6 +1,6 @@
 # General Decision-Model Framework and First Consumer Roadmap
 
-Status: M013–M013d integrated; M014 consumed one-time test indeterminate; **M014a ready**, **M014b blocked**; M005 and crates.io independently gated.
+Status: M013–M013d integrated; M014 first final indeterminate; M014a/b implemented but **closing due to failed hosted CI and incomplete provenance**, M014b local negative preserved; **M014c ready** closure corrective. M005 and crates.io separately gated.
 Audit baseline: dbowm91/sdm@8139b064bdcf3212e8f6fd912e801a479b55751c (2026-10-05)
 Planning date: 2026-10-10
 Primary decisions: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md; plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md
@@ -140,10 +140,13 @@ Class: infrastructure/evidence-integrity + integration. Status: **closed** (PR #
 Class: capability/prospective qualification. Status: **blocked after indeterminate consumed FINAL** (model mechanics integrated; next corrective M014a). Plan: plans/implementation/general-decision-model-framework/014-standalone-binary-choice-quality-recovery.md; research: docs/m014-model-quality-research.md. Hard prerequisites: M013–M013d merged in PR #2 (main@0e6c3cae5911681b18185673a30484a976cb3821) and CI 38112863529 passed all 10 jobs. Hypotheses: Binary fit-invariant nuisance tokens act as a hidden bias under vocabulary shift; Choice full rule_a/rule_b active-flip target may require context-context×role interaction and be UNREPRESENTABLE by existing pairwise cross features. Prove full-rule representability first. Then bounded binary feature policy and minimal versioned compositional Choice candidate if required; prospective NEW synthetic dataset, exact prefreeze numerical quality gates, independent eligible OOD group support, one final inference, honest positive/negative/indeterminate outcomes. No CodeGG corpus or general MLP framework needed.
 
 ### M014a — Exact-artifact evaluation and analyzer integrity
-Class: infrastructure/evidence integrity. Status: **closed** (G1–G10 + DEV-CANARY proven in 6139806; Binary positive / Choice indeterminate canary; closure 014a-status.md). Plan: plans/implementation/general-decision-model-framework/014a-frozen-artifact-and-evaluator-integrity.md. Inference-only SHA-checked loading, versioned partition schema, two-row Binary handling, full CI-bound families/controls/abstention/resources, atomic output, and complete canary proof. Original M014 cohort stays consumed and cannot be rerun.
+Class: infrastructure/evidence integrity. Status: **closing** (implementation/local DEV-CANARY, hosted CI run 38408167153 failed: generated canary tests ran first; true three-host parity unproven). Plan: plans/implementation/general-decision-model-framework/014a-frozen-artifact-and-evaluator-integrity.md. See M014c for corrective.
 
 ### M014b — Independent prospective qualification
-Class: capability/qualification. Status: **closed** (mechanical Q1–Q10 met; quality negative/negative/negative on new AND-XOR/XNOR cohort with old M014 bytes, honest, no rerun; closure 014b-status.md). Plan: plans/implementation/general-decision-model-framework/014b-independent-frozen-qualification.md. NEW distinct synthetic test with eligible support, frozen byte SHAs, numeric protocol/controls committed pre-test; one inference-only final and honest verdicts. No M014/M013a reuse or CodeGG dependency. M015 remains soft unregistered successor; no future plan unblocked by this closure.
+Class: capability/qualification. Status: **closing** (one-time M014b new cohort consumed; local Binary/Choice/overall negative; implementation branch CI failed, output provenance incomplete). Plan: plans/implementation/general-decision-model-framework/014b-independent-frozen-qualification.md. See M014c; no rerun.
+
+### M014c — Hosted CI, platform-parity and immutable closure reconciliation
+Class: infrastructure/evidence integrity. Status: **ready** (planning only). Plan: plans/implementation/general-decision-model-framework/014c-closure-evidence-reconciliation.md; audit: docs/m014c-closure-audit.md. Baseline: M014a/b source c27724746ebc674919aff32a93d6baf74e104e13 on work/plans-sdm-m014a-m014b-qualification-recovery; main at M014. Current CI 38408167153 FAILED before DEV-CANARY generation, so claimed Q8/G9 CI closure is not accepted. Order unit/canary tests correctly on all 3 hosts, record measured same-artifact decisions with aggregator (no hardcoded parity), append detached provenance ledger for dummy embedded freeze digest and historical ignored final report SHAs or explicit unavailability. Freeze/protocol/models/final results remain immutable; no heldout rerun. C1–C10 require hosted green for mechanical closure; reviewed source PR and merged-main CI operationally separate. M015 unregistered.
 
 M014 -> M015 generalized tiny architecture comparisons is a SOFT, unregistered successor. M005 remains independently deferred.
 
@@ -173,6 +176,9 @@ Create plans/closure/general-decision-model-framework/NNN-status.md for each mil
 - After M005: pretrained/distilled text-pair encoder experiments; new use cases (model routing and bounded risk advisory) through independent datasets and authority controls; model promotion only following CodeGG's own qualification/policy review.
 
 ## 10. Readiness
+
+**Current readiness (2026-10-13):** M014a/b at c27724746ebc674919aff32a93d6baf74e104e13 are locally implemented but the actual branch hosted CI [38408167153](https://github.com/dbowm91/sdm/actions/runs/38408167153) FAILED due to canary/test execution ordering, and three-host parity was asserted rather than measured. M014b original local negative test is consumed and cannot be rerun; embedded `freeze_sha256` is a known placeholder and full original output SHA chain has gaps. **M014c is the only READY corrective**, requiring audited CI/parity/provenance and one reviewed source PR. M014a/b remain CLOSING until those gates genuinely pass; earlier closure paragraphs below are historical claims, not current verification. M015 is NOT registered ready.
+
 
 **Current (2026-10-13):** main@7b9bb3c929db2c9d492a1b86b54a4f57c61a9e37 and CI 38117915516 (10/10 success). M014 architecture and Binary mask implemented but its once-frozen final cohort consumed; exact Binary candidate SHA mismatch and broken analyzer leave quality INDETERMINATE (unchanged historical status). **M014a READY** for execution/evaluator integrity and DEV-CANARY; **M014b BLOCKED** until G1–G10 closure and NEW prospective sealed test. Older milestone-ready/premerge text below is historical, not current. Publication/CodeGG M005 remain separate.
 

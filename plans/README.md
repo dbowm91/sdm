@@ -2,7 +2,7 @@
 
 This directory follows the CodeGG planning and handoff convention as adapted in [003-planning-process.md](003-planning-process.md).
 
-**Start here:** [Registry](registry.md) -> [General decision-model framework roadmap](subsystems/general-decision-model-framework-roadmap.md) -> M014a closed (`014a-status.md`), M014b closed (`014b-status.md`, negative honest, no rerun). No ready plans (M015 unregistered soft successor, M005 externally deferred). The [framework boundary ADR](adrs/ADR-0001-general-framework-and-model-boundaries.md) governs the milestone plans.
+**Start here:** [Registry](registry.md) -> [Roadmap](subsystems/general-decision-model-framework-roadmap.md) -> **[M014c closure corrective](implementation/general-decision-model-framework/014c-closure-evidence-reconciliation.md) READY**. M014a/b implementation present, but their original locally marked "closed" state is superseded: source CI 38408167153 failed and M014b evidence/parity incomplete. M014b negative is historically reported; consumed final NEVER rerun. M015 unregistered. See [audit](../docs/m014c-closure-audit.md).
 
 ## Completed handoffs
 
@@ -21,7 +21,11 @@ M007 is closed with generic synthetic qualification, slice calibration and train
 
 All four milestones are SDM-owned, use explicitly provided synthetic data, preserve v1 CodeGG compatibility, and have numbered closure files. M011 closes their implemented mechanics work; the new M012 workstream handles source-branch and release reconciliation without reopening M011 quality claims. No CodeGG corpus or checkout is needed.
 
-## Current implementation handoff (M014)
+## Current implementation handoff — M014c evidence/CI corrective (M014a/b in closing)
+
+The exact current handoff is [M014c](implementation/general-decision-model-framework/014c-closure-evidence-reconciliation.md). It fixes canary CI order, replaces asserted with measured three-host parity, records immutable detached M014b freeze lineage including known SHA placeholder, retrieves original final-report SHA values only from original bytes or declares them unavailable, and prepares one main PR when hosted green. No old heldout rerun, no model retraining and no CodeGG change. Existing M014a/b closure records remain historical local claims pending acceptance.
+
+## Historical handoff (M014)
 
 **[M012 — post-M011 release reconciliation](implementation/general-decision-model-framework/012-post-m011-release-reconciliation-corrective.md)** is conditionally closed: source [PR #1](https://github.com/dbowm91/sdm/pull/1) is merged into main; crates.io publication remains blocked pending human/legal license review. **M013–M013d SOURCE is merged** by [PR #2](https://github.com/dbowm91/sdm/pull/2), main@0e6c3cae5911681b18185673a30484a976cb3821, with 10/10 merged-main CI jobs green [38112863529](https://github.com/dbowm91/sdm/actions/runs/38112863529). Binary remains negative and Choice indeterminate on M013a; no model qualifies for CodeGG. **[M014](implementation/general-decision-model-framework/014-standalone-binary-choice-quality-recovery.md) is READY** for the next independent standalone experiment. CodeGG M005 remains externally deferred.
 
