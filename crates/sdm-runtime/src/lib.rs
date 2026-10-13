@@ -1,4 +1,5 @@
 //! Small, offline decision-model runtime. This crate has no training or network dependency.
+pub mod tinymlp;
 pub use sdm_core::{features_for, features_for_tokens, tokens};
 use sdm_core::{
     DecisionAnswer, DecisionCandidate, DecisionError, DecisionProvenance, DecisionRequest,
@@ -7,6 +8,7 @@ use sdm_core::{
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
+pub use tinymlp::{TinyMlpChoiceRuntime, TinyMlpPayload, TINYMLP_ARCHITECTURE};
 
 pub const ARTIFACT_SCHEMA: u16 = 1;
 pub const RUNTIME_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -327,6 +329,96 @@ impl ArtifactEnvelopeV2 {
         envelope.validate()?;
         Ok(envelope)
     }
+    /// Build the additive bounded TinyMLP Choice architecture
+    /// (`sdm-typed-choice-tinymlp-v1`). Validates shapes/finite/bounds before
+    /// sealing SHAs; SHA is re-checked on load before any inference allocation.
+    #[allow(clippy::too_many_arguments)]
+    pub fn for_typed_choice_tinymlp(
+        encoder: &sdm_core::FittedFeatureEncoderV2,
+        payload: tinymlp::TinyMlpPayload,
+        threshold: f64,
+        calibration_fingerprint: impl Into<String>,
+        model_id: impl Into<String>,
+        max_candidates: usize,
+    ) -> Result<Self, RuntimeError> {
+        encoder
+            .validate()
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        // Payload must bind the same encoder passed explicitly.
+        let payload_dim = payload
+            .validate_shapes()
+            .map_err(RuntimeError::InvalidArtifact)?;
+        let dim = encoder
+            .dimension()
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        if payload_dim != dim {
+            return Err(RuntimeError::InvalidArtifact(
+                "tinymlp encoder dimension mismatch".into(),
+            ));
+        }
+        if payload
+            .encoder
+            .schema
+            .fingerprint()
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?
+            != encoder
+                .schema
+                .fingerprint()
+                .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?
+        {
+            return Err(RuntimeError::InvalidArtifact(
+                "tinymlp encoder schema mismatch".into(),
+            ));
+        }
+        if !(2..=tinymlp::TINYMLP_MAX_CANDIDATES).contains(&max_candidates) {
+            return Err(RuntimeError::InvalidArtifact(
+                "tinymlp max candidates must be 2..=128".into(),
+            ));
+        }
+        if !threshold.is_finite() || !(0.0..=1.0).contains(&threshold) {
+            return Err(RuntimeError::InvalidArtifact(
+                "invalid tinymlp threshold".into(),
+            ));
+        }
+        if payload.parameter_count() > tinymlp::TINYMLP_MAX_PARAMS {
+            return Err(RuntimeError::InvalidArtifact(
+                "tinymlp parameter count exceeds bound".into(),
+            ));
+        }
+        let payload_bytes = serde_json::to_vec(&payload)
+            .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        if payload_bytes.len() > V2_MAX_ARTIFACT_BYTES {
+            return Err(RuntimeError::InvalidArtifact(
+                "tinymlp payload exceeds byte limit".into(),
+            ));
+        }
+        let calibration_payload = serde_json::to_vec(&TypedCalibration {
+            threshold,
+            dev_fingerprint: calibration_fingerprint.into(),
+            policy: "dev-answerability-v1".into(),
+        })
+        .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?;
+        let envelope = Self {
+            schema_version: ARTIFACT_ENVELOPE_V2,
+            architecture: tinymlp::TINYMLP_ARCHITECTURE.into(),
+            model_id: model_id.into(),
+            required_feature_schema_sha256: encoder
+                .schema
+                .fingerprint()
+                .map_err(|e| RuntimeError::InvalidArtifact(e.to_string()))?,
+            capabilities: vec!["choice".into()],
+            max_candidates,
+            parameter_count: payload_bytes.len(),
+            tensor_payload_sha256: format!("sha256:{:x}", Sha256::digest(&payload_bytes)),
+            calibration_sha256: format!("sha256:{:x}", Sha256::digest(&calibration_payload)),
+            calibration_payload,
+            license: "MIT".into(),
+            source: "sdm-experiment".into(),
+            payload: payload_bytes,
+        };
+        envelope.validate()?;
+        Ok(envelope)
+    }
     #[allow(clippy::too_many_arguments)]
     pub fn for_typed_rank(
         encoder: &sdm_core::FittedFeatureEncoderV2,
@@ -551,6 +643,7 @@ pub enum LoadedArtifact {
     NonlinearV2(NonlinearRuntime),
     TypedRankV2(TypedRankRuntime),
     TypedTaskV2(TypedTaskRuntime),
+    TinyMlpChoiceV2(TinyMlpChoiceRuntime),
     UnsupportedV2(ArtifactEnvelopeV2),
 }
 
@@ -559,11 +652,29 @@ struct RankCalibration {
     threshold: f64,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct TypedCalibration {
-    threshold: f64,
-    dev_fingerprint: String,
-    policy: String,
+pub(crate) struct TypedCalibration {
+    pub threshold: f64,
+    pub dev_fingerprint: String,
+    pub policy: String,
 }
+
+impl TypedCalibration {
+    pub(crate) fn validate(&self) -> Result<(), RuntimeError> {
+        if !self.threshold.is_finite()
+            || !(0.0..=1.0).contains(&self.threshold)
+            || self.dev_fingerprint.trim().is_empty()
+            || self.policy != "dev-answerability-v1"
+        {
+            return Err(RuntimeError::InvalidArtifact(
+                "invalid typed task calibration".into(),
+            ));
+        }
+        Ok(())
+    }
+}
+
+/// Compatibility shim for the TinyMLP module (same wire format as TypedCalibration).
+pub(crate) type TypedCalibrationShim = TypedCalibration;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct TypedRankPayload {
@@ -1363,6 +1474,10 @@ pub fn load_artifact(bytes: &[u8]) -> Result<LoadedArtifact, RuntimeError> {
             Ok(LoadedArtifact::TypedTaskV2(TypedTaskRuntime::from_bytes(
                 bytes,
             )?))
+        } else if envelope.architecture == tinymlp::TINYMLP_ARCHITECTURE {
+            Ok(LoadedArtifact::TinyMlpChoiceV2(
+                TinyMlpChoiceRuntime::from_bytes(bytes)?,
+            ))
         } else {
             Ok(LoadedArtifact::UnsupportedV2(envelope))
         }

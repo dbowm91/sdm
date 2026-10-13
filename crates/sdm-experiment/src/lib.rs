@@ -1,6 +1,7 @@
 //! Reproducible, frozen-split Rank experiments. Training and calibration APIs
 //! receive only their respective partitions; test labels are evaluation-only.
 pub mod m015a;
+pub mod m016;
 use sdm_core::{features_for, DecisionSpec};
 use sdm_data::{
     validate_dataset, validate_split, DatasetExample, Provenance, SplitManifest, TargetLabel,
@@ -2566,6 +2567,11 @@ pub fn run(spec: &ExperimentSpec) -> Result<ExperimentRunManifest, ExperimentErr
                     ExperimentError::Invalid("typed task features absent at inference".into())
                 })?,
             ),
+            LoadedArtifact::TinyMlpChoiceV2(_) => {
+                return Err(ExperimentError::Invalid(
+                    "tinymlp Choice artifact does not support Rank inference".into(),
+                ))
+            }
             LoadedArtifact::UnsupportedV2(_) => {
                 return Err(ExperimentError::Invalid(
                     "runtime does not support trained artifact".into(),

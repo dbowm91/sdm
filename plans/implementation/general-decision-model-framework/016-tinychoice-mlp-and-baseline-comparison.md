@@ -1,8 +1,8 @@
 # SDM M016 — TinyChoice compact Choice/answerability head and baseline comparison
 
-Status: **blocked on M015 accepted source/CI integration AND M015a final-action evaluation-integrity corrective closure** (planning registered; no implementation).
+Status: **active (unblocked 2026-10-13; M015a merged 0dd2ff4 with merged-main CI 38460909332 green; implementation in progress on `work/plans-sdm-m016-tinymlp`)**.
 Class: capability.
-Planning baseline: dbowm91/sdm@c048189d7026d723c7da584d7429cb275c714d23 (2026-10-13); refresh before start.
+Planning baseline: dbowm91/sdm@0dd2ff470285c09309e3c823fb07dcb76efea229 (2026-10-13), M015a merge; refreshed from c048189d at start.
 Research: docs/m015-small-model-research.md.
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md.
 Authority: ADR-0001, ADR-0002, M015 data/protocol, CodeGG ADR-0013.
