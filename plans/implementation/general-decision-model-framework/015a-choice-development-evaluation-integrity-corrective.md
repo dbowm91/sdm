@@ -1,6 +1,6 @@
 # SDM M015a — Choice development-evaluation integrity corrective
 
-Status: **READY for implementation, planning only**. Not mechanically closed; no production model qualifies.
+Status: **CLOSING (branch implementation complete; review/merge/merged-main CI pending)**. Not yet merged; no production model qualifies. See closure `plans/closure/general-decision-model-framework/015a-status.md`.
 Class: corrective infrastructure / evaluation integrity.
 Source audit baseline: `dbowm91/sdm@e7655429b0695177a30a56aaeaeea8c83abfbe55` (2026-10-13), merged M015 PR [#4](https://github.com/dbowm91/sdm/pull/4).
 Source predecessor: M015 implementation merged; its PR-head CI [38438937445](https://github.com/dbowm91/sdm/actions/runs/38438937445) passed all 11 jobs. M015 historical closure file is pre-merge; main-post-merge CI/closure reconciliation is an operational check, **not** a claimed completed gate.

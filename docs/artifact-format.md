@@ -64,3 +64,25 @@ M014a adds no new artifact architecture identifier. It adds `sdm experiment eval
 # M014c closure (additive, no new artifact architecture)
 
 M014c adds no new artifact architecture identifier and changes no head/training math. It orders CI (pure analyzer before canary provisioning before dependent tests + `check_m014a_ci_order` regression), replaces the single-host `three_host_parity=true` literal with measured per-host attestation (`m014c_canary_attestation`: 948 Binary + 926 Choice decisions, artifact/dataset/split SHAs, source/host/build, integrity hash) and aggregator (`verify_m014c_parity`: exact `linux-x86_64`/`linux-aarch64`/`macos-aarch64`, source/case equality, exact action/abstention match; new `canary-parity` CI job), and adds read-only lineage (`verify_m014c_lineage`: detached Git/SHA-256 chain, `freeze_sha256=sha256:111…1` flagged `placeholder_unbound`, ancestry `9cc80f0`→`c277247`, one-byte corruption fails) plus original-byte ledger (`docs/m014c-evidence-ledger.json`). Frozen M014b bytes and embedded placeholder remain unchanged in place; detached attestation does not repair the field. See `plans/closure/general-decision-model-framework/014c-status.md`.
+
+# M015a DEV-only final-action sidecar (additive, no new artifact architecture)
+
+M015a adds no new artifact architecture identifier and changes no head, weight,
+threshold, encoder, or `DecisionSpec::Choice` 2..=128 semantics. It adds
+`sdm experiment m015a-replay --config PATH` with `M015aReplaySpec`
+(`deny_unknown_fields`; no training fields): named typed dataset/split/artifact
++ corpus TRAIN/DEV + generator/task-spec paths, expected artifact/dataset/split/
+generator/spec/corpus SHAs, architecture, provenance, and unique output path.
+The path validates all input SHAs **before any inference**, loads the frozen
+artifact read-only, runs actual `TypedTaskRuntime::decide_typed` +
+`choice_probabilities`/`choice_logits`/`choice_answerability_probability` over
+the DEV partition only, derives no-answer origins from corpus provenance
+(`available=false` vs `available=true, zero satisfying`), and evaluates the
+versioned `choice-final-v2` contract. Sidecars use `sdm-m015a-dev-final-v1`
+(`schema_version=1`, explicit `partition=DEV only`, `test_membership=[]`,
+input SHAs, census, v2 report with support/CIs, legacy mixed-value glossary,
+bootstrap seed/replicates/method, deterministic `report_sha256`). Legacy
+`run_semantic` diagnostics and M011 serialization are unchanged; new v2 keys
+carry a `_v2` suffix. Atomic unique outputs under `target/m015a/` refuse
+overwrite; interruption leaves no accepted partial. See
+`docs/m015a-evaluation-erratum.md`.
