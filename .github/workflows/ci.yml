@@ -203,6 +203,19 @@ jobs:
         run: python3 -m unittest discover -s scripts -p 'test_m013d_*.py'
       - name: Verify M014 representability proof
         run: python3 -m unittest discover -s scripts -p 'test_m014_*.py'
+      - name: Verify M014a frozen-artifact evaluator and DEV-CANARY
+        run: |
+          python3 -m unittest discover -s scripts -p 'test_m014a_*.py'
+          python3 scripts/run_m014a_dev_canary.py
+          test -f target/m014a/canary/qualification.json
+          python3 - <<'PY'
+          import json
+          qual = json.load(open('target/m014a/canary/qualification.json'))
+          assert qual['binary_verdict'] == 'positive', qual['binary_reason']
+          assert qual['choice_verdict'] == 'indeterminate', qual['choice_reason']
+          assert qual['overall_verdict'] == 'indeterminate'
+          print("M014a DEV-CANARY verified: Binary positive, Choice indeterminate, all gates present")
+          PY
       - name: Capture runtime benchmark
         run: cargo run -p sdm-runtime --example benchmark -- fixtures/benchmark-rank-request.json artifacts/compatibility-rank-v1.json > benchmark-${{ matrix.name }}.json
       - name: Capture nonlinear runtime benchmark
@@ -233,6 +246,7 @@ jobs:
             target/m011-v2/
             target/m013a/
             target/m014/
+            target/m014a/
             target/m013b/
             target/m013c/
   portability:

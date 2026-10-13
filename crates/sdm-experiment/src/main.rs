@@ -8,8 +8,12 @@ fn main() {
 }
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = env::args().collect();
-    if args.len() != 5 || args[1] != "experiment" || args[2] != "run" || args[3] != "--config" {
-        return Err("usage: sdm experiment run --config PATH".into());
+    if args.len() != 5
+        || args[1] != "experiment"
+        || (args[2] != "run" && args[2] != "evaluate")
+        || args[3] != "--config"
+    {
+        return Err("usage: sdm experiment (run|evaluate) --config PATH".into());
     }
     let path = &args[4];
     let mut bytes = Vec::new();
@@ -18,6 +22,14 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         .read_to_end(&mut bytes)?;
     if bytes.len() > sdm_experiment::MAX_CONFIG_BYTES {
         return Err("config exceeds byte bound".into());
+    }
+    if args[2] == "evaluate" {
+        // Inference-only path: EvaluateSpec denies training fields, validates
+        // exact artifact SHA before scoring, and never trains or rewrites bytes.
+        let spec: sdm_experiment::EvaluateSpec = serde_json::from_slice(&bytes)?;
+        let result = serde_json::to_value(sdm_experiment::run_evaluate(&spec)?)?;
+        println!("{}", serde_json::to_string_pretty(&result)?);
+        return Ok(());
     }
     let spec: sdm_experiment::ExperimentSpec = serde_json::from_slice(&bytes)?;
     let result = match spec.architecture.as_str() {
