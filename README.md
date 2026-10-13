@@ -48,6 +48,15 @@ groups into the existing typed Choice schema and runs the linear, cross, and
 compositional baselines with an empty test partition. These are synthetic
 research artifacts, not CodeGG evidence or model qualification.
 
+M015 source merged via PR #4; historical development accuracy and causal-pair
+summary values must not be read as complete *final-action* Choice accuracy:
+the legacy diagnostic uses raw conditional argmax for answerable cases and
+final abstention for no-answer cases. The registered
+[M015a evaluation-integrity corrective](plans/implementation/general-decision-model-framework/015a-choice-development-evaluation-integrity-corrective.md)
+requires immutable-history erratum and DEV-only revised final-action metrics
+before [M016](plans/implementation/general-decision-model-framework/016-tinychoice-mlp-and-baseline-comparison.md)
+model/baseline comparison. M015a is planning-only, not implemented.
+
 ## Build and qualify
 
 ```sh
