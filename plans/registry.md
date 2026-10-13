@@ -1,6 +1,6 @@
 # SDM Planning Registry
 
-Status: M014 original final test consumed and indeterminate. **M014a ready** exact-artifact evaluation corrective; **M014b blocked** until mechanical proof and DEV-CANARY. M013–M013d integrated. CodeGG M005 and crates.io publishing separately gated.
+Status: M014 original final indeterminate; **M014a closed** (G1–G10 + DEV-CANARY proven, Binary positive / Choice indeterminate canary); **M014b active** (fresh cohort qualification underway). M013–M013d integrated. CodeGG M005 and crates.io publishing separately gated.
 Governance: plans/003-planning-process.md
 Current planning baseline: main@7b9bb3c929db2c9d492a1b86b54a4f57c61a9e37 (latest successful 10-job CI 38117915516).
 Accepted architecture: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md
@@ -12,7 +12,7 @@ States: proposed, ready, active, blocked, closing, closed, conditionally closed,
 
 | Subsystem | Status | Next handoff | Blockers |
 | --- | --- | --- | --- |
-| Standalone general decision-model framework | M014 final indeterminate; **M014a ready**, **M014b blocked** | M014a frozen-artifact inference and full analyzer; then distinct M014b cohort | Historical M014 test consumed; M014a G1–G10 and DEV-CANARY required before any new final inference |
+| Standalone general decision-model framework | M014 final indeterminate; **M014a closed**, **M014b active** | M014b fresh independent cohort + one-time frozen inference; then M015 future | M014a G1–G10 and DEV-CANARY complete (Binary positive / Choice indeterminate canary); M014 consumed cohort never rerun |
 | CodeGG consumer-specific effectiveness (M005) | deferred / indeterminate | independent CodeGG-owned evidence, unscheduled | No approved corpus; does not block M008-M011 |
 
 ## Registered milestone plans
@@ -37,8 +37,8 @@ States: proposed, ready, active, blocked, closing, closed, conditionally closed,
 | M013c | **closed** (source merged; evaluation integrity only) | infrastructure / evidence-integrity corrective | plans/implementation/general-decision-model-framework/013c-qualification-gate-hardening-corrective.md | CI-bound decisions, support-bounded critical negatives, complete family/control coverage implemented; CI 38112863529 passed on merged main; historical closure retained at plans/closure/general-decision-model-framework/013c-status.md |
 | M013d | **closed** (source merged; CI 10/10) | infrastructure / evidence integrity and source integration | plans/implementation/general-decision-model-framework/013d-bootstrap-repair-and-source-integration.md | PR #2 merged as 0e6c3cae5911681b18185673a30484a976cb3821; main CI 38112863529 passed; publication still separately gated; historical closure remains intact |
 | M014 | **blocked; consumed final, indeterminate** | capability / prospective quality corrective | plans/implementation/general-decision-model-framework/014-standalone-binary-choice-quality-recovery.md | Choice capacity gap proven; additive compositional architecture and Binary constant mask implemented. Final run record: plans/closure/general-decision-model-framework/014-status.md. Binary artifact identity mismatch and evaluator failure prevent qualification; new independent cohort required for any further attempt |
-| M014a | **ready** | infrastructure/evidence-integrity corrective | plans/implementation/general-decision-model-framework/014a-frozen-artifact-and-evaluator-integrity.md | Existing M014 source/indeterminate closure evidence only; no new final cohort |
-| M014b | **blocked** | capability/prospective qualification | plans/implementation/general-decision-model-framework/014b-independent-frozen-qualification.md | Hard predecessor M014a acceptance G1–G10 and complete DEV-CANARY; then prospective new cohort freeze |
+| M014a | **closed** (G1–G10 + DEV-CANARY proven; Binary positive / Choice indeterminate canary) | infrastructure/evidence-integrity corrective | plans/implementation/general-decision-model-framework/014a-frozen-artifact-and-evaluator-integrity.md | Implementation 6139806 on work/plans-sdm-m014a-m014b-qualification-recovery; closure plans/closure/general-decision-model-framework/014a-status.md; no frozen M014 inputs rewritten; no new final cohort |
+| M014b | **active** | capability/prospective qualification | plans/implementation/general-decision-model-framework/014b-independent-frozen-qualification.md | M014a G1–G10 + DEV-CANARY complete; fresh independent cohort freeze underway on same branch |
 
 ## Interface and operational dependencies
 
@@ -50,7 +50,7 @@ Accepted boundary: plans/adrs/ADR-0002-standalone-framework-before-consumer-qual
 
 ## M014a/M014b corrective handoff
 
-**Only ready plan:** plans/implementation/general-decision-model-framework/014a-frozen-artifact-and-evaluator-integrity.md; planning branch work/plans-sdm-m014a-m014b-qualification-recovery, source main@7b9bb3c929db2c9d492a1b86b54a4f57c61a9e37. Repair exact SHA-bound inference-only evaluation and complete paired family/negative-control/abstention/resource/CI gates; prove DEVELOPMENT-CANARY before any new final cohort. Historical M014 freeze, five final reports/artifacts and status stay immutable; do not rerun. **M014b is registered BLOCKED:** plans/implementation/general-decision-model-framework/014b-independent-frozen-qualification.md requires a closed M014a and fresh independent, pre-committed test/protocol/candidate SHA. See docs/m014-qualification-failure-analysis.md. No CodeGG promotion or crate publication.
+**M014a closed, M014b active:** M014a implementation 6139806 + closure `014a-status.md` complete G1–G10 and DEV-CANARY (Binary positive / Choice indeterminate canary) on branch work/plans-sdm-m014a-m014b-qualification-recovery (base main@7b9bb3c). Historical M014 freeze, five final reports/artifacts and status immutable; no rerun. **M014b is now ACTIVE:** `014b-independent-frozen-qualification.md` proceeds with fresh independent cohort (new generator/seed/IDs, prospective freeze, one-time inference-only final). See docs/m014-qualification-failure-analysis.md. No CodeGG promotion or crate publication.
 
 ## M014 quality-recovery handoff
 

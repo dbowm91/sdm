@@ -1,6 +1,6 @@
 # M014a — Exact-artifact qualification execution and evaluator integrity
 
-Status: **ready** — implementation handoff, not implemented by this planning commit
+Status: **closed** — implemented in 6139806, G1–G10 + DEV-CANARY proven; closure plans/closure/general-decision-model-framework/014a-status.md. This file is retained as the implementation handoff of record.
 Primary class: infrastructure / evidence integrity
 Planning baseline: dbowm91/sdm@7b9bb3c929db2c9d492a1b86b54a4f57c61a9e37, main, latest successful 10-job CI 38117915516
 Branch: work/plans-sdm-m014a-m014b-qualification-recovery
