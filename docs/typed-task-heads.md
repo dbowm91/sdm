@@ -70,3 +70,7 @@ The opt-in `sdm-typed-choice-compositional-v1` runtime adds a bounded conjunctio
 # M014a inference-only evaluation (no head change)
 
 M014a changes no Binary/Choice head, training math, or thresholds. It adds `sdm experiment evaluate --config PATH` for exact frozen bytes (see `artifact-format.md`): SHA-checked read-only loading, pure scoring via the existing `TypedTaskRuntime`, and versioned `sdm-semantic-evaluate-v2` reports that always carry raw probabilities/logits/answerability beside the final thresholded decision. Choice counterfactual success requires **both** finals correct (raw-correct that abstains does not pass); no-answer targets need no extra option. Qualification (paired-group CIs, families/controls, recall/coverage, resources) lives in `scripts/qualify_semantic_v2.py`, proven on DEV-CANARY (Binary positive via OOD gain + ID noninferiority; Choice indeterminate via shifted recall). No model is qualified or promoted.
+
+# M014c closure (no head change)
+
+M014c changes no Binary/Choice head, training math, or thresholds. It orders CI (pure→gen→dependent + ordering regression), replaces single-host `three_host_parity=true` with measured same-artifact attestation + aggregator (`m014c_canary_attestation` / `verify_m014c_parity` + `canary-parity` job; provisional indeterminate for unverified parity is correct), and adds detached lineage + original-byte ledger for the consumed M014b FINAL (placeholder `freeze_sha256` defect preserved, never rerun). See `plans/closure/general-decision-model-framework/014c-status.md`.
