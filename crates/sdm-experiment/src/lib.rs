@@ -1556,10 +1556,18 @@ pub fn run_semantic(
             "choice" => {
                 let mut answerable = 0usize;
                 let mut correct = 0usize;
-                let mut no_answer = 0usize;
-                let mut no_answer_correct = 0usize;
                 let mut covered = 0usize;
-                let mut pair_correct = BTreeMap::<String, Vec<bool>>::new();
+                let mut nuisance_pair_correct = BTreeMap::<String, Vec<bool>>::new();
+                let mut causal_pair_correct = BTreeMap::<String, Vec<bool>>::new();
+                let mut pair_predictions = BTreeMap::<String, Vec<Option<String>>>::new();
+                let mut group_correct = BTreeMap::<String, Vec<bool>>::new();
+                let mut answerability_brier = 0.0;
+                let mut answerability_nll = 0.0;
+                let mut choice_nll = 0.0;
+                let mut choice_brier = 0.0;
+                let mut answerability_group_sums =
+                    BTreeMap::<String, (usize, f64, f64, f64, f64)>::new();
+                let mut no_answer_group_sums = BTreeMap::<String, (usize, usize)>::new();
                 for e in &dev {
                     let TargetLabel::Choice(target) = &e.label else {
                         unreachable!()
@@ -1568,21 +1576,48 @@ pub fn run_semantic(
                     let confidence = runtime
                         .choice_answerability_probability(&e.request, binding)
                         .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                    let answerable_target = target.is_some();
+                    let confidence_clamped = confidence.clamp(1e-15, 1.0 - 1e-15);
+                    let row_answerability_nll = if answerable_target {
+                        -confidence_clamped.ln()
+                    } else {
+                        -(1.0 - confidence_clamped).ln()
+                    };
+                    let group_stats = answerability_group_sums
+                        .entry(e.leakage_group.clone())
+                        .or_default();
+                    group_stats.0 += 1;
+                    group_stats.1 += confidence;
+                    group_stats.2 += f64::from(answerable_target);
+                    group_stats.3 += (confidence - f64::from(answerable_target)).powi(2);
+                    group_stats.4 += row_answerability_nll;
                     let response = runtime
                         .decide_typed(&e.request, binding)
                         .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                    let predicted_id = match response.answer {
+                        Some(sdm_core::DecisionAnswer::Choice { option_id, .. }) => Some(option_id),
+                        _ => None,
+                    };
+                    if let Some(pair) = &e.counterfactual_pair {
+                        if pair.ends_with("-nuisance") {
+                            pair_predictions
+                                .entry(pair.clone())
+                                .or_default()
+                                .push(predicted_id.clone());
+                        }
+                    }
                     if let Some(target) = target {
                         answerable += 1;
-                        if response.answer.is_some() {
+                        if predicted_id.is_some() {
                             covered += 1;
                         }
-                        let logits = runtime
-                            .choice_logits(&e.request, binding)
+                        let probabilities = runtime
+                            .choice_probabilities(&e.request, binding)
                             .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
                         let sdm_core::DecisionSpec::Choice { options, .. } = &e.request.spec else {
                             unreachable!()
                         };
-                        let best = logits
+                        let best = probabilities
                             .iter()
                             .enumerate()
                             .max_by(|a, b| a.1.total_cmp(b.1))
@@ -1590,21 +1625,120 @@ pub fn run_semantic(
                             .unwrap();
                         let ok = options[best].id == *target;
                         correct += usize::from(ok);
+                        group_correct
+                            .entry(e.leakage_group.clone())
+                            .or_default()
+                            .push(ok);
                         if let Some(pair) = &e.counterfactual_pair {
-                            pair_correct.entry(pair.clone()).or_default().push(ok);
+                            if pair.ends_with("-nuisance") {
+                                nuisance_pair_correct
+                                    .entry(pair.clone())
+                                    .or_default()
+                                    .push(ok);
+                            } else {
+                                causal_pair_correct
+                                    .entry(pair.clone())
+                                    .or_default()
+                                    .push(ok);
+                            }
                         }
+                        let target_index = options
+                            .iter()
+                            .position(|option| option.id == *target)
+                            .ok_or_else(|| {
+                            ExperimentError::Invalid("Choice target outside options".into())
+                        })?;
+                        choice_nll -= probabilities[target_index].clamp(1e-15, 1.0).ln();
+                        choice_brier += probabilities
+                            .iter()
+                            .enumerate()
+                            .map(|(i, probability)| {
+                                (probability - f64::from(i == target_index)).powi(2)
+                            })
+                            .sum::<f64>();
                     } else {
-                        no_answer += 1;
-                        if confidence < runtime.abstention_threshold() {
-                            no_answer_correct += 1;
+                        let no_answer_ok = confidence < runtime.abstention_threshold();
+                        let group_stats = no_answer_group_sums
+                            .entry(e.leakage_group.clone())
+                            .or_default();
+                        group_stats.0 += 1;
+                        group_stats.1 += usize::from(no_answer_ok);
+                        if let Some(pair) = &e.counterfactual_pair {
+                            if !pair.ends_with("-nuisance") {
+                                causal_pair_correct
+                                    .entry(pair.clone())
+                                    .or_default()
+                                    .push(predicted_id.is_none());
+                            }
                         }
                     }
                 }
-                let pairs = pair_correct
+                let nuisance_pairs = nuisance_pair_correct
                     .values()
                     .filter(|correct| correct.len() == 2)
                     .collect::<Vec<_>>();
-                let both = pairs.iter().filter(|pair| pair.iter().all(|x| *x)).count();
+                let causal_pairs = causal_pair_correct
+                    .values()
+                    .filter(|correct| correct.len() == 2)
+                    .collect::<Vec<_>>();
+                let both = causal_pairs
+                    .iter()
+                    .filter(|pair| pair.iter().all(|x| *x))
+                    .count();
+                let paired_predictions = pair_predictions
+                    .values()
+                    .filter(|predictions| predictions.len() == 2)
+                    .collect::<Vec<_>>();
+                let invariant_pairs = paired_predictions
+                    .iter()
+                    .filter(|predictions| predictions[0] == predictions[1])
+                    .count();
+                let group_values = group_correct
+                    .values()
+                    .map(|values| {
+                        values.iter().filter(|ok| **ok).count() as f64 / values.len() as f64
+                    })
+                    .collect::<Vec<_>>();
+                let mut bootstrap = Vec::with_capacity(2000);
+                let mut rng = 0x4d31355fu64;
+                for _ in 0..2000 {
+                    let mut sum = 0.0;
+                    for _ in 0..group_values.len() {
+                        rng = rng
+                            .wrapping_mul(6364136223846793005)
+                            .wrapping_add(1442695040888963407);
+                        sum += group_values[(rng as usize) % group_values.len()];
+                    }
+                    bootstrap.push(sum / group_values.len() as f64);
+                }
+                bootstrap.sort_by(f64::total_cmp);
+                let mut answerability_bins = [(0usize, 0.0f64, 0.0f64); 10];
+                let mut answerability_groups = 0usize;
+                let mut no_answer_group_recall = 0.0;
+                for (count, confidence_sum, observed_sum, brier_sum, nll_sum) in
+                    answerability_group_sums.values()
+                {
+                    let confidence = confidence_sum / *count as f64;
+                    let observed = observed_sum / *count as f64;
+                    answerability_brier += brier_sum / *count as f64;
+                    answerability_nll += nll_sum / *count as f64;
+                    answerability_groups += 1;
+                    let bin = ((confidence * 10.0).floor() as usize).min(9);
+                    answerability_bins[bin].0 += 1;
+                    answerability_bins[bin].1 += confidence;
+                    answerability_bins[bin].2 += observed;
+                }
+                for (count, correct) in no_answer_group_sums.values() {
+                    no_answer_group_recall += *correct as f64 / *count as f64;
+                }
+                let ece = answerability_bins
+                    .iter()
+                    .filter(|bin| bin.0 > 0)
+                    .map(|(count, confidence_sum, observed_sum)| {
+                        (*count as f64 / answerability_groups.max(1) as f64)
+                            * (confidence_sum / *count as f64 - *observed_sum / *count as f64).abs()
+                    })
+                    .sum::<f64>();
                 values.insert(
                     "dev_answerable_accuracy".into(),
                     correct as f64 / answerable.max(1) as f64,
@@ -1615,13 +1749,86 @@ pub fn run_semantic(
                 );
                 values.insert(
                     "dev_no_answer_recall".into(),
-                    no_answer_correct as f64 / no_answer.max(1) as f64,
+                    no_answer_group_recall / no_answer_group_sums.len().max(1) as f64,
                 );
-                values.insert("dev_counterfactual_pairs".into(), pairs.len() as f64);
+                values.insert(
+                    "dev_no_answer_groups".into(),
+                    no_answer_group_sums.len() as f64,
+                );
+                values.insert("dev_counterfactual_pairs".into(), causal_pairs.len() as f64);
                 values.insert(
                     "dev_counterfactual_correct_on_both".into(),
-                    both as f64 / pairs.len().max(1) as f64,
+                    both as f64 / causal_pairs.len().max(1) as f64,
                 );
+                values.insert("dev_causal_flip_pairs".into(), causal_pairs.len() as f64);
+                let nuisance_both = nuisance_pairs
+                    .iter()
+                    .filter(|pair| pair.iter().all(|x| *x))
+                    .count();
+                values.insert(
+                    "dev_nuisance_correct_on_both".into(),
+                    nuisance_both as f64 / nuisance_pairs.len().max(1) as f64,
+                );
+                values.insert("dev_nuisance_pairs".into(), nuisance_pairs.len() as f64);
+                values.insert(
+                    "dev_answerability_brier".into(),
+                    answerability_brier / answerability_groups.max(1) as f64,
+                );
+                values.insert(
+                    "dev_answerability_log_loss".into(),
+                    answerability_nll / answerability_groups.max(1) as f64,
+                );
+                values.insert("dev_answerability_ece_10_bins".into(), ece);
+                values.insert(
+                    "dev_answerability_groups".into(),
+                    answerability_groups as f64,
+                );
+                values.insert(
+                    "dev_answerable_conditional_choice_nll".into(),
+                    choice_nll / answerable.max(1) as f64,
+                );
+                values.insert(
+                    "dev_answerable_conditional_choice_brier".into(),
+                    choice_brier / answerable.max(1) as f64,
+                );
+                values.insert(
+                    "dev_answerable_independent_groups".into(),
+                    group_values.len() as f64,
+                );
+                values.insert(
+                    "dev_answerable_accuracy_group_bootstrap_95_ci_lower".into(),
+                    bootstrap[(bootstrap.len() as f64 * 0.025) as usize],
+                );
+                values.insert(
+                    "dev_answerable_accuracy_group_bootstrap_95_ci_upper".into(),
+                    bootstrap[((bootstrap.len() as f64 * 0.975) as usize).min(bootstrap.len() - 1)],
+                );
+                values.insert(
+                    "dev_nuisance_pair_prediction_agreement".into(),
+                    invariant_pairs as f64 / paired_predictions.len().max(1) as f64,
+                );
+                values.insert(
+                    "dev_nuisance_prediction_pairs".into(),
+                    paired_predictions.len() as f64,
+                );
+                for (index, (count, confidence_sum, observed_sum)) in
+                    answerability_bins.iter().enumerate()
+                {
+                    values.insert(
+                        format!("dev_answerability_bin_{index}_count"),
+                        *count as f64,
+                    );
+                    if *count > 0 {
+                        values.insert(
+                            format!("dev_answerability_bin_{index}_confidence"),
+                            confidence_sum / *count as f64,
+                        );
+                        values.insert(
+                            format!("dev_answerability_bin_{index}_observed_rate"),
+                            observed_sum / *count as f64,
+                        );
+                    }
+                }
             }
             _ => {}
         }

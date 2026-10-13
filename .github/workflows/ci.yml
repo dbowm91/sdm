@@ -210,6 +210,34 @@ jobs:
           python3 -m unittest discover -s scripts -p 'test_m014_representability.py'
           python3 -m unittest discover -s scripts -p 'test_m014_suite.py'
           python3 -m unittest discover -s scripts -p 'test_m014a_analyzer.py'
+      - name: Verify M015 TRAIN/DEV generator and oracle (no final partition)
+        run: |
+          python3 -m unittest discover -s scripts -p 'test_m015_*.py'
+          python3 scripts/generate_m015_suite.py --out target/m015 --groups 2000 --seed 150015 > target/m015-generator.json
+          python3 scripts/analyze_m015_dev.py --train target/m015/train.jsonl --dev target/m015/dev.jsonl --out target/m015/dev-report.json > target/m015-dev-analysis.stdout.json
+          python3 - <<'PY'
+          import json
+          report = json.load(open('target/m015/dev-report.json'))
+          assert report['oracle_disagreements'] == 0
+          assert report['dev_groups'] == 200
+          assert report['partition'] == 'DEV only'
+          assert 'run by scripts/run_m015_baselines.py' in report['learned_baselines']['typed_cross']
+          assert all(s['answerable_groups'] > 0 and s['no_answer_groups'] > 0 for s in report['answerability_by_family'].values())
+      - name: Run existing M015 Choice baselines (TRAIN/DEV only)
+        if: matrix.name == 'linux-x64'
+        run: |
+          python3 scripts/run_m015_baselines.py --out target/m015-baselines --groups 2000 --seed 150015 > target/m015-baselines.stdout.json
+          python3 - <<'PY'
+          import json
+          summary = json.load(open('target/m015-baselines/baseline-summary.json'))
+          assert summary['mode'] == 'TRAIN/DEV only'
+          assert set(summary['models']) == {'typed-choice', 'typed-choice-cross', 'typed-choice-compositional'}
+          for model in summary['models'].values():
+              assert model['test_evaluation_performed'] is False
+              assert model['verdict'] == 'train-dev-only'
+              assert model['metrics']['dev_answerable_accuracy_group_bootstrap_95_ci_lower'] <= model['metrics']['dev_answerable_accuracy']
+              assert model['metrics']['dev_answerable_accuracy_group_bootstrap_95_ci_upper'] >= model['metrics']['dev_answerable_accuracy']
+          PY
       - name: Generate M014a DEV-CANARY (provision artifacts before dependent tests)
         run: |
           # Deterministically creates target/m014a/canary/* on every matrix host.
@@ -326,6 +354,8 @@ jobs:
             target/m014/
             target/m014a/
             target/m014b/
+            target/m015/
+            target/m015-baselines/
             target/m013b/
             target/m013c/
       - uses: actions/upload-artifact@v4

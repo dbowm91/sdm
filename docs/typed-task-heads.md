@@ -50,6 +50,14 @@ is shared by training and runtime inference.
 - Rank continues to score each caller-supplied candidate independently and retains
   multi-relevant labels.
 
+M015 defines a separate TRAIN/DEV-only research contract in
+[m015-task-spec-v1.md](m015-task-spec-v1.md). Its rule descriptors are
+source-defined and observable. `scripts/run_m015_baselines.py` maps that
+contract to a frozen typed feature schema and runs the existing linear, cross,
+and compositional Choice architectures against identical TRAIN/DEV membership
+with an empty test partition. The conversion is research-only; M015 adds no
+inference architecture.
+
 Semantic experiments may set `quality_diagnostics: true` to record raw Choice
 logits/probabilities and answerability beside the actual final runtime decision
 and abstention. The default remains off to preserve historical M011 report

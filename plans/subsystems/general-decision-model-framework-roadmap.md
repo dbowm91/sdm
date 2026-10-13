@@ -1,7 +1,7 @@
 # General Decision-Model Framework and First Consumer Roadmap
 
-Status: M013–M013d integrated; M014 first final indeterminate; M014a/b **closed (negative, honest, original-byte ledger, source merged)** via M014c; **M014c closed (C1–C12 pass; PR #3 merged, merged-main green)**. M005 and crates.io separately gated.
-Audit baseline: dbowm91/sdm@8139b064bdcf3212e8f6fd912e801a479b55751c (2026-10-05)
+Status: M014c closed and merged (11/11 main CI); **M015 conditionally closed on implementation branch; reviewed merge and merged-main CI pending**; M016 architecture/baselines BLOCKED on accepted M015 integration; M017 independent frozen synthetic qualification BLOCKED on M015/M016. M005 and crates.io separately gated.
+Audit baseline: original historical audit at 8139b064bdcf3212e8f6fd912e801a479b55751c (2026-10-05); current TinyChoice planning baseline main@c048189d7026d723c7da584d7429cb275c714d23 (2026-10-13).
 Planning date: 2026-10-10
 Primary decisions: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md; plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md
 Planning governance: plans/003-planning-process.md
@@ -150,6 +150,26 @@ Class: infrastructure/evidence integrity. Status: **closed (C1–C12 pass; PR #3
 
 M014 -> M015 generalized tiny architecture comparisons is a SOFT, unregistered successor. M005 remains independently deferred.
 
+## Independent small-model research successor M015–M017 (2026-10-13)
+
+Research rationale: [docs/m015-small-model-research.md](../../docs/m015-small-model-research.md). M014c closes source/evaluator parity and provenance mechanics, NOT model generalization. M014b tested fixed old AND/XOR candidates against changed AND-XOR/XNOR labels without observably specifying the changed target rule, and therefore cannot decide whether a model is robust to label-preserving nuisance shifts. New M015 research separates these identifiable questions and has no CodeGG-data hard dependency.
+
+Dependency graph (hard): `M014c (closed) → M015 (conditionally closed; integration pending) → M016 (blocked) → M017 (blocked)`. M005 still externally deferred and publication still legal-gated.
+
+### M015 — Oracle-audited synthetic corpus and prospective design foundation
+Class: capability / research infrastructure. Status: **conditionally closed on implementation branch; reviewed merge + merged-main CI pending**. Plan: [015](../implementation/general-decision-model-framework/015-tinychoice-corpus-and-research-foundation.md); closure evidence: [015-status](../closure/general-decision-model-framework/015-status.md).
+Build >=5 distinct rule families with independent oracle, reproducible configurable group budgets, leakage/counterfactual support, FIXED-rule nuisance perturbation and OBSERVABLE rule-conditioned compositional experiments. Existing Choice 2..128 options remain valid; 0/1 are negative invalid-request controls. Run only new TRAIN/DEV model baselines and negative controls; preserve all historical FINAL inputs and leave future M017 final ungenerated/unopened. The implementation includes an existing typed Choice baseline harness and grouped diagnostics. M016 remains blocked until M015 is accepted and integrated. See [M015 run evidence](../../docs/m015-dev-results.md).
+
+### M016 — TinyChoice native-CPU shared scorer and answerability
+Class: capability. Status: **blocked** on M015 accepted closure/merge. Plan: [016](../implementation/general-decision-model-framework/016-tinychoice-mlp-and-baseline-comparison.md).
+Introduce an **additive** `sdm-typed-choice-tinymlp-v1` optional Choice artifact: shared order-equivariant candidate MLP, separately supervised symmetric answerability head and dev-calibrated conditional score/abstention semantics. Probe 32/64-unit capacities and record actual parameters; evaluate existing linear/legacy/cross/compositional controls and independent shallow-tree benchmark on same feature/candidate universe. Any tree tooling is offline research-only and must not contaminate Rust runtime. Finite gradients, bounds, dependency isolation, metamorphic tests, 2..128 option contract and quantified DEV-only resource/quality evidence are required. No new FINAL evaluation or consumer promotion.
+
+### M017 — Prospective one-time synthetic qualification and portability
+Class: capability / prospective evidence. Status: **blocked** on M015/M016 closures. Plan: [017](../implementation/general-decision-model-framework/017-tinychoice-prospective-qualification-and-portability.md).
+Freeze new independent test source + protocol + numeric CI-bound gates + frozen candidate artifact bytes in a **non-circular two-phase SHA binding**; verify eligible group support and green CI BEFORE exactly one inference-only final. Report fixed-rule robustness and explicit rule-conditioned transfer separately, with grouped uncertainty, answerability and calibration, unchanged source/control identity and original output byte ledger. Attest same committed model bytes on Linux x86_64/Linux ARM64/macOS ARM64 CANARY, not a replay of historical FINAL. A positive result only establishes narrow synthetic quality; M005 needs newly approved CodeGG data and a separate consumer-owned plan.
+
+Non-goals throughout: no CodeGG pin or tool-policy changes, license publication, full semantic-language model, reinterpretation of M014b negative evidence or reuse of its consumed final test.
+
 ## 7. Cross-cutting requirements
 
 - Compatibility: v1 LinearArtifact remains readable; no destructive v1 feature/schema changes. New artifacts identify architecture, model and calibration hashes and required feature schemas. On incompatibility return explicit Unsupported/Unavailable, not guessed coercion.
@@ -177,7 +197,7 @@ Create plans/closure/general-decision-model-framework/NNN-status.md for each mil
 
 ## 10. Readiness
 
-**Current readiness (2026-10-13):** M014c implementation af74c01 + fix d60d9c0 + docs 3d8db08 is closed (C1–C12 pass; PR #3 merged 91b0c3b, merged-main 38424519807 green; ordered CI, SAME-committed-bytes parity, detached lineage, original-byte ledger; historic negatives retained, no rerun). Old runs [38408167153](https://github.com/dbowm91/sdm/actions/runs/38408167153) (order defect) + [38413896571](https://github.com/dbowm91/sdm/actions/runs/38413896571) (retraining diverges, 0 decision divergences) FAILED and retained. Hosted [38418968150](https://github.com/dbowm91/sdm/actions/runs/38418968150) SUCCESS 11/11 on d60d9c0 (0 divergences, max prob delta 8.67e-19); C11 PR #3 reviewed (39 files, stack only) with PR run 38422712418 SUCCESS; C12 merge 91b0c3b + merged-main 38424519807 SUCCESS. **M014a/b are closed (negative, honest, source merged)** with original-byte ledger. Embedded `freeze_sha256` remains placeholder defect with detached chain. **M014c is the closed corrective**. M015 is NOT registered ready; M005 deferred; publication gated.
+**Current readiness (2026-10-13):** M014c implementation af74c01 + fix d60d9c0 + docs 3d8db08 is closed (C1–C12 pass; PR #3 merged 91b0c3b, merged-main 38424519807 green; ordered CI, SAME-committed-bytes parity, detached lineage, original-byte ledger; historic negatives retained, no rerun). Old runs [38408167153](https://github.com/dbowm91/sdm/actions/runs/38408167153) (order defect) + [38413896571](https://github.com/dbowm91/sdm/actions/runs/38413896571) (retraining diverges, 0 decision divergences) FAILED and retained. Hosted [38418968150](https://github.com/dbowm91/sdm/actions/runs/38418968150) SUCCESS 11/11 on d60d9c0 (0 divergences, max prob delta 8.67e-19); C11 PR #3 reviewed (39 files, stack only) with PR run 38422712418 SUCCESS; C12 merge 91b0c3b + merged-main 38424519807 SUCCESS. **M014a/b are closed (negative, honest, source merged)** with original-byte ledger. Embedded `freeze_sha256` remains placeholder defect with detached chain. **M014c is the closed corrective**. M015 has conditional branch closure evidence; reviewed merge and merged-main CI are pending. M016/M017 remain blocked; M005 deferred; publication gated.
 
 
 **Current (2026-10-13):** main@7b9bb3c929db2c9d492a1b86b54a4f57c61a9e37 and CI 38117915516 (10/10 success). M014 architecture and Binary mask implemented but its once-frozen final cohort consumed; exact Binary candidate SHA mismatch and broken analyzer leave quality INDETERMINATE (unchanged historical status). **M014a READY** for execution/evaluator integrity and DEV-CANARY; **M014b BLOCKED** until G1–G10 closure and NEW prospective sealed test. Older milestone-ready/premerge text below is historical, not current. Publication/CodeGG M005 remain separate.
