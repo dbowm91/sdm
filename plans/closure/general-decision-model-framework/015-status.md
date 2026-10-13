@@ -5,7 +5,7 @@ Status: **conditionally closed on implementation branch; integration pending**.
 Plan: [015-tinychoice-corpus-and-research-foundation.md](../../implementation/general-decision-model-framework/015-tinychoice-corpus-and-research-foundation.md)  
 Branch: `work/plans-sdm-m015-m017-tinychoice-research`  
 Base: `main@c048189d7026d723c7da584d7429cb275c714d23`  
-Implementation commit: to be recorded after implementation commit is created.  
+Implementation commit: `f4c4abebd41ccf1d41a4c686df95aa1d54535df9` (`feat(m015): complete TinyChoice research foundation`).  
 Integration PR: [#4](https://github.com/dbowm91/sdm/pull/4), open; final hosted CI and reviewed merge pending.
 
 M015 provides bounded synthetic TRAIN/DEV research infrastructure and evidence for existing Choice heads. It does not add a runtime architecture, qualify a model, or establish CodeGG effectiveness. M016 cannot start until this closure is accepted and source is merged to main with green main CI. M017 remains blocked on M015 and M016.
