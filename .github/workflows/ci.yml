@@ -210,6 +210,19 @@ jobs:
           python3 -m unittest discover -s scripts -p 'test_m014_representability.py'
           python3 -m unittest discover -s scripts -p 'test_m014_suite.py'
           python3 -m unittest discover -s scripts -p 'test_m014a_analyzer.py'
+      - name: Verify M015 TRAIN/DEV generator and oracle (no final partition)
+        run: |
+          python3 -m unittest discover -s scripts -p 'test_m015_*.py'
+          python3 scripts/generate_m015_suite.py --out target/m015 --groups 2000 --seed 150015 > target/m015-generator.json
+          python3 scripts/analyze_m015_dev.py --train target/m015/train.jsonl --dev target/m015/dev.jsonl --out target/m015/dev-report.json > target/m015-dev-analysis.stdout.json
+          python3 - <<'PY'
+          import json
+          report = json.load(open('target/m015/dev-report.json'))
+          assert report['oracle_disagreements'] == 0
+          assert report['dev_groups'] == 200
+          assert report['partition'] == 'DEV only'
+          assert 'unsupported' in report['learned_baselines']['typed_cross']
+          PY
       - name: Generate M014a DEV-CANARY (provision artifacts before dependent tests)
         run: |
           # Deterministically creates target/m014a/canary/* on every matrix host.

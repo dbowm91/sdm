@@ -1,0 +1,11 @@
+# M015 development run evidence (not closure)
+
+Status: **incomplete**. This document records one TRAIN/DEV generator run and its controls; M015 acceptance M15-5 is not met, so M016 remains blocked.
+
+Run: generator `scripts/generate_m015_suite.py`, seed `150015`, 2,000 independent groups, output under ignored `target/m015-v3/`. Generator SHA-256: `960d35f63cf08c18077f22ad2ee6fadb4334060fcb34e827d5012f742e87974d`. Task-spec SHA-256: `018ea1fc80eed77a9a0bc1726aa06aa597bd5ac10c73674a7abaebe23016556f`. TRAIN: 1,800 groups / 3,600 rows, SHA-256 `ce777b2c8f2d3fca96c3798e30f5e628852f03a7c474315f09f826791129cf9a`. DEV: 200 groups / 400 rows, SHA-256 `66580b5f27bd5b51969d9812fe55ca5d4804a5b8dc272bbcd482474a258225b7`. All five source-defined families have 40 DEV groups (80 rows) each. No final partition was generated.
+
+Independent oracle disagreements: zero. The analyzer checked exact pair membership, group confinement, stable label and candidate IDs/semantics, nuisance perturbation, reverse option order, and per-row oracle targets. DEV accuracy is 0.20 (95% group bootstrap CI 0.145–0.260) for always-None, 0.60 (0.5725–0.630) for first-option, and 1.0 for the synthetic semantic oracle. The oracle is a correctness ceiling, not a learned model. The random paired-row construction means accuracy rows are correlated; group bootstrap is used.
+
+**Unmet M15-5:** the existing typed linear, cross, and compositional artifacts consume the established typed-task schema. This corpus currently has a separate source-defined rule descriptor/candidate representation and has not yet been projected into that schema or run through those model baselines. The analyzer correctly marks those baselines unsupported. No learned-model or quality conclusion is available, no candidate was selected, and no M017 final examples or labels were constructed. The harness/schema integration and its repeatable experiment run are required before M015 closure and M016 readiness.
+
+Focused command: `python3 -m unittest discover -s scripts -p 'test_m015_*.py'` (8 tests passed). Exact generation and analysis commands are in the M015 CI step. A prior run exposed and corrected a counterfactual candidate-ID regeneration defect; the superseded outputs remain ignored under earlier unique `target/m015*` paths and are not evidence.

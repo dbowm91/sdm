@@ -50,6 +50,13 @@ is shared by training and runtime inference.
 - Rank continues to score each caller-supplied candidate independently and retains
   multi-relevant labels.
 
+M015 defines a separate TRAIN/DEV-only research contract in
+[m015-task-spec-v1.md](m015-task-spec-v1.md). Its rule descriptors are
+source-defined and observable. Existing typed-task artifacts do not accept the
+M015 schema yet, so the M015 analyzer reports those learned baselines as
+unsupported until a shared feature contract is implemented and verified.
+M015 adds no inference architecture.
+
 Semantic experiments may set `quality_diagnostics: true` to record raw Choice
 logits/probabilities and answerability beside the actual final runtime decision
 and abstention. The default remains off to preserve historical M011 report

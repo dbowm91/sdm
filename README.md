@@ -39,6 +39,13 @@ versions also serve Binary, Choice, Score, and typed Rank heads. Multiple releva
 Rank candidates remain independent labels. Applications still own policy, authority,
 and abstention handling.
 
+M015 TinyChoice task semantics are defined in
+[the task specification](docs/m015-task-spec-v1.md). The TRAIN/DEV-only
+generator and independent oracle are in `scripts/generate_m015_suite.py`;
+partition checks and development diagnostics are in
+`scripts/analyze_m015_dev.py`. These are synthetic research artifacts, not
+CodeGG evidence or model qualification.
+
 ## Build and qualify
 
 ```sh
