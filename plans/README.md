@@ -2,7 +2,11 @@
 
 This directory follows the CodeGG planning and handoff convention as adapted in [003-planning-process.md](003-planning-process.md).
 
-**Start here:** [Registry](registry.md) -> [Roadmap](subsystems/general-decision-model-framework-roadmap.md) -> **[M014c closure](closure/general-decision-model-framework/014c-status.md) CLOSED (C1–C12 pass; PR #3 merged, merged-main green)**. M014a/b restored from closing to mechanically closed (negative, honest, original-byte ledger) via M014c C1–C9. Old CI 38408167153 FAILED (retained). M014b negative historically reported; consumed final NEVER rerun. M015 unregistered. See [plan](implementation/general-decision-model-framework/014c-closure-evidence-reconciliation.md), [audit](../docs/m014c-closure-audit.md), [ledger](../docs/m014c-evidence-ledger.json).
+**Start here:** [Registry](registry.md) -> [Roadmap](subsystems/general-decision-model-framework-roadmap.md) -> **[M014c closure](closure/general-decision-model-framework/014c-status.md) CLOSED (C1–C12 pass; PR #3 merged, merged-main green)**. M014a/b restored from closing to mechanically closed (negative, honest, original-byte ledger) via M014c C1–C9. Old CI 38408167153 FAILED (retained). M014b negative historically reported; consumed final NEVER rerun. **M015 research/corpus foundation is READY; M016 and M017 are blocked**, newly registered for standalone TinyChoice work. See [plan](implementation/general-decision-model-framework/014c-closure-evidence-reconciliation.md), [audit](../docs/m014c-closure-audit.md), [ledger](../docs/m014c-evidence-ledger.json).
+
+## Current standalone TinyChoice research handoff (2026-10-13)
+
+[Research basis](../docs/m015-small-model-research.md) — [M015 oracle-audited corpus and train/dev protocols](implementation/general-decision-model-framework/015-tinychoice-corpus-and-research-foundation.md) **READY** — [M016 native compact Choice/answerability and baselines](implementation/general-decision-model-framework/016-tinychoice-mlp-and-baseline-comparison.md) **BLOCKED on M015** — [M017 independent frozen prospective evaluation and parity](implementation/general-decision-model-framework/017-tinychoice-prospective-qualification-and-portability.md) **BLOCKED on M015/M016**. Choice retains its existing 2..128 valid-option requirement. No CodeGG corpus required and no historical FINAL test is rerun. This is planning-only on a feature branch; no model implementation or quality claim has landed.
 
 ## Completed handoffs
 
@@ -21,9 +25,9 @@ M007 is closed with generic synthetic qualification, slice calibration and train
 
 All four milestones are SDM-owned, use explicitly provided synthetic data, preserve v1 CodeGG compatibility, and have numbered closure files. M011 closes their implemented mechanics work; the new M012 workstream handles source-branch and release reconciliation without reopening M011 quality claims. No CodeGG corpus or checkout is needed.
 
-## Current closure — M014c mechanically closed (M014a/b restored; integration pending)
+## Completed M014c closure — merged to main (historical handoff)
 
-[M014c](implementation/general-decision-model-framework/014c-closure-evidence-reconciliation.md) is mechanically closed in [014c-status.md](closure/general-decision-model-framework/014c-status.md) (C1–C12 pass; PR #3 merged 91b0c3b, merged-main 38424519807 green; implementation af74c01 + fix d60d9c0 + docs 3d8db08). It orders canary CI (pure→gen→dependent + regression), replaces asserted with measured same-artifact attestation + aggregator + `canary-parity` job, records detached lineage with placeholder_unbound defect, and ledgers original final-report SHAs from original bytes. No old heldout rerun, no model retraining and no CodeGG change. M014a/b are closed (negative, honest, source merged via PR #3); full integration complete (hosted + PR + merged-main all green). M015 unregistered, M005 deferred, publication gated.
+[M014c](implementation/general-decision-model-framework/014c-closure-evidence-reconciliation.md) is mechanically closed in [014c-status.md](closure/general-decision-model-framework/014c-status.md) (C1–C12 pass; PR #3 merged 91b0c3b, merged-main 38424519807 green; implementation af74c01 + fix d60d9c0 + docs 3d8db08). It orders canary CI (pure→gen→dependent + regression), replaces asserted with measured same-artifact attestation + aggregator + `canary-parity` job, records detached lineage with placeholder_unbound defect, and ledgers original final-report SHAs from original bytes. No old heldout rerun, no model retraining and no CodeGG change. M014a/b are closed (negative, honest, source merged via PR #3); full integration complete (hosted + PR + merged-main all green). M015 now registered ready (see current handoff); M005 deferred, publication gated.
 
 ## Historical handoff (M014)
 
