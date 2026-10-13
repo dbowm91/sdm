@@ -249,6 +249,14 @@ jobs:
           mkdir -p target/m014c
           python3 scripts/verify_m014c_lineage.py --out target/m014c/lineage-verdict.json
           cat target/m014c/lineage-verdict.json
+      - name: Generate M014c parity evaluations (SAME committed bytes on all hosts)
+        run: |
+          # Evaluates SAME committed artifacts/m014/* bytes on locally generated
+          # (deterministic-identical) canary data. Canary-retrained Choice bytes
+          # differ across OSes, so parity MUST use committed bytes (plan B2).
+          # Outputs only target/m014a/canary/parity-*; never FINAL paths.
+          python3 scripts/m014c_parity_evaluate.py
+          ls -lh target/m014a/canary/parity-*.report.json
       - name: Generate M014c per-host canary attestation (same-artifact decisions)
         run: |
           mkdir -p target/m014a/canary target/m014c
@@ -258,9 +266,9 @@ jobs:
             macos-arm64) PLATFORM=macos-aarch64 ;;
             *) echo "unknown matrix ${{ matrix.name }}"; exit 1 ;;
           esac
-          python3 scripts/m014c_canary_attestation.py --platform "$PLATFORM" --out "target/m014a/canary/attestation-${{ matrix.name }}.json"
+          python3 scripts/m014c_canary_attestation.py --parity --platform "$PLATFORM" --out "target/m014a/canary/attestation-${{ matrix.name }}.json"
           test -f "target/m014a/canary/attestation-${{ matrix.name }}.json"
-          cat "target/m014a/canary/attestation-${{ matrix.name }}.json" | head -n 40
+          python3 -c "import json; a=json.load(open('target/m014a/canary/attestation-${{ matrix.name }}.json')); print('parity_mode:', a.get('parity_mode'), 'binary:', a['binary_case_count'], 'choice:', a['choice_case_count']); assert a.get('parity_mode') is True"
       - name: Verify M014b prospective freeze (no final rerun)
         run: |
           # Regenerate M014b cohort deterministically and verify freeze SHAs,

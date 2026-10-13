@@ -9,9 +9,11 @@ equality, then compares ACTUAL decisions by fixed case and candidate identity.
   {linux-x86_64, linux-aarch64, macos-aarch64}. Missing/duplicate host blocks pass.
 - Requires identical source_commit across hosts (same exact commit).
 - Requires identical test-membership/dataset/split SHAs (deterministic generation).
-- Records canary-trained artifact SHAs per host; if they differ, reports
-  artifact divergence separately (never compare independently retrained floats
-  as parity without flagging). Committed artifact SHAs must match exactly.
+- Records parity artifact SHAs per host (in --parity mode these are SAME
+  committed bytes; in default mode retrained canary bytes); if they differ,
+  reports artifact divergence separately (never compare independently
+  retrained floats as parity without flagging). Committed artifact SHAs must
+  match exactly.
 - Compares actual decisions: for each case_id, prediction and abstained must
   match exactly across hosts. Numerical probability/logit tolerances are
   recorded separately (f64) but NEVER allow a changed selected action/
@@ -195,7 +197,7 @@ def main(argv=None) -> int:
         "note": "Probabilities compared with tolerance separately; changed action/abstention never passes under tolerance. Host timings/RSS not compared.",
     }
     if artifact_divergence and not divergences:
-        ledger["reason"] = f"canary-trained artifact bytes differ across hosts ({len(artifact_divergence)} artifacts); not same-artifact evidence"
+        ledger["reason"] = f"parity artifact bytes differ across hosts ({len(artifact_divergence)} artifacts); not same-artifact evidence"
     elif divergences:
         first = divergences[0]
         ledger["reason"] = (f"decision divergence on {first['task']} {first['case_id']}: "
