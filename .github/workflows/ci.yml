@@ -317,6 +317,21 @@ jobs:
           assert comp['disposition'] in ('positive-dev-only', 'needs-review'), comp['disposition']
           print('M016 comparison verified: disposition=' + comp['disposition'])
           PY
+      - name: Upload M016 evidence (always, for fixture audit)
+        if: matrix.name == 'linux-x64' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m016-evidence-${{ matrix.name }}
+          path: |
+            target/m016/m016-comparison.json
+            target/m016/m016-train-spec.json
+            target/m016/tree-report.json
+            target/m016/tree-baseline.json
+            target/m016/typed-choice-tinymlp.sidecar.json
+            target/m016/typed-choice.sidecar.json
+            target/m016/train/m016-train-report.json
+            target/m016/train/tinymlp-*.artifact.json
+            target/m016-stdout.json
       - name: Verify M016 same-artifact parity sample (all hosts)
         run: cargo test -p sdm-runtime --locked tinymlp_fixture_parity
       - name: Generate M014a DEV-CANARY (provision artifacts before dependent tests)

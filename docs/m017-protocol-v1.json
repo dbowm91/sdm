@@ -1,0 +1,63 @@
+{
+  "schema": "sdm-m017-protocol-v1",
+  "description": "Preregistered M017 prospective synthetic qualification. Frozen before any final labels are used for inference. All comparisons paired by leakage group (row metrics) or pair id (pair metrics) with 95% percentile bootstrap CIs (seed 170018, 2000 replicates, sorted).",
+  "cohort": {
+    "generator": "scripts/generate_m017_suite.py",
+    "canary": {"groups": 60, "seed": 170017},
+    "final": {"groups": 1000, "seed": 170018},
+    "minimum_eligible_groups_per_family_per_primary_metric": 150
+  },
+  "models": {
+    "primary": "typed-choice-tinymlp (frozen fixture fixtures/m016-tinymlp-selected.artifact.json, DEV threshold 0.63)",
+    "baselines": ["typed-choice", "typed-choice-cross", "typed-choice-compositional"],
+    "research_only": ["shallow-gbdt-tree (refit TRAIN/DEV only, exploratory, unadjusted)"]
+  },
+  "family_taxonomy": [
+    "m017-all_required-v1",
+    "m017-any_required-v1",
+    "m017-exclusive-v1",
+    "m017-threshold-v1",
+    "m017-category_and_flag-v1"
+  ],
+  "tracks": {
+    "fixed_rule": ["m017-all_required-v1", "m017-any_required-v1", "m017-threshold-v1", "m017-category_and_flag-v1"],
+    "rule_conditioned": ["m017-exclusive-v1"]
+  },
+  "primary_estimands": [
+    {
+      "id": "P1",
+      "metric": "dev_answerable_final_accuracy_v2 (final partition)",
+      "comparison": "tinymlp minus each legacy head, paired leakage-group bootstrap",
+      "directionality": "superiority",
+      "success": "lower 95% CI bound > 0.10 for all three legacy heads (Holm-Bonferroni over 3)",
+      "note": "DEV observed diff +0.333; margin 0.10 requires a substantial replicated effect"
+    }
+  ],
+  "secondary_gates": [
+    {"id": "S1", "metric": "no-answer recall (final)", "gate": "point >= 0.90", "note": "DEV 0.9875"},
+    {"id": "S2", "metric": "causal both-final-correct (final)", "gate": "point >= 0.75", "note": "DEV 0.9812; legacy DEV 0.0"},
+    {"id": "S3", "metric": "nuisance both-final-correct (final)", "gate": "point >= 0.95", "note": "DEV 1.0"},
+    {"id": "S4", "metric": "answerability AUROC (final)", "gate": "point >= 0.95", "note": "DEV 0.9997"},
+    {"id": "S5", "metric": "answerability ECE 10-bin (final)", "gate": "point <= 0.05", "note": "DEV 0.0113"},
+    {"id": "S6", "metric": "rule-conditioned (exclusive) answerable final accuracy", "gate": "point >= 0.80", "note": "compositional generalization track; DEV per-family 1.0"}
+  ],
+  "negative_controls": [
+    {"id": "N1", "metric": "context-only conditional accuracy (eval-time zeroing, final)", "gate": "point < 0.60", "note": "must not solve choice from context alone; DEV 0.29"},
+    {"id": "N2", "metric": "raw-logit causal responsiveness", "gate": "conditional argmax differs across causal flips on > 50% of pairs", "note": "rejects flip-invariant models; DEV consistency low by design"},
+    {"id": "N3", "metric": "rule-hidden impossibility control", "note": "informational only; contradictions are not a primary failure"}
+  ],
+  "calibration_reporting": ["conditional NLL", "conditional Brier", "answerability log-loss", "answerability Brier", "coverage/AURC"],
+  "operating_threshold": "0.63 from M016 DEV (frozen in artifact calibration; no final retuning)",
+  "resource_ceilings": {
+    "p50_inference_ms_128_options": 1.0,
+    "peak_rss_mb": 500,
+    "artifact_bytes": 16777216,
+    "parameters": 1000000
+  },
+  "verdicts": {
+    "fixed_rule_robustness": "PASS iff P1 success on fixed-rule families AND S1..S5 pass; else FAIL (or INDETERMINATE if any required family under minimum support)",
+    "rule_conditioned_composition": "PASS iff S6 passes on the exclusive track; else FAIL (or INDETERMINATE if under-supported)",
+    "overall": "synthetic-only positive iff both tracks PASS; negative if any track FAILs on powered support; indeterminate on freeze violation, missing family, leakage, or interrupted inference"
+  },
+  "forbidden": ["training on final/canary", "threshold/feature/hyperparameter changes after freeze", "rerun on the cohort for any reason", "test-family ID features", "CodeGG/corpus/publication claims"]
+}
