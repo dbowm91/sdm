@@ -2,7 +2,7 @@
 
 This directory follows the CodeGG planning and handoff convention as adapted in [003-planning-process.md](003-planning-process.md).
 
-**Start here:** [Registry](registry.md) -> [Roadmap](subsystems/general-decision-model-framework-roadmap.md) -> **[M014c closure](closure/general-decision-model-framework/014c-status.md) MECHANICALLY CLOSED (C1–C10 pass, hosted green; C11–C12 pending)**. M014a/b restored from closing to mechanically closed (negative, honest, original-byte ledger) via M014c C1–C9. Old CI 38408167153 FAILED (retained). M014b negative historically reported; consumed final NEVER rerun. M015 unregistered. See [plan](implementation/general-decision-model-framework/014c-closure-evidence-reconciliation.md), [audit](../docs/m014c-closure-audit.md), [ledger](../docs/m014c-evidence-ledger.json).
+**Start here:** [Registry](registry.md) -> [Roadmap](subsystems/general-decision-model-framework-roadmap.md) -> **[M014c closure](closure/general-decision-model-framework/014c-status.md) CLOSED (C1–C12 pass; PR #3 merged, merged-main green)**. M014a/b restored from closing to mechanically closed (negative, honest, original-byte ledger) via M014c C1–C9. Old CI 38408167153 FAILED (retained). M014b negative historically reported; consumed final NEVER rerun. M015 unregistered. See [plan](implementation/general-decision-model-framework/014c-closure-evidence-reconciliation.md), [audit](../docs/m014c-closure-audit.md), [ledger](../docs/m014c-evidence-ledger.json).
 
 ## Completed handoffs
 
@@ -23,7 +23,7 @@ All four milestones are SDM-owned, use explicitly provided synthetic data, prese
 
 ## Current closure — M014c mechanically closed (M014a/b restored; integration pending)
 
-[M014c](implementation/general-decision-model-framework/014c-closure-evidence-reconciliation.md) is mechanically closed in [014c-status.md](closure/general-decision-model-framework/014c-status.md) (C1–C10 pass with hosted green 38418968150 on d60d9c0; C11–C12 pending PR/merge; implementation af74c01 + fix d60d9c0). It orders canary CI (pure→gen→dependent + regression), replaces asserted with measured same-artifact attestation + aggregator + `canary-parity` job, records detached lineage with placeholder_unbound defect, and ledgers original final-report SHAs from original bytes. No old heldout rerun, no model retraining and no CodeGG change. M014a/b are mechanically closed (negative, honest) conditional on C1–C9; full integration requires hosted green + one reviewed M014a–c PR + merge. M015 unregistered, M005 deferred, publication gated.
+[M014c](implementation/general-decision-model-framework/014c-closure-evidence-reconciliation.md) is mechanically closed in [014c-status.md](closure/general-decision-model-framework/014c-status.md) (C1–C12 pass; PR #3 merged 91b0c3b, merged-main 38424519807 green; implementation af74c01 + fix d60d9c0 + docs 3d8db08). It orders canary CI (pure→gen→dependent + regression), replaces asserted with measured same-artifact attestation + aggregator + `canary-parity` job, records detached lineage with placeholder_unbound defect, and ledgers original final-report SHAs from original bytes. No old heldout rerun, no model retraining and no CodeGG change. M014a/b are closed (negative, honest, source merged via PR #3); full integration complete (hosted + PR + merged-main all green). M015 unregistered, M005 deferred, publication gated.
 
 ## Historical handoff (M014)
 

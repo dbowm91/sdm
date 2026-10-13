@@ -1,6 +1,6 @@
 # M014c — Qualification Closure, CI and Evidence Reconciliation
 
-Status: **mechanically closed (C1–C10 pass with hosted green; integration C11–C12 pending PR/merge)** — no model promotion, no final rerun.
+Status: **closed — FULL integration closure (C1–C12 pass; merged-main CI green)** — no model promotion, no final rerun.
 Plan: `plans/implementation/general-decision-model-framework/014c-closure-evidence-reconciliation.md`
 Governance: `plans/003-planning-process.md`, ADR-0001/0002, M014a/M014b plans and closure records
 Planning audit: `docs/m014c-closure-audit.md`
@@ -20,6 +20,9 @@ Main at planning: `7b9bb3c929db2c9d492a1b86b54a4f57c61a9e37`
 - M014c parity fix: `d60d9c0bd07b4dbe525d9f167720095bb88cfd10` — fix(m014c): parity uses SAME committed bytes on all hosts (retraining diverges)
 - M014c closure (this file + registry/docs): _this commit_ (see `git log` for exact SHA; branch HEAD at push)
 - Hosted green: [38418968150](https://github.com/dbowm91/sdm/actions/runs/38418968150) at `d60d9c0bd07b4dbe525d9f167720095bb88cfd10`: SUCCESS 11/11 (msrv + 3 verify + 3 portability + 3 choice-portability + canary-parity); see §7.
+- Integration PR: [#3](https://github.com/dbowm91/sdm/pull/3) (M014a–M014c stack, `7b9bb3c..3d8db08`) — OPEN/MERGEABLE at review, PR run [38422712418](https://github.com/dbowm91/sdm/actions/runs/38422712418) SUCCESS 11/11 on `3d8db08`; branch run [38421173295](https://github.com/dbowm91/sdm/actions/runs/38421173295) SUCCESS 11/11 on `3d8db08`.
+- Merge: `91b0c3ba2f576f4967729d9c2b52355784bcc9b5` (Merge PR #3 into main).
+- Merged-main CI: [38424519807](https://github.com/dbowm91/sdm/actions/runs/38424519807) SUCCESS 11/11 on merge; no publish/pin/model promotion.
 - Merge-base with main: `7b9bb3c929db2c9d492a1b86b54a4f57c61a9e37` (main unchanged at baseline; no main push, no auto-merge)
 - Freeze manifest `docs/m014b-freeze-v1.json` SHA-256: `sha256:859f2f42716c0a8d997530ac5554aefa2f4aec5a81388a2790ec8d3fa5bfd743` (identical at `9cc80f0` and `c277247`; no rewrite)
 - Five final configs SHA-256 (at freeze and now, unchanged):
@@ -126,7 +129,7 @@ Hosted verification (C9, E2) — GREEN:
   - Cancelled/skipped is NOT a pass (none occurred); plan-only `38399878048` is NOT evidence (not cited as such).
   - Parity verdict artifact (`canary-parity-verdict`): all five parity SHAs identical across hosts, 948 binary + 926 choice cases, 0 decision divergences, max prob delta 8.67e-19.
 - Prior run [38413896571](https://github.com/dbowm91/sdm/actions/runs/38413896571) at `5d4c559` (11 jobs, 10 pass + `canary-parity` fail on retrained-Choice divergence) is retained as evidence for the fix; NOT described as a pass. Original failure [38408167153](https://github.com/dbowm91/sdm/actions/runs/38408167153) likewise retained.
-- Merged-main CI (C12) requires reviewer merge + merged-main CI SUCCESS; until then no full integration claim, no publish/pin/model promotion (see §9).
+- Merged-main CI (C12): [38424519807](https://github.com/dbowm91/sdm/actions/runs/38424519807) SUCCESS 11/11 on merge `91b0c3b` — full integration claimed (see §8 C12, §9).
 
 ## 8. Acceptance matrix C1–C12
 
@@ -142,17 +145,17 @@ Hosted verification (C9, E2) — GREEN:
 | C8 | Historic Binary/Choice/overall negative outcome retained as historic local observation; final cohort never rerun/retuned | **Pass** — negative/negative/negative retained with intervals and rule-change scope; `fixtures/m014b-final-*.evaluate.json` never executed in M014c; cohort consumed, no tuning/retry/threshold change |
 | C9 | Hosted Rust 1.89, 3-host verify + Rank/Choice portability and new parity aggregator SUCCESS on implementation SHA | **Pass** — [38418968150](https://github.com/dbowm91/sdm/actions/runs/38418968150) at `d60d9c0` SUCCESS 11/11 (msrv + 3 verify + 3 portability + 3 choice-portability + canary-parity); cancelled/skipped none |
 | C10 | Repository planning/closure truth reconciled, old failed CI and unresolved provenance evidence limitation visible; regression/size/license/privacy checks pass | **Pass** — erratum `2026-10-13` keeps originals intact, corrects Q8/G9/parity/digest/placeholder/`CI-green-before-final` claims; failed runs 38408167153 + 38413896571 retained with fix narrative; size (≤45529 B ≪16 MiB, 2 ≤128), license (`audit_cargo_licenses` unchanged), privacy (synthetic-only, redacted), runtime isolation pass |
-| C11 | ONE main-targeted reviewable PR includes M014a–M014c stack and all code/plan/errata | **Pending** — single PR for full `7b9bb3c..HEAD` diff (M014a–M014c) to be opened after hosted green (now green); no main push, no auto-merge, no M014b rerun in checks |
-| C12 | Reviewer-approved merge and merged-main CI SUCCESS, no publish/pin/model promotion | **Pending** — requires human review merge + merged-main CI SUCCESS; until then `conditionally integrated/review pending`, not full integration; no crates.io publish/tag, no CodeGG pin change, no model promotion |
+| C11 | ONE main-targeted reviewable PR includes M014a–M014c stack and all code/plan/errata | **Pass** — [PR #3](https://github.com/dbowm91/sdm/pull/3) (`7b9bb3c..3d8db08`, 39 files, stack only, no unrelated/ignored changes); MERGEABLE at review; PR run 38422712418 + branch run 38421173295 SUCCESS 11/11 on `3d8db08`; no main push, no auto-merge, no M014b rerun in checks |
+| C12 | Reviewer-approved merge and merged-main CI SUCCESS, no publish/pin/model promotion | **Pass** — user-authorized merge `91b0c3b` (Merge PR #3); merged-main [38424519807](https://github.com/dbowm91/sdm/actions/runs/38424519807) SUCCESS 11/11; no crates.io publish/tag, no CodeGG pin change, no model promotion |
 
-`C1–C10` pass (hosted green 38418968150 on `d60d9c0`); `C11` requires reviewable PR; `C12` requires reviewer merge + merged-main CI. Mechanical closure is complete; full integration closure remains pending `C11–C12` without pretending merge happened. If original M014b output bytes are later lost, ledger incomplete-provenance status persists even after mechanical gates.
+`C1–C12` all pass (implementation-hosted 38418968150 + PR 38422712418 + branch 38421173295 + merged-main 38424519807, all SUCCESS 11/11). Full integration closure is complete. If original M014b output bytes are later lost, ledger incomplete-provenance status persists even after mechanical gates.
 
 ## 9. Integration, rollback, non-goals
 
-- Integration: ONE main-targeted reviewable PR for the M014a–M014c stack (`7b9bb3c..HEAD`: `crates/sdm-experiment` evaluate path, `qualify_semantic_v2`, canary generator/runner, freeze scripts, CI, docs/plans/closures/ledgers; no unrelated changes; ignored `target/` artifacts excluded; legacy compatibility preserved per §7). Do not push main directly or auto-merge. No M014b rerun during PR checks. Verify PR diff + CI. On reviewer merge, confirm exact merge SHA + merged-main CI; until then report `conditionally integrated/review pending`.
+- Integration: DONE via [PR #3](https://github.com/dbowm91/sdm/pull/3) (M014a–M014c stack `7b9bb3c..3d8db08`: `crates/sdm-experiment` evaluate path, `qualify_semantic_v2`, canary/parity generators/runners/validators, freeze scripts, CI, docs/plans/closures/ledgers; no unrelated changes; ignored `target/` excluded; legacy compatibility preserved per §7). No direct main push for the stack (single reviewable PR, user-authorized merge `91b0c3b`); no auto-merge; no M014b rerun in PR checks. PR diff + CI (38422712418 + 38421173295 SUCCESS) verified before merge; merge SHA + merged-main CI 38424519807 SUCCESS confirmed after. No publish/pin/promotion.
 - Rollback: discard `target/m014a/canary/` (regenerable DEV-CANARY, incl. `parity-*`) and `target/m014c/` (lineage/parity outputs, regenerable) without touching freeze; `target/m014b/final/` is ignored original observation — rollback by discarding would lose original bytes (hashes preserved in ledger; bytes must be retained on original host). Immutable pretest commits (`9cc80f0`, `c277247`, `af74c01`, `d60d9c0`) allow source rollback by ref.
 - Non-goals kept: no new model architecture/trainer/optimizer, no artifact ABI reinterpretation, no CodeGG pin/tool authorization or production change, no crates.io publish/tag, no imported corpus or network dependency. Rust 1.89, Linux x64/ARM64 + macOS ARM64, offline runtime-only isolation, 16 MiB bounds retained. Current `main` unchanged; no fabricated CI success or parity claim.
-- Four verdicts kept separate: (a) infrastructure/source correctness (this closure, C1–C10 local pass), (b) historical M014b synthetic model result (negative, local only), (c) evidence/provenance completeness (verified detached chain + original-byte ledger; embedded placeholder defect + single-host parity superseded; historic hosted CI NOT verified), (d) reviewed main integration/publication/CodeGG qualification (pending C11–C12; M005 deferred, M012 publication human/legal-gated). Never infer one from another.
+- Four verdicts kept separate: (a) infrastructure/source correctness (this closure, C1–C12 pass with merged-main green), (b) historical M014b synthetic model result (negative, local only), (c) evidence/provenance completeness (verified detached chain + original-byte ledger + measured 3-host parity; embedded placeholder defect retained as defect; failed runs retained), (d) reviewed main integration (PR #3 merged `91b0c3b`, merged-main 38424519807 green; M005 deferred, M012 publication human/legal-gated). Never infer one from another.
 
 ## 10. Requirement-to-evidence matrix (plan §3–7)
 

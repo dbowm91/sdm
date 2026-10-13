@@ -1,6 +1,6 @@
 # M014c — Qualification Closure, CI and Evidence Reconciliation
 
-Status: **mechanically closed** — implemented in af74c01, C1–C8+C10 local pass; C9/C11/C12 pending push/review/merge; closure plans/closure/general-decision-model-framework/014c-status.md. This file is retained as the implementation handoff of record.
+Status: **closed** — implemented in af74c01 + fix d60d9c0 + docs 3d8db08, C1–C12 pass (PR #3 merged 91b0c3b, merged-main 38424519807 green); closure plans/closure/general-decision-model-framework/014c-status.md. This file is retained as the implementation handoff of record.
 Primary class: infrastructure / evidence integrity corrective
 Repository: `dbowm91/sdm`
 Planning baseline: `work/plans-sdm-m014a-m014b-qualification-recovery@c27724746ebc674919aff32a93d6baf74e104e13` (five commits ahead of main)
