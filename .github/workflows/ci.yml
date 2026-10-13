@@ -201,13 +201,25 @@ jobs:
       - name: Verify M013d bootstrap percentile repair
         if: hashFiles('target/m013a/*.report.json') != ''
         run: python3 -m unittest discover -s scripts -p 'test_m013d_*.py'
-      - name: Verify M014 representability proof
-        run: python3 -m unittest discover -s scripts -p 'test_m014_*.py'
-      - name: Verify M014a frozen-artifact evaluator and DEV-CANARY
+      - name: Verify M014 representability proof (pure, no canary artifacts)
         run: |
-          python3 -m unittest discover -s scripts -p 'test_m014a_*.py'
+          # Pure unit tests only: no target/m014a/canary/* dependency.
+          # Explicit file patterns (never the broad test_m014_*.py wildcard,
+          # which also matches artifact-backed test_m014a_canary.py and
+          # reproduces hosted run 38408167153 on clean checkouts).
+          python3 -m unittest discover -s scripts -p 'test_m014_representability.py'
+          python3 -m unittest discover -s scripts -p 'test_m014_suite.py'
+          python3 -m unittest discover -s scripts -p 'test_m014a_analyzer.py'
+      - name: Generate M014a DEV-CANARY (provision artifacts before dependent tests)
+        run: |
+          # Deterministically creates target/m014a/canary/* on every matrix host.
+          # Must succeed before any artifact-backed test; fails the job otherwise.
+          # Regenerates safely and only deletes its own DEV-CANARY artifacts;
+          # NEVER removes M014b final or earlier M014 paths.
           python3 scripts/run_m014a_dev_canary.py
           test -f target/m014a/canary/qualification.json
+          test -f target/m014a/canary/manifest.json
+          test -f target/m014a/canary/resource-evidence.json
           python3 - <<'PY'
           import json
           qual = json.load(open('target/m014a/canary/qualification.json'))
@@ -216,6 +228,39 @@ jobs:
           assert qual['overall_verdict'] == 'indeterminate'
           print("M014a DEV-CANARY verified: Binary positive, Choice indeterminate, all gates present")
           PY
+          echo "--- per-host canary evidence (source test vs workload distinguished) ---"
+          git rev-parse HEAD
+          rustc -Vv
+          uname -a
+          python3 - <<'PY'
+          import json, hashlib, pathlib
+          def fsha(p): return "sha256:"+hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
+          print("manifest:", fsha("target/m014a/canary/manifest.json"))
+          print("qualification:", fsha("target/m014a/canary/qualification.json"))
+          for n in ("eval-binary-mask","eval-binary-baseline","eval-choice-compositional","eval-choice-legacy","eval-choice-cross"):
+              print(n, fsha(f"target/m014a/canary/{n}.report.json"))
+          PY
+      - name: Verify M014a artifact-backed canary tests (requires generated canary)
+        run: python3 -m unittest discover -s scripts -p 'test_m014a_canary.py'
+      - name: Enforce M014a CI ordering (regression)
+        run: python3 scripts/check_m014a_ci_order.py
+      - name: Verify M014c lineage (read-only, no final rerun)
+        run: |
+          mkdir -p target/m014c
+          python3 scripts/verify_m014c_lineage.py --out target/m014c/lineage-verdict.json
+          cat target/m014c/lineage-verdict.json
+      - name: Generate M014c per-host canary attestation (same-artifact decisions)
+        run: |
+          mkdir -p target/m014a/canary target/m014c
+          case "${{ matrix.name }}" in
+            linux-x64) PLATFORM=linux-x86_64 ;;
+            linux-arm64) PLATFORM=linux-aarch64 ;;
+            macos-arm64) PLATFORM=macos-aarch64 ;;
+            *) echo "unknown matrix ${{ matrix.name }}"; exit 1 ;;
+          esac
+          python3 scripts/m014c_canary_attestation.py --platform "$PLATFORM" --out "target/m014a/canary/attestation-${{ matrix.name }}.json"
+          test -f "target/m014a/canary/attestation-${{ matrix.name }}.json"
+          cat "target/m014a/canary/attestation-${{ matrix.name }}.json" | head -n 40
       - name: Verify M014b prospective freeze (no final rerun)
         run: |
           # Regenerate M014b cohort deterministically and verify freeze SHAs,
@@ -275,6 +320,41 @@ jobs:
             target/m014b/
             target/m013b/
             target/m013c/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: canary-attestation-${{ matrix.name }}
+          path: target/m014a/canary/attestation-${{ matrix.name }}.json
+  canary-parity:
+    needs: verify
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: canary-attestation-linux-x64
+          path: parity-inputs/linux-x64
+      - uses: actions/download-artifact@v4
+        with:
+          name: canary-attestation-linux-arm64
+          path: parity-inputs/linux-arm64
+      - uses: actions/download-artifact@v4
+        with:
+          name: canary-attestation-macos-arm64
+          path: parity-inputs/macos-arm64
+      - name: Verify three-host same-artifact parity (M014c B3)
+        run: |
+          ls -R parity-inputs
+          mkdir -p target/m014c
+          python3 scripts/verify_m014c_parity.py \
+            --inputs parity-inputs/linux-x64/attestation-linux-x64.json parity-inputs/linux-arm64/attestation-linux-arm64.json parity-inputs/macos-arm64/attestation-macos-arm64.json \
+            --out target/m014c/parity-verdict.json
+          cat target/m014c/parity-verdict.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: canary-parity-verdict
+          path: target/m014c/parity-verdict.json
   portability:
     needs: verify
     strategy:

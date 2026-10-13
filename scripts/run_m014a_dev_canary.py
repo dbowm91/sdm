@@ -181,8 +181,13 @@ def main() -> int:
     max_bytes = max((ROOT/f"target/m014a/canary/candidates/{n}.artifact.json").stat().st_size for n in ["canary-binary-mask","canary-binary-baseline","canary-choice-compositional","canary-choice-legacy","canary-choice-cross"])
     host = subprocess.run(["uname","-a"], capture_output=True, text=True).stdout.strip()
     rustc = subprocess.run(["rustc","-V"], capture_output=True, text=True).stdout.strip()
-    evidence = {"artifact_bytes": max_bytes, "max_options": 2, "p95_128_micros": p95_128, "peak_rss_bytes": bench["peak_rss_bytes"], "cold_load_micros": bench["cold_load_micros"], "host": host, "build": rustc, "three_host_parity": True,
-                "note": "Real benchmark_typed_choice on canary compositional; determinism proven via identical report_sha on rerun; three-host CI verifies parity."}
+    # M014c B4: NEVER assert three_host_parity=true from a single host.
+    # Single-host determinism is proven via identical report_sha on rerun (below);
+    # real cross-host parity requires the downstream three-host attestation
+    # aggregator (scripts/verify_m014c_parity.py). Provisional indeterminate
+    # due to unverified parity is correct; the analyzer remains fail-closed.
+    evidence = {"artifact_bytes": max_bytes, "max_options": 2, "p95_128_micros": p95_128, "peak_rss_bytes": bench["peak_rss_bytes"], "cold_load_micros": bench["cold_load_micros"], "host": host, "build": rustc, "three_host_parity": False,
+                "note": "Real benchmark_typed_choice on canary compositional; determinism proven via identical report_sha on rerun; three_host_parity=false means UNVERIFIED single-host (M014c B4) — real parity requires downstream three-host attestation aggregation, never a single-host literal."}
     (CANARY/"resource-evidence.json").write_text(json.dumps(evidence, indent=2, sort_keys=True)+"\n")
     # 8. Analyzer with no manual repair.
     if (CANARY/"qualification.json").exists():
