@@ -17,6 +17,17 @@ use std::{
 
 pub const MAX_CONFIG_BYTES: usize = 1024 * 1024;
 
+use std::cell::Cell;
+thread_local! {
+    static M014A_TRAP: Cell<bool> = const { Cell::new(false) };
+}
+/// Test-only fail-trainer trap (thread-local, no cross-test interference).
+/// When set, any reachable training call must fail; evaluate never sets it.
+#[doc(hidden)]
+pub fn __m014a_set_trap(value: bool) {
+    M014A_TRAP.set(value);
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExperimentSpec {
     pub dataset_path: String,
@@ -739,6 +750,15 @@ fn train_typed_task(
     seeded_epoch_order: bool,
     quality_diagnostics: bool,
 ) -> Result<TypedTaskModel, ExperimentError> {
+    // M014a fail-trainer trap: when this marker is set, any reachable training
+    // call must fail. The inference-only evaluate path never calls this
+    // function, so setting the marker and calling evaluate proves G1.
+    // Thread-local trap is test-isolated; env var is a manual backstop.
+    if M014A_TRAP.get() || std::env::var("SDM_M014A_FAIL_TRAINER_TRAP").is_ok() {
+        return Err(ExperimentError::Invalid(
+            "trainer trap triggered: training is unreachable from evaluate-only path".into(),
+        ));
+    }
     let first = train
         .first()
         .and_then(|e| e.typed_rank_features.as_ref())
@@ -1696,6 +1716,527 @@ pub fn run_semantic(
     Ok(report)
 }
 
+// ---------------------------------------------------------------------------
+// M014a inference-only frozen evaluation (G1/G2/G3)
+// ---------------------------------------------------------------------------
+
+/// Inference-only evaluation against an EXACT previously frozen artifact.
+///
+/// This config MUST NOT accept training fields. `deny_unknown_fields` makes
+/// `epochs`, `learning_rate`, optimizer policy, re-fitting flags or an
+/// artifact output path a parse error rather than a silently ignored field.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct EvaluateSpec {
+    pub dataset_path: String,
+    pub split_path: String,
+    /// Input frozen artifact bytes (read-only; never rewritten).
+    pub artifact_path: String,
+    /// Unique output report path (must not exist; atomic write, no overwrite).
+    pub report_path: String,
+    pub expected_artifact_sha256: String,
+    pub expected_dataset_sha256: String,
+    pub expected_split_fingerprint: String,
+    pub expected_test_membership_sha256: String,
+    /// Spec architecture: typed-binary, typed-choice, typed-choice-cross,
+    /// typed-choice-compositional, typed-score.
+    pub expected_architecture: String,
+    /// Envelope architecture: sdm-typed-task-v1,
+    /// sdm-typed-choice-cross-v1, sdm-typed-choice-compositional-v1.
+    pub expected_artifact_architecture: String,
+    pub expected_feature_schema_sha256: String,
+    pub expected_calibration_sha256: String,
+    pub protocol_sha256: String,
+    pub freeze_sha256: String,
+    pub provenance: Provenance,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SemanticEvaluateOutcome {
+    pub case_id: String,
+    pub leakage_group: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub family: Option<String>,
+    pub target: serde_json::Value,
+    pub prediction: serde_json::Value,
+    pub score: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub raw_probabilities: Option<Vec<f64>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub raw_logits: Option<Vec<f64>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub answerability_probability: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub nuisance_probabilities: Option<BTreeMap<String, f64>>,
+    pub abstained: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SemanticEvaluateManifest {
+    pub schema: String,
+    pub schema_version: u16,
+    /// Always "test" for accepted inference-only evaluation.
+    pub evaluated_partition: String,
+    /// Always true, serialized explicitly (no skip) so the new contract is
+    /// distinguishable from the legacy omitted-true serialization.
+    #[serde(default = "default_true")]
+    pub test_evaluation_performed: bool,
+    pub dataset_sha256: String,
+    pub split_fingerprint: String,
+    pub test_membership_sha256: String,
+    pub protocol_sha256: String,
+    pub freeze_sha256: String,
+    pub architecture: String,
+    pub artifact_architecture: String,
+    pub semantic: String,
+    pub train_ids: Vec<String>,
+    pub dev_ids: Vec<String>,
+    pub test_ids: Vec<String>,
+    pub model_sha256: String,
+    pub calibration_sha256: String,
+    pub artifact_sha256: String,
+    pub loaded_artifact_sha256: String,
+    pub required_feature_schema_sha256: String,
+    pub report_sha256: String,
+    pub metrics: SemanticMetrics,
+    pub abstentions: usize,
+    pub outcomes: Vec<SemanticEvaluateOutcome>,
+    pub verdict: String,
+}
+
+pub fn test_membership_sha256(test_ids: &[String]) -> String {
+    let mut sorted = test_ids.to_vec();
+    sorted.sort();
+    format!(
+        "sha256:{:x}",
+        Sha256::digest(serde_json::to_vec(&sorted).unwrap_or_default())
+    )
+}
+
+fn validate_sha_format(value: &str, what: &str) -> Result<(), ExperimentError> {
+    if !value.starts_with("sha256:") || value.len() != 71 {
+        return Err(ExperimentError::Invalid(format!(
+            "{what} must be sha256:<64 hex>"
+        )));
+    }
+    if !value[7..].chars().all(|c| c.is_ascii_hexdigit()) {
+        return Err(ExperimentError::Invalid(format!("{what} contains non-hex")));
+    }
+    Ok(())
+}
+
+fn expected_envelope_architecture(spec_arch: &str) -> Option<&'static str> {
+    match spec_arch {
+        "typed-binary" | "typed-choice" | "typed-score" => Some("sdm-typed-task-v1"),
+        "typed-choice-cross" => Some("sdm-typed-choice-cross-v1"),
+        "typed-choice-compositional" => Some("sdm-typed-choice-compositional-v1"),
+        _ => None,
+    }
+}
+
+pub fn run_evaluate(spec: &EvaluateSpec) -> Result<SemanticEvaluateManifest, ExperimentError> {
+    for (value, what) in [
+        (&spec.expected_artifact_sha256, "expected_artifact_sha256"),
+        (&spec.expected_dataset_sha256, "expected_dataset_sha256"),
+        (
+            &spec.expected_test_membership_sha256,
+            "expected_test_membership_sha256",
+        ),
+        (
+            &spec.expected_feature_schema_sha256,
+            "expected_feature_schema_sha256",
+        ),
+        (
+            &spec.expected_calibration_sha256,
+            "expected_calibration_sha256",
+        ),
+        (&spec.protocol_sha256, "protocol_sha256"),
+        (&spec.freeze_sha256, "freeze_sha256"),
+    ] {
+        validate_sha_format(value, what)?;
+    }
+    validate_sha_format(
+        &spec.expected_split_fingerprint,
+        "expected_split_fingerprint",
+    )?;
+    let task = semantic_task(&spec.expected_architecture)
+        .ok_or_else(|| ExperimentError::Invalid("unsupported evaluate architecture".into()))?;
+    let envelope_arch = expected_envelope_architecture(&spec.expected_architecture)
+        .ok_or_else(|| ExperimentError::Invalid("unsupported evaluate architecture".into()))?;
+    if spec.expected_artifact_architecture != envelope_arch {
+        return Err(ExperimentError::Invalid(format!(
+            "expected_artifact_architecture {} does not match spec architecture {} (need {})",
+            spec.expected_artifact_architecture, spec.expected_architecture, envelope_arch
+        )));
+    }
+    // Bounded read-only artifact bytes; validate SHA BEFORE any inference.
+    let artifact_bytes = {
+        let mut buf = Vec::new();
+        fs::File::open(&spec.artifact_path)?
+            .take((sdm_runtime::V2_MAX_ARTIFACT_BYTES + 1) as u64)
+            .read_to_end(&mut buf)?;
+        if buf.len() > sdm_runtime::V2_MAX_ARTIFACT_BYTES {
+            return Err(ExperimentError::Invalid(
+                "artifact exceeds 16MiB v2 bound".into(),
+            ));
+        }
+        buf
+    };
+    let actual_artifact_sha = format!("sha256:{:x}", Sha256::digest(&artifact_bytes));
+    if actual_artifact_sha != spec.expected_artifact_sha256 {
+        return Err(ExperimentError::Invalid(format!(
+            "artifact SHA mismatch: expected {} got {}",
+            spec.expected_artifact_sha256, actual_artifact_sha
+        )));
+    }
+    // Dataset + split provenance, disjoint groups, exact test membership.
+    let mut raw = Vec::new();
+    fs::File::open(&spec.dataset_path)?
+        .take((sdm_data::MAX_DATASET_BYTES + 1) as u64)
+        .read_to_end(&mut raw)?;
+    let bundle: serde_json::Value = serde_json::from_slice(&raw)?;
+    let provenance: Provenance = serde_json::from_value(bundle["provenance"].clone())?;
+    let examples: Vec<DatasetExample> = serde_json::from_value(bundle["examples"].clone())?;
+    if provenance != spec.provenance {
+        return Err(ExperimentError::Invalid(
+            "config provenance differs from dataset".into(),
+        ));
+    }
+    let computed_dataset_sha = validate_dataset(&examples, &provenance)
+        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+    if computed_dataset_sha != spec.expected_dataset_sha256 {
+        return Err(ExperimentError::Invalid(format!(
+            "dataset SHA mismatch: expected {} got {}",
+            spec.expected_dataset_sha256, computed_dataset_sha
+        )));
+    }
+    let mut split_raw = Vec::new();
+    fs::File::open(&spec.split_path)?
+        .take((MAX_CONFIG_BYTES + 1) as u64)
+        .read_to_end(&mut split_raw)?;
+    let split: SplitManifest = serde_json::from_slice(&split_raw)?;
+    validate_split(&examples, &split, &computed_dataset_sha)
+        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+    if split.fingerprint != spec.expected_split_fingerprint {
+        return Err(ExperimentError::Invalid(format!(
+            "split fingerprint mismatch: expected {} got {}",
+            spec.expected_split_fingerprint, split.fingerprint
+        )));
+    }
+    let computed_membership = test_membership_sha256(&split.test);
+    if computed_membership != spec.expected_test_membership_sha256 {
+        return Err(ExperimentError::Invalid(format!(
+            "test membership SHA mismatch: expected {} got {}",
+            spec.expected_test_membership_sha256, computed_membership
+        )));
+    }
+    // Load artifact read-only; reuse pure scoring logic. No training call.
+    let loaded =
+        load_artifact(&artifact_bytes).map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+    let LoadedArtifact::TypedTaskV2(runtime) = loaded else {
+        return Err(ExperimentError::Invalid(
+            "evaluate supports typed task artifacts only".into(),
+        ));
+    };
+    let envelope: ArtifactEnvelopeV2 = serde_json::from_slice(&artifact_bytes)
+        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+    if envelope.architecture != spec.expected_artifact_architecture {
+        return Err(ExperimentError::Invalid(format!(
+            "artifact envelope architecture {} != expected {}",
+            envelope.architecture, spec.expected_artifact_architecture
+        )));
+    }
+    if envelope.calibration_sha256 != spec.expected_calibration_sha256 {
+        return Err(ExperimentError::Invalid(format!(
+            "calibration SHA mismatch: expected {} got {}",
+            spec.expected_calibration_sha256, envelope.calibration_sha256
+        )));
+    }
+    if envelope.required_feature_schema_sha256 != spec.expected_feature_schema_sha256 {
+        return Err(ExperimentError::Invalid(
+            "feature schema SHA mismatch".into(),
+        ));
+    }
+    if envelope.max_candidates == 0 || envelope.max_candidates > sdm_core::MAX_CANDIDATES {
+        return Err(ExperimentError::Invalid(
+            "artifact max candidates outside bounds".into(),
+        ));
+    }
+    // Exact test case IDs and group memberships; typed schema, option IDs,
+    // calibrated semantics, bounded options, finite scores.
+    let test = rank_parts(&examples, &split.test)?;
+    for e in &examples {
+        if e.typed_rank_features.is_none()
+            || !matches!(
+                (task, &e.label),
+                ("binary", TargetLabel::Binary(_))
+                    | ("choice", TargetLabel::Choice(_))
+                    | ("score", TargetLabel::Score(_))
+            )
+        {
+            return Err(ExperimentError::Invalid(
+                "dataset must contain one matching typed semantic family".into(),
+            ));
+        }
+    }
+    let mut abstentions = 0usize;
+    let mut outcomes = Vec::with_capacity(test.len());
+    let metrics =
+        match task {
+            "binary" => {
+                let mut truth = Vec::new();
+                let mut probabilities = Vec::new();
+                for e in &test {
+                    let TargetLabel::Binary(y) = e.label else {
+                        unreachable!()
+                    };
+                    truth.push(y);
+                    let b = e.typed_rank_features.as_ref().unwrap();
+                    let r = runtime
+                        .decide_typed(&e.request, b)
+                        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                    if r.answer.is_none() {
+                        abstentions += 1;
+                    }
+                    let probs = runtime
+                        .binary_probability(&e.request, b)
+                        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                    if !probs.is_finite() {
+                        return Err(ExperimentError::Invalid("nonfinite binary score".into()));
+                    }
+                    probabilities.push(probs);
+                    let was_abstained = r.answer.is_none();
+                    outcomes.push(SemanticEvaluateOutcome {
+                        case_id: e.case_id.clone(),
+                        leakage_group: e.leakage_group.clone(),
+                        family: e.family.clone(),
+                        target: serde_json::json!(y),
+                        prediction: if was_abstained {
+                            serde_json::Value::Null
+                        } else {
+                            serde_json::json!(probs >= 0.5)
+                        },
+                        score: Some(probs),
+                        raw_probabilities: Some(vec![probs]),
+                        raw_logits: None,
+                        answerability_probability: None,
+                        nuisance_probabilities: None,
+                        abstained: was_abstained,
+                    });
+                }
+                SemanticMetrics::Binary(
+                    sdm_eval::evaluate_binary(&truth, &probabilities, 0.5)
+                        .map_err(|e| ExperimentError::Invalid(e.to_string()))?,
+                )
+            }
+            "choice" => {
+                let mut truth = Vec::new();
+                let mut probs = Vec::new();
+                for e in &test {
+                    let TargetLabel::Choice(target) = &e.label else {
+                        unreachable!()
+                    };
+                    let b = e.typed_rank_features.as_ref().unwrap();
+                    if let sdm_core::DecisionSpec::Choice { options, .. } = &e.request.spec {
+                        if options.len() > sdm_core::MAX_OPTIONS
+                            || options.len() > envelope.max_candidates
+                        {
+                            return Err(ExperimentError::Invalid(
+                                "choice option bound exceeded".into(),
+                            ));
+                        }
+                    } else {
+                        return Err(ExperimentError::Invalid(
+                            "Choice request missing options".into(),
+                        ));
+                    }
+                    let r = runtime
+                        .decide_typed(&e.request, b)
+                        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                    if r.answer.is_none() {
+                        abstentions += 1;
+                    }
+                    if let Some(target) = target {
+                        let sdm_core::DecisionSpec::Choice { options, .. } = &e.request.spec else {
+                            unreachable!()
+                        };
+                        truth.push(options.iter().position(|o| &o.id == target).ok_or_else(
+                            || ExperimentError::Invalid("choice target outside options".into()),
+                        )?);
+                        let p = runtime
+                            .choice_probabilities(&e.request, b)
+                            .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                        if p.iter().any(|v| !v.is_finite()) {
+                            return Err(ExperimentError::Invalid("nonfinite choice score".into()));
+                        }
+                        probs.push(p);
+                    }
+                    let raw_probs = Some(
+                        runtime
+                            .choice_probabilities(&e.request, b)
+                            .map_err(|e| ExperimentError::Invalid(e.to_string()))?,
+                    );
+                    let raw_logits = Some(
+                        runtime
+                            .choice_logits(&e.request, b)
+                            .map_err(|e| ExperimentError::Invalid(e.to_string()))?,
+                    );
+                    let answerability = Some(
+                        runtime
+                            .choice_answerability_probability(&e.request, b)
+                            .map_err(|e| ExperimentError::Invalid(e.to_string()))?,
+                    );
+                    let abstained = r.answer.is_none();
+                    let predicted = match r.answer {
+                        Some(sdm_core::DecisionAnswer::Choice { option_id, .. }) => {
+                            serde_json::Value::String(option_id)
+                        }
+                        _ => serde_json::Value::Null,
+                    };
+                    outcomes.push(SemanticEvaluateOutcome {
+                        case_id: e.case_id.clone(),
+                        leakage_group: e.leakage_group.clone(),
+                        family: e.family.clone(),
+                        target: serde_json::json!(target),
+                        prediction: predicted,
+                        score: None,
+                        raw_probabilities: raw_probs,
+                        raw_logits,
+                        answerability_probability: answerability,
+                        nuisance_probabilities: None,
+                        abstained,
+                    });
+                }
+                SemanticMetrics::Choice(
+                    sdm_eval::evaluate_choice(&truth, &probs)
+                        .map_err(|e| ExperimentError::Invalid(e.to_string()))?,
+                )
+            }
+            "score" => {
+                let mut scored = Vec::new();
+                for e in &test {
+                    let TargetLabel::Score(y) = e.label else {
+                        unreachable!()
+                    };
+                    let b = e.typed_rank_features.as_ref().unwrap();
+                    let r = runtime
+                        .decide_typed(&e.request, b)
+                        .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
+                    if let Some(sdm_core::DecisionAnswer::Score { value, .. }) = r.answer {
+                        let sdm_core::DecisionSpec::Score {
+                            minimum, maximum, ..
+                        } = &e.request.spec
+                        else {
+                            unreachable!()
+                        };
+                        if !y.is_finite()
+                            || !value.is_finite()
+                            || y < *minimum
+                            || y > *maximum
+                            || value < *minimum
+                            || value > *maximum
+                        {
+                            return Err(ExperimentError::Invalid(
+                                "score outside per-example rubric".into(),
+                            ));
+                        }
+                        scored.push((y, value));
+                        outcomes.push(SemanticEvaluateOutcome {
+                            case_id: e.case_id.clone(),
+                            leakage_group: e.leakage_group.clone(),
+                            family: e.family.clone(),
+                            target: serde_json::json!(y),
+                            prediction: serde_json::json!(value),
+                            score: Some(value),
+                            raw_probabilities: None,
+                            raw_logits: None,
+                            answerability_probability: None,
+                            nuisance_probabilities: None,
+                            abstained: false,
+                        });
+                    } else {
+                        abstentions += 1;
+                        outcomes.push(SemanticEvaluateOutcome {
+                            case_id: e.case_id.clone(),
+                            leakage_group: e.leakage_group.clone(),
+                            family: e.family.clone(),
+                            target: serde_json::json!(y),
+                            prediction: serde_json::Value::Null,
+                            score: None,
+                            raw_probabilities: None,
+                            raw_logits: None,
+                            answerability_probability: None,
+                            nuisance_probabilities: None,
+                            abstained: true,
+                        });
+                    }
+                }
+                let mut squared = 0.0;
+                let mut absolute = 0.0;
+                for (y, p) in &scored {
+                    absolute += (y - p).abs();
+                    squared += (y - p).powi(2);
+                }
+                SemanticMetrics::Score(sdm_eval::ScoreMetrics {
+                    count: scored.len(),
+                    mae: (!scored.is_empty()).then_some(absolute / scored.len() as f64),
+                    rmse: (!scored.is_empty()).then_some((squared / scored.len() as f64).sqrt()),
+                })
+            }
+            _ => unreachable!(),
+        };
+    let mut report = SemanticEvaluateManifest {
+        schema: "sdm-semantic-evaluate-v2".into(),
+        schema_version: 2,
+        evaluated_partition: "test".into(),
+        test_evaluation_performed: true,
+        dataset_sha256: computed_dataset_sha,
+        split_fingerprint: split.fingerprint.clone(),
+        test_membership_sha256: computed_membership,
+        protocol_sha256: spec.protocol_sha256.clone(),
+        freeze_sha256: spec.freeze_sha256.clone(),
+        architecture: spec.expected_architecture.clone(),
+        artifact_architecture: envelope.architecture.clone(),
+        semantic: task.into(),
+        train_ids: split.train,
+        dev_ids: split.dev,
+        test_ids: split.test,
+        model_sha256: envelope.tensor_payload_sha256.clone(),
+        calibration_sha256: envelope.calibration_sha256.clone(),
+        artifact_sha256: actual_artifact_sha.clone(),
+        loaded_artifact_sha256: actual_artifact_sha.clone(),
+        required_feature_schema_sha256: envelope.required_feature_schema_sha256.clone(),
+        report_sha256: String::new(),
+        metrics,
+        abstentions,
+        outcomes,
+        verdict: "synthetic-mechanics-only".into(),
+    };
+    report.report_sha256 = digest(&(
+        &report.schema,
+        &report.evaluated_partition,
+        &report.dataset_sha256,
+        &report.split_fingerprint,
+        &report.test_membership_sha256,
+        &report.architecture,
+        &report.model_sha256,
+        &report.calibration_sha256,
+        &report.artifact_sha256,
+        &report.metrics,
+        &report.abstentions,
+        &report.outcomes,
+    ))?;
+    // Immutable bytes: re-read input artifact and require exact identity.
+    let reread = fs::read(&spec.artifact_path)?;
+    if format!("sha256:{:x}", Sha256::digest(&reread)) != actual_artifact_sha {
+        return Err(ExperimentError::Invalid(
+            "artifact bytes changed during evaluation".into(),
+        ));
+    }
+    atomic_write(&spec.report_path, &serde_json::to_vec_pretty(&report)?)?;
+    Ok(report)
+}
+
 pub fn run(spec: &ExperimentSpec) -> Result<ExperimentRunManifest, ExperimentError> {
     if spec.epochs == 0
         || spec.epochs > 10_000
@@ -2477,5 +3018,322 @@ mod tests {
             assert_eq!(baseline.calibration_sha256, mutated.calibration_sha256);
         }
         fs::remove_dir_all(root).unwrap();
+    }
+
+    fn evaluate_spec_for(
+        dataset_path: &str,
+        split_path: &str,
+        artifact_path: &str,
+        report_path: &str,
+        architecture: &str,
+        provenance: Provenance,
+    ) -> EvaluateSpec {
+        let dataset_bytes = fs::read(dataset_path).unwrap();
+        let bundle: serde_json::Value = serde_json::from_slice(&dataset_bytes).unwrap();
+        let examples: Vec<DatasetExample> =
+            serde_json::from_value(bundle["examples"].clone()).unwrap();
+        let dataset_sha = validate_dataset(&examples, &provenance).expect("dataset validates");
+        let split_bytes = fs::read(split_path).unwrap();
+        let split: SplitManifest = serde_json::from_slice(&split_bytes).unwrap();
+        let artifact_bytes = fs::read(artifact_path).unwrap();
+        let artifact_sha = format!("sha256:{:x}", Sha256::digest(&artifact_bytes));
+        let envelope: sdm_runtime::ArtifactEnvelopeV2 =
+            serde_json::from_slice(&artifact_bytes).unwrap();
+        EvaluateSpec {
+            dataset_path: dataset_path.into(),
+            split_path: split_path.into(),
+            artifact_path: artifact_path.into(),
+            report_path: report_path.into(),
+            expected_artifact_sha256: artifact_sha,
+            expected_dataset_sha256: dataset_sha,
+            expected_split_fingerprint: split.fingerprint.clone(),
+            expected_test_membership_sha256: test_membership_sha256(&split.test),
+            expected_architecture: architecture.into(),
+            expected_artifact_architecture: envelope.architecture.clone(),
+            expected_feature_schema_sha256: envelope.required_feature_schema_sha256.clone(),
+            expected_calibration_sha256: envelope.calibration_sha256.clone(),
+            protocol_sha256: format!("sha256:{}", "0".repeat(64)),
+            freeze_sha256: format!("sha256:{}", "1".repeat(64)),
+            provenance,
+        }
+    }
+
+    #[test]
+    fn m014a_evaluate_rejects_training_fields() {
+        // G1: EvaluateSpec must not accept epochs/learning-rate/optimizer flags.
+        let json = serde_json::json!({
+            "dataset_path": "a", "split_path": "b", "artifact_path": "c",
+            "report_path": "d", "expected_artifact_sha256": format!("sha256:{}", "0".repeat(64)),
+            "expected_dataset_sha256": format!("sha256:{}", "0".repeat(64)),
+            "expected_split_fingerprint": format!("sha256:{}", "0".repeat(64)),
+            "expected_test_membership_sha256": format!("sha256:{}", "0".repeat(64)),
+            "expected_architecture": "typed-binary",
+            "expected_artifact_architecture": "sdm-typed-task-v1",
+            "expected_feature_schema_sha256": format!("sha256:{}", "0".repeat(64)),
+            "expected_calibration_sha256": format!("sha256:{}", "0".repeat(64)),
+            "protocol_sha256": format!("sha256:{}", "0".repeat(64)),
+            "freeze_sha256": format!("sha256:{}", "0".repeat(64)),
+            "provenance": {"source":"s","license":"MIT","consent_scope":"c","label_lineage":"l","redistributable":true},
+            "epochs": 120, "learning_rate": 0.2
+        });
+        let parsed: Result<EvaluateSpec, _> = serde_json::from_value(json);
+        assert!(
+            parsed.is_err(),
+            "training fields must be rejected by deny_unknown_fields"
+        );
+    }
+
+    #[test]
+    fn m014a_fail_trainer_trap_proves_training_unreachable() {
+        // G1: with the trap set, training must fail but evaluate must succeed.
+        let root = temp_root();
+        let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../fixtures");
+        let dataset = dir
+            .join("synthetic-binary-typed-v1.json")
+            .display()
+            .to_string();
+        let split = dir
+            .join("synthetic-binary-typed-v1.split.json")
+            .display()
+            .to_string();
+        let raw: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../fixtures/synthetic-binary-typed-v1.json"
+        ))
+        .unwrap();
+        let provenance: Provenance = serde_json::from_value(raw["provenance"].clone()).unwrap();
+        let mut cfg = spec(
+            &root,
+            "typed-binary",
+            &dataset,
+            &split,
+            "trap-train",
+            provenance.clone(),
+        );
+        cfg.epochs = 2;
+        let _trained = run_semantic(&cfg).unwrap();
+        // Training with trap set must fail (thread-local, isolated per test).
+        __m014a_set_trap(true);
+        let mut trapped = spec(
+            &root,
+            "typed-binary",
+            &dataset,
+            &split,
+            "trap-fail",
+            provenance.clone(),
+        );
+        trapped.epochs = 2;
+        trapped.artifact_path = root.join("trap-fail.artifact.json").display().to_string();
+        trapped.report_path = root.join("trap-fail.report.json").display().to_string();
+        assert!(run_semantic(&trapped).is_err(), "trainer trap must fire");
+        // Evaluate with trap set must still succeed (no training call).
+        let artifact_path = root.join("trap-train.artifact.json").display().to_string();
+        let report_path = root.join("trap-eval.report.json").display().to_string();
+        let espec = evaluate_spec_for(
+            &dataset,
+            &split,
+            &artifact_path,
+            &report_path,
+            "typed-binary",
+            provenance,
+        );
+        let evaluated = run_evaluate(&espec).expect("evaluate must not touch trainer");
+        assert_eq!(evaluated.evaluated_partition, "test");
+        assert!(evaluated.test_evaluation_performed);
+        __m014a_set_trap(false);
+        fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn m014a_byte_mismatch_fails_before_scoring_on_tiny_delta() {
+        // G2: 1e-14 numeric change still fails SHA identity before any scoring.
+        let root = temp_root();
+        let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../fixtures");
+        let dataset = dir
+            .join("synthetic-binary-typed-v1.json")
+            .display()
+            .to_string();
+        let split = dir
+            .join("synthetic-binary-typed-v1.split.json")
+            .display()
+            .to_string();
+        let raw: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../fixtures/synthetic-binary-typed-v1.json"
+        ))
+        .unwrap();
+        let provenance: Provenance = serde_json::from_value(raw["provenance"].clone()).unwrap();
+        let mut cfg = spec(
+            &root,
+            "typed-binary",
+            &dataset,
+            &split,
+            "sha-base",
+            provenance.clone(),
+        );
+        cfg.epochs = 2;
+        run_semantic(&cfg).unwrap();
+        let base_artifact = root.join("sha-base.artifact.json");
+        let base_bytes = fs::read(&base_artifact).unwrap();
+        // Perturb one payload byte by the smallest representable delta path:
+        // decode payload, nudge first weight by 1e-14, re-encode.
+        let payload_bytes = base64_payload_nudge(&base_bytes);
+        assert_ne!(payload_bytes, base_bytes, "nudge must change bytes");
+        let tampered_path = root.join("tampered.artifact.json");
+        fs::write(&tampered_path, &payload_bytes).unwrap();
+        let report_path = root.join("tampered.report.json").display().to_string();
+        // Build spec expecting ORIGINAL bytes but pointing at TAMPERED file.
+        let mut espec = evaluate_spec_for(
+            &dataset,
+            &split,
+            &base_artifact.display().to_string(),
+            &report_path,
+            "typed-binary",
+            provenance,
+        );
+        espec.artifact_path = tampered_path.display().to_string();
+        let err = run_evaluate(&espec).expect_err("SHA mismatch must fail");
+        assert!(
+            err.to_string().contains("artifact SHA mismatch"),
+            "must fail on SHA identity before scoring, got: {err}"
+        );
+        assert!(
+            !Path::new(&report_path).exists(),
+            "failed evaluation must not leave partial report"
+        );
+        fs::remove_dir_all(root).unwrap();
+    }
+
+    fn base64_payload_nudge(artifact_bytes: &[u8]) -> Vec<u8> {
+        // Minimal 1e-14-scale perturbation: parse envelope, nudge first weight.
+        let mut envelope: sdm_runtime::ArtifactEnvelopeV2 =
+            serde_json::from_slice(artifact_bytes).unwrap();
+        let mut payload: serde_json::Value = serde_json::from_slice(&envelope.payload).unwrap();
+        if let Some(weights) = payload.get_mut("weights").and_then(|v| v.as_array_mut()) {
+            if let Some(first) = weights.first_mut().and_then(|v| v.as_f64()) {
+                weights[0] = serde_json::json!(first + 1e-14);
+            }
+        }
+        envelope.payload = serde_json::to_vec(&payload).unwrap();
+        // Keep digests stale on purpose so SHA validation is the gate; also
+        // payload digest will mismatch which is itself a rejection.
+        serde_json::to_vec(&envelope).unwrap()
+    }
+
+    #[test]
+    fn m014a_successful_evaluate_preserves_bytes_and_test_ids() {
+        // G2/G3: fixed artifact evaluates with identical SHA before/after.
+        let root = temp_root();
+        for (task, arch, envelope_arch) in [
+            ("binary", "typed-binary", "sdm-typed-task-v1"),
+            (
+                "choice",
+                "typed-choice-compositional",
+                "sdm-typed-choice-compositional-v1",
+            ),
+        ] {
+            let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../fixtures");
+            let dataset = dir
+                .join(format!("synthetic-{task}-typed-v1.json"))
+                .display()
+                .to_string();
+            let split = dir
+                .join(format!("synthetic-{task}-typed-v1.split.json"))
+                .display()
+                .to_string();
+            let raw: serde_json::Value = serde_json::from_str(match task {
+                "binary" => include_str!("../../../fixtures/synthetic-binary-typed-v1.json"),
+                _ => include_str!("../../../fixtures/synthetic-choice-typed-v1.json"),
+            })
+            .unwrap();
+            let provenance: Provenance = serde_json::from_value(raw["provenance"].clone()).unwrap();
+            let mut cfg = spec(
+                &root,
+                arch,
+                &dataset,
+                &split,
+                &format!("fix-{task}"),
+                provenance.clone(),
+            );
+            cfg.epochs = 2;
+            run_semantic(&cfg).unwrap();
+            let artifact_path = root
+                .join(format!("fix-{task}.artifact.json"))
+                .display()
+                .to_string();
+            let before = fs::read(&artifact_path).unwrap();
+            let before_sha = format!("sha256:{:x}", Sha256::digest(&before));
+            let report_path = root
+                .join(format!("fix-{task}-eval.report.json"))
+                .display()
+                .to_string();
+            let mut espec = evaluate_spec_for(
+                &dataset,
+                &split,
+                &artifact_path,
+                &report_path,
+                arch,
+                provenance,
+            );
+            assert_eq!(espec.expected_artifact_architecture, envelope_arch);
+            let report = run_evaluate(&espec).unwrap();
+            let after = fs::read(&artifact_path).unwrap();
+            assert_eq!(before, after, "artifact bytes must be immutable");
+            assert_eq!(report.artifact_sha256, before_sha);
+            assert_eq!(report.loaded_artifact_sha256, before_sha);
+            assert_eq!(report.evaluated_partition, "test");
+            assert!(report.test_evaluation_performed);
+            // New contract serializes the flag explicitly (no omission).
+            let raw_report: serde_json::Value =
+                serde_json::from_slice(&fs::read(&report_path).unwrap()).unwrap();
+            assert_eq!(
+                raw_report["test_evaluation_performed"],
+                serde_json::Value::Bool(true)
+            );
+            assert_eq!(
+                raw_report["evaluated_partition"],
+                serde_json::Value::String("test".into())
+            );
+            assert_eq!(
+                raw_report["schema"],
+                serde_json::Value::String("sdm-semantic-evaluate-v2".into())
+            );
+            // Correct test IDs.
+            let split_manifest: SplitManifest =
+                serde_json::from_slice(&fs::read(&split).unwrap()).unwrap();
+            assert_eq!(report.test_ids, split_manifest.test);
+            assert_eq!(report.outcomes.len(), split_manifest.test.len());
+            // Second run to same path must refuse overwrite (atomic, no partial).
+            espec.report_path = report_path.clone();
+            assert!(run_evaluate(&espec).is_err(), "must refuse overwrite");
+        }
+        fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn m014a_legacy_reports_remain_readable_new_reports_are_versioned() {
+        // G3/G8: old omitted-true reports still parse; new reports are explicit.
+        let legacy: SemanticExperimentRunManifest = serde_json::from_str(include_str!(
+            "../../../artifacts/m014/final-v1/binary-baseline.report.json"
+        ))
+        .unwrap_or_else(|_| {
+            // Fallback: construct minimal legacy shape if fixture path changes.
+            let raw: serde_json::Value = serde_json::from_str(include_str!(
+                "../../../fixtures/synthetic-binary-typed-v1.json"
+            ))
+            .unwrap();
+            let _ = raw;
+            panic!("legacy M014 final report must remain readable")
+        });
+        assert_eq!(legacy.semantic, "binary");
+        // Legacy serialization omits true; deserialized default is true.
+        assert!(legacy.test_evaluation_performed);
+        let raw_legacy: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../artifacts/m014/final-v1/binary-baseline.report.json"
+        ))
+        .unwrap();
+        assert!(
+            raw_legacy.get("test_evaluation_performed").is_none(),
+            "legacy true must be omitted (serde skip)"
+        );
+        assert!(raw_legacy.get("evaluated_partition").is_none());
     }
 }

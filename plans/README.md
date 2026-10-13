@@ -2,7 +2,7 @@
 
 This directory follows the CodeGG planning and handoff convention as adapted in [003-planning-process.md](003-planning-process.md).
 
-**Start here:** [Registry](registry.md) -> [General decision-model framework roadmap](subsystems/general-decision-model-framework-roadmap.md) -> **[M014 standalone Binary/Choice quality recovery](implementation/general-decision-model-framework/014-standalone-binary-choice-quality-recovery.md) (ready)**. CodeGG M005 remains externally deferred. The [framework boundary ADR](adrs/ADR-0001-general-framework-and-model-boundaries.md) governs the milestone plans.
+**Start here:** [Registry](registry.md) -> [Roadmap](subsystems/general-decision-model-framework-roadmap.md) -> **[M014c closure](closure/general-decision-model-framework/014c-status.md) MECHANICALLY CLOSED (C1–C10 pass, hosted green; C11–C12 pending)**. M014a/b restored from closing to mechanically closed (negative, honest, original-byte ledger) via M014c C1–C9. Old CI 38408167153 FAILED (retained). M014b negative historically reported; consumed final NEVER rerun. M015 unregistered. See [plan](implementation/general-decision-model-framework/014c-closure-evidence-reconciliation.md), [audit](../docs/m014c-closure-audit.md), [ledger](../docs/m014c-evidence-ledger.json).
 
 ## Completed handoffs
 
@@ -21,7 +21,11 @@ M007 is closed with generic synthetic qualification, slice calibration and train
 
 All four milestones are SDM-owned, use explicitly provided synthetic data, preserve v1 CodeGG compatibility, and have numbered closure files. M011 closes their implemented mechanics work; the new M012 workstream handles source-branch and release reconciliation without reopening M011 quality claims. No CodeGG corpus or checkout is needed.
 
-## Current implementation handoff (M014)
+## Current closure — M014c mechanically closed (M014a/b restored; integration pending)
+
+[M014c](implementation/general-decision-model-framework/014c-closure-evidence-reconciliation.md) is mechanically closed in [014c-status.md](closure/general-decision-model-framework/014c-status.md) (C1–C10 pass with hosted green 38418968150 on d60d9c0; C11–C12 pending PR/merge; implementation af74c01 + fix d60d9c0). It orders canary CI (pure→gen→dependent + regression), replaces asserted with measured same-artifact attestation + aggregator + `canary-parity` job, records detached lineage with placeholder_unbound defect, and ledgers original final-report SHAs from original bytes. No old heldout rerun, no model retraining and no CodeGG change. M014a/b are mechanically closed (negative, honest) conditional on C1–C9; full integration requires hosted green + one reviewed M014a–c PR + merge. M015 unregistered, M005 deferred, publication gated.
+
+## Historical handoff (M014)
 
 **[M012 — post-M011 release reconciliation](implementation/general-decision-model-framework/012-post-m011-release-reconciliation-corrective.md)** is conditionally closed: source [PR #1](https://github.com/dbowm91/sdm/pull/1) is merged into main; crates.io publication remains blocked pending human/legal license review. **M013–M013d SOURCE is merged** by [PR #2](https://github.com/dbowm91/sdm/pull/2), main@0e6c3cae5911681b18185673a30484a976cb3821, with 10/10 merged-main CI jobs green [38112863529](https://github.com/dbowm91/sdm/actions/runs/38112863529). Binary remains negative and Choice indeterminate on M013a; no model qualifies for CodeGG. **[M014](implementation/general-decision-model-framework/014-standalone-binary-choice-quality-recovery.md) is READY** for the next independent standalone experiment. CodeGG M005 remains externally deferred.
 
@@ -38,3 +42,5 @@ M013c handoff: [implementation plan](implementation/general-decision-model-frame
 M013d is conditionally closed: [implementation handoff](implementation/general-decision-model-framework/013d-bootstrap-repair-and-source-integration.md), [provenance audit](../docs/m013d-final-corrective-audit.md), and [closure evidence](closure/general-decision-model-framework/013d-status.md). It is not a predictive rerun. Historical sidecar hashes are reproduced at the pinned commit; regenerated M013b/M013c hashes are separately recorded with their source-fingerprint cause. PR #2 carries M013–M013d; full integration requires reviewed merge and merged-main CI. No successor predictive plan is ready.
 
 M014 ready: [bounded implementation and exact freeze criteria](implementation/general-decision-model-framework/014-standalone-binary-choice-quality-recovery.md), [source and methods research](../docs/m014-model-quality-research.md). The full Choice two-rule truth table must be proven expressible before optimizer choice. New independent synthetic groups, numeric gates, subgroup support and frozen protocol must precede a one-time final test; M013a final data is historical only. No CodeGG data required.
+
+Current handoff: M014 produced implemented models but its one-time final synthetic cohort was consumed without valid qualification. **M014a is the ONLY ready milestone**, addressing inference-only artifact byte identity, serde's omitted true, full paired-group and control evaluation, and a CI-enforced DEV-CANARY. **M014b is blocked** until M014a closure and will own a NEW prospectively frozen cohort. Plans: [M014a](implementation/general-decision-model-framework/014a-frozen-artifact-and-evaluator-integrity.md), [M014b](implementation/general-decision-model-framework/014b-independent-frozen-qualification.md), [failure audit](../docs/m014-qualification-failure-analysis.md). Never rerun the M014 final configs.

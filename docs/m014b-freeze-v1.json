@@ -1,0 +1,57 @@
+{
+  "candidate_reports": [
+    "binary-baseline.report.json",
+    "binary-mask.report.json",
+    "choice-legacy.report.json",
+    "choice-cross.report.json",
+    "choice-compositional.report.json"
+  ],
+  "candidates": {
+    "artifacts/m014/binary-baseline-v1.artifact.json": "sha256:3d3c1a1453c274d19bdbdd47751c385246f172b5843ad3f5df42e5ddd812e810",
+    "artifacts/m014/binary-constant-mask-v1.artifact.json": "sha256:19c2a3406944d19dc9b81aba4647e2c75f87317af2b7d4dd5e8d35129dd83260",
+    "artifacts/m014/choice-compositional-v1.artifact.json": "sha256:e77d44a0c81c39e8adf71108dce680d9d00bcced47416ca9000fd5dd7fc341fb",
+    "artifacts/m014/choice-cross-v1.artifact.json": "sha256:ba17c92979e0365999721822b5b9af6cfb8b2a1a8c2de0405635bc099dad514e",
+    "artifacts/m014/choice-legacy-v1.artifact.json": "sha256:e512cb53a8a9e56046e0b499c36b167a52ea8d0ff17a42e2f14c271a6a9b284e"
+  },
+  "datasets": {
+    "target/m014b/binary.json": "sha256:4d728c94e4fa65d85670096d8642395f0649bdf34a433e8fcb5228102ec29564",
+    "target/m014b/choice.json": "sha256:70ad8d91f19ec3f89ae8040c8e5d428d35c44ae898161241b28c2023decaf6a2"
+  },
+  "evaluator": "scripts/qualify_semantic_v2.py",
+  "evaluator_sha256": "sha256:7b91dda8c0044e7b239de4cb87348eec41468a944e6deb9586c4c97a91d49dbc",
+  "exclusion_digest_known_m014_m013a_final": "sha256:84d434b078065d674e9dd5fbfd83769fd88d2dc59dc2060bea0967a87762e154",
+  "final_configs": {
+    "fixtures/m014b-final-binary-baseline.evaluate.json": "sha256:611555e489c45bfb0585dd6bf6e41b3c8e7b525c9cdae9ca0d4a9f4abf835cc4",
+    "fixtures/m014b-final-binary-mask.evaluate.json": "sha256:7d9f82dd65a6b419fda936f6cdffddf06e79ff02683e232eaf62b68b5c76f7f0",
+    "fixtures/m014b-final-choice-compositional.evaluate.json": "sha256:2782677d50c60677c8dfbc1fc5d8dda02dfa2ecf340ffeff0a569fec133de678",
+    "fixtures/m014b-final-choice-cross.evaluate.json": "sha256:2c38d6068ed044749dc6cecdf434c90192ee3dcdc37a8a5b371618d69e774eef",
+    "fixtures/m014b-final-choice-legacy.evaluate.json": "sha256:09f183a44e216f1d0caca48f1bc5e0598a90230613b95ff18d8b4e9773c3ac61"
+  },
+  "freeze_id": "sdm-m014b-freeze-v1",
+  "generator": "scripts/generate_m014b_suite.py",
+  "generator_sha256": "sha256:5167a16d4cd6c2d44277b5df207b056d5792dba0cabcfee9bed58b33c239412e",
+  "note": "Freeze BEFORE any fixtures/m014b-final-*.evaluate.json run. Run frozen final set ONCE after freeze commit + green CI; outputs only under target/m014b/final/.",
+  "protocol": "docs/m014b-protocol-v1.json",
+  "protocol_sha256": "sha256:3cea183188f3672cc7d58ed21aa195c899d6f333faea518067392fe3733df407",
+  "split_fingerprints": {
+    "binary": "sha256:15865bb726fe77c730cb135f18ed100951d55ab9f3314d58b2ace48e2552f7dc",
+    "choice": "sha256:8179f672d864122323d76a6dc9c80f1f5226c352ba4dea4dfaecfc180346ece2"
+  },
+  "splits": {
+    "fixtures/m014b-binary-v1.split.json": "sha256:9948d8bf92087624010d84a026b66c5bbc547c7fb6bba0f2b98a76db47c938b7",
+    "fixtures/m014b-choice-v1.split.json": "sha256:0001eb42ea858c6d5ef4d4f209e6ee4e05c6e92383e5b58c1c13106aebd6c030"
+  },
+  "status": "prospective-freeze-before-final-test",
+  "support_reports": {
+    "target/m014b/binary-support.json": "sha256:e9604fc64985a5a869787e953e86c3a37c6144990fdc16e44c2be92bdd2d96be",
+    "target/m014b/choice-support.json": "sha256:0f5ac67065eda53a2fb482fce3c4b51b3734fad8736c31c4c49dc77b073b9171"
+  },
+  "support_verdicts": {
+    "binary": "pass",
+    "choice": "pass"
+  },
+  "test_memberships": {
+    "binary": "sha256:8fe044507a1260bae6e7eef54b8253afbf7e75efbd86b3d0f98169c25fdc5c00",
+    "choice": "sha256:05d432b6a01f72e2206c9b21722c527f3ddd8ece4cf2ab874550967b115b9c68"
+  }
+}
