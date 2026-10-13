@@ -1,5 +1,6 @@
 //! Reproducible, frozen-split Rank experiments. Training and calibration APIs
 //! receive only their respective partitions; test labels are evaluation-only.
+pub mod m015a;
 use sdm_core::{features_for, DecisionSpec};
 use sdm_data::{
     validate_dataset, validate_split, DatasetExample, Provenance, SplitManifest, TargetLabel,

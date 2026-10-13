@@ -1,11 +1,11 @@
 # SDM M017 — TinyChoice prospective synthetic qualification and portable model evidence
 
-Status: **blocked on M015 + M016 accepted closures** (registered future handoff; NO final dataset generated).
+Status: **blocked on M015 + M015a + M016 accepted closures** (registered future handoff; NO final dataset generated).
 Class: capability / prospective evidence qualification.
 Planning baseline: dbowm91/sdm@c048189d7026d723c7da584d7429cb275c714d23 (2026-10-13); re-audit before implementation.
 Research: docs/m015-small-model-research.md.
 Roadmap and governance: general-decision-model-framework-roadmap.md; plans/003-planning-process.md.
-Hard predecessors: M015 generator/oracle/protocol and M016 trained model+DEV-only comparison closed, integrated main green; sufficient independent eligible support for new test predeclared.
+Hard predecessors: M015 generator/oracle/protocol accepted and merged; M015a versioned final-action evaluation/pair-support correction accepted, merged and main CI green; M016 trained model and valid DEV-only comparison closed, integrated main green; sufficient independent eligible support for new test predeclared. M017 must not inherit the historical mixed raw/final M015 diagnostic keys.
 External dependency: no CodeGG corpus; hardware/CI available for claimed platform attestation.
 Historical boundaries: M014/M014b original FINAL are consumed, unchanged, not rerunnable; M014c records a legacy embedded freeze placeholder defect.
 

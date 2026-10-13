@@ -82,3 +82,24 @@ M014a changes no Binary/Choice head, training math, or thresholds. It adds `sdm 
 # M014c closure (no head change)
 
 M014c changes no Binary/Choice head, training math, or thresholds. It orders CI (pure→gen→dependent + ordering regression), replaces single-host `three_host_parity=true` with measured same-artifact attestation + aggregator (`m014c_canary_attestation` / `verify_m014c_parity` + `canary-parity` job; provisional indeterminate for unverified parity is correct), and adds detached lineage + original-byte ledger for the consumed M014b FINAL (placeholder `freeze_sha256` defect preserved, never rerun). See `plans/closure/general-decision-model-framework/014c-status.md`.
+
+# M015a Choice final-action corrective (no head change)
+
+M015a changes no Choice head, weight, threshold, encoder, or runtime behavior.
+It adds a reusable versioned `choice-final-v2` evaluator (`sdm-eval`,
+`scripts/m015a_final_metrics.py` mirror): final correctness requires answered
+exact ID for `Some` and abstention for `None`; raw conditional argmax,
+answerability, coverage and answered-only selective accuracy are separate;
+strict exactly-two matcher accepts only declarative `-nuisance`/`-causal`
+suffixes with matching labels, same group/split/family/rule, compatible option
+sets, causal exactly-one-`None` + identical context + flipped semantics, and
+nuisance identical targets + preserved semantics; origins come from corpus
+provenance; leakage-group 95% CIs use seed `150015`, 2,000 replicates, sorted
+inputs/replicates; empty strata are `insufficient_support`. The DEV-only replay
+(`sdm experiment m015a-replay`, `scripts/analyze_m015a_final_actions.py`) runs
+the three frozen M015 heads through actual `decide_typed` and records v2
+metrics plus an immutable-history erratum (`docs/m015a-evaluation-erratum.md`).
+Retrospective DEV findings: raw 1.0, final answerable 0.666…, false abstention
+0.333…, causal both-final 0.0 (context-only impossibility), nuisance
+both-final 1.0. No retuning, no new FINAL, no M016 benefit claimed. M016 must
+consume the v2 contract.

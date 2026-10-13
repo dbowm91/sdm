@@ -1,4 +1,5 @@
 //! Algorithm-neutral metrics for frozen predictions; no training dependency.
+pub mod choice_final_v2;
 use serde::{Deserialize, Serialize};
 use sha2::Digest;
 use thiserror::Error;

@@ -48,6 +48,20 @@ groups into the existing typed Choice schema and runs the linear, cross, and
 compositional baselines with an empty test partition. These are synthetic
 research artifacts, not CodeGG evidence or model qualification.
 
+M015 source merged via PR #4; historical development accuracy and causal-pair
+summary values must not be read as complete *final-action* Choice accuracy:
+the legacy diagnostic uses raw conditional argmax for answerable cases and
+final abstention for no-answer cases. The
+[M015a evaluation-integrity corrective](plans/implementation/general-decision-model-framework/015a-choice-development-evaluation-integrity-corrective.md)
+is implemented on this branch with immutable-history erratum
+(`docs/m015a-evaluation-erratum.md`) and DEV-only revised final-action metrics
+(`target/m015a/`, contract `choice-final-v2`): raw conditional 1.0, final
+answerable 0.666…, false abstention 0.333…, causal both-final 0.0
+(context-only impossibility), nuisance both-final 1.0. No retuning, no new
+FINAL, no model qualification. [M016](plans/implementation/general-decision-model-framework/016-tinychoice-mlp-and-baseline-comparison.md)
+remains blocked until M015a is reviewed, merged, green on merged-main CI, and
+accepted via `015a-status.md`; it must consume the v2 contract.
+
 ## Build and qualify
 
 ```sh

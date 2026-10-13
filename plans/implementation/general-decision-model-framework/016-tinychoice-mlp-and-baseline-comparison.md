@@ -1,18 +1,18 @@
 # SDM M016 — TinyChoice compact Choice/answerability head and baseline comparison
 
-Status: **blocked on M015 accepted closure** (planning registered; no implementation).
+Status: **blocked on M015 accepted source/CI integration AND M015a final-action evaluation-integrity corrective closure** (planning registered; no implementation).
 Class: capability.
 Planning baseline: dbowm91/sdm@c048189d7026d723c7da584d7429cb275c714d23 (2026-10-13); refresh before start.
 Research: docs/m015-small-model-research.md.
 Roadmap: plans/subsystems/general-decision-model-framework-roadmap.md.
 Authority: ADR-0001, ADR-0002, M015 data/protocol, CodeGG ADR-0013.
-Hard predecessor: all M015 gates M15-1..8 accepted, implementation source merged and main CI green.
+Hard predecessors: all M015 gates M15-1..8 accepted, PR #4 merged (`e7655429`), independently verified merged-main CI; AND all M015a gates M15a-1..8 accepted with reviewed merged PR, green merged-main CI and immutable-history DEV erratum. M015a plan: `015a-choice-development-evaluation-integrity-corrective.md`.
 Soft/operational: offline shallow-tree baseline tooling may be independent from native runtime; 3-host benchmarks depend on accessible runners.
 Successor: M017 blocked until M016 closure and new prospective freeze.
 
 ## 1. Objective and contract
 
-Implement and evaluate an optional **small, native-CPU, task-conditioned Choice model** with (a) one SHARED context/candidate nonlinear scorer and (b) separately trained permutation-invariant answerability (no-option) probability. Compare against SAME-feature existing legacy/cross/compositional Choice, deterministic rule oracle and a shallow boosted-tree benchmark. Declare learned-model quality DEV-ONLY, not qualifying or promoting it. Model size is a hypothesis, not proof of usefulness: two candidate hidden widths 32 and 64; provisional 5k–50k actual trainable parameters, bounded by the measured input dimension and artifact caps. Do not increase a cap or artificially pad weights to meet it.
+Implement and evaluate an optional **small, native-CPU, task-conditioned Choice model** with (a) one SHARED context/candidate nonlinear scorer and (b) separately trained permutation-invariant answerability (no-option) probability. Compare against SAME-feature existing legacy/cross/compositional Choice, deterministic rule oracle and a shallow boosted-tree benchmark. Declare learned-model quality DEV-ONLY, not qualifying or promoting it. **Mandatory evaluation contract:** consume M015a v2 *final-action* Choice correctness and pair metrics; raw conditional argmax, abstention/coverage and no-answer sources stay separate. The historical M015 all-1.0 baseline summary is NOT a valid final-action performance ceiling or comparison. Model size is a hypothesis, not proof of usefulness: two candidate hidden widths 32 and 64; provisional 5k–50k actual trainable parameters, bounded by the measured input dimension and artifact caps. Do not increase a cap or artificially pad weights to meet it.
 
 Respect the existing `DecisionSpec::Choice` requirement of **2..=128 options**; 0/1 invalid requests must fail closed in the existing core, NOT turn into valid Choice(None) through an accidental API change. For 2+ valid options, `Choice(None)` means no eligible answer. The runtime returns only one supplied option ID or None, never constructs a new ID. CodeGG owns tool admission/permissions.
 
@@ -36,7 +36,7 @@ E. Keep the native CPU inference-only crate isolated: no `sdm-training`, `sdm-ev
 2. Build a genuinely trained shallow-tree ensemble benchmark (e.g. a fixed small-depth gradient-boosted tree model) using locked offline-only build/tooling, with exact feature ordering, max depth/estimators/seed and exportable results. The baseline may remain research-only and NOT be loaded into the Rust runtime; choose a scoped Rust implementation or approved isolated Python development environment without network access at run time. Audit tree feature equivalence and schema—no target-derived or test-family ID features. If tree training cannot be reproduced under available resources, label tree comparison **indeterminate** and do not claim neural superiority to trees.
 3. Run bounded train/dev grid: 32/64 widths, at most three independent seeds each, at most three DEV-selected learning rates and two regularization points (<=36 trained MLP configurations). Record all candidates, masks, gradients, learning curves, baseline scores and discarded failures; choose at most one MLP candidate/operating threshold solely on independent DEV metrics. Do not tune on M013a/M014/M014b FINAL, nor on future M017 final.
 4. DEV diagnostics: answerable conditional accuracy, NLL, Brier (explicit multiclass conventions), answerability AUROC/AP, no-answer recall, false abstention, ECE/calibration bins, coverage/selective risk, option-id/order invariance, correct-on-both causal counterfactuals, stable nuisance-pair predictions, per-family/support CI. Include structural heldouts with and without rule information, preserving impossible rule-hidden control as its own result.
-5. Ablations: context-only vs candidate-only, no answerability head vs explicit head, compositional feature removal, note/text-only nuisance perturbation, maximum relevant-candidate count and seed sensitivity; disclose any role-encoding shortcut. Reject a purported successful model if its raw logits are invariant to causal flips or depend on option ordering.
+5. Ablations: context-only vs candidate-only, no answerability head vs explicit head, compositional feature removal, note/text-only nuisance perturbation, maximum relevant-candidate count and seed sensitivity; disclose any role-encoding shortcut. In particular, M015a must first demonstrate that context-only answerability cannot simultaneously get both final actions right on candidate-flip pairs; the new symmetric candidate-aware head must be scored against that baseline using the SAME *final-action* decision contract. Reject a purported successful model if its raw logits are invariant to causal flips or depend on option ordering.
 
 ## 4. Failure, restart, resource and security
 
