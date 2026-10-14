@@ -111,7 +111,12 @@ def paired_bootstrap_diffs(units, val_a, val_b, seed=150015, replicates=2000):
             ta += na
             sb += cb
             tb += nb
-        diffs.append(sa / ta - sb / tb)
+        if ta == 0 or tb == 0:
+            # Degenerate resample (no eligible rows for one side): no
+            # information, record zero diff. Unreachable on powered cohorts.
+            diffs.append(0.0)
+        else:
+            diffs.append(sa / ta - sb / tb)
     diffs.sort()
     alpha = 0.025
 
