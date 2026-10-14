@@ -1,6 +1,6 @@
 # SDM M017 — TinyChoice prospective synthetic qualification and portable model evidence
 
-Status: **closing (freeze committed + CI green pre-final; final consumed exactly once 2026-10-14 with synthetic-only negative disposition; ledger + manifests committed; PR #7 review/merge pending)**.
+Status: **closed (PR #7 merged as 4a28a42 with merged-main CI 38498985798 green; final consumed once with synthetic-only negative disposition; see `plans/closure/general-decision-model-framework/017-status.md`)**.
 Class: capability / prospective evidence qualification.
 Planning baseline: dbowm91/sdm@c17492a5c6348bab842a6c39650897733eb5c77f (2026-10-14); M016 merged-main CI 38489890063 green.
 Research: docs/m015-small-model-research.md.
