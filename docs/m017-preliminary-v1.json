@@ -1,0 +1,85 @@
+{
+  "cohorts": {
+    "canary": {
+      "groups": 60,
+      "output_sha256": "sha256:21da6476b55588f43eed520b8a7911e7c7bedab75bedb349caa152ae958d7794",
+      "path": "target/m017-freeze/canary.jsonl",
+      "rows": 130,
+      "seed": 170017
+    },
+    "final": {
+      "groups": 1000,
+      "output_sha256": "sha256:743b6dce873bc5c8e5242f3a63fcd2ae16e23621cdeb2f0cc90bc1b430a67b9d",
+      "path": "target/m017-freeze/final.jsonl",
+      "rows": 3560,
+      "seed": 170018
+    }
+  },
+  "evaluator_sources": {
+    "crates/sdm-experiment/src/lib.rs": "sha256:2871e35ee592afbb4b750335f159693dfd4e47bf6102f491b0c7bfadc66b0fb3",
+    "crates/sdm-experiment/src/m015a.rs": "sha256:b359a48a79f3e2a504387a8586f9154affb89c5fbb48f70eb09c34eca9a1a91d",
+    "crates/sdm-experiment/src/m016.rs": "sha256:132e2da7a4f21c3bcee49eb4a518a26ae6f0a64dce606fbd90f3de066385636d",
+    "crates/sdm-experiment/src/main.rs": "sha256:0f17e42a72c1436453289e1add76206a804361d7d86c1466983862043a08d119",
+    "crates/sdm-runtime/src/lib.rs": "sha256:46497791afbfd2140f822e0fc1cfec1f2b73fc47fa663194ac8f845e4532da3b",
+    "crates/sdm-runtime/src/tinymlp.rs": "sha256:93a6fd44e6167fc2987161e4016a289f0f50fd522f5f97afd37ee01b79fd63b4",
+    "scripts/analyze_m017_final.py": "sha256:3f910cd4911bda1a13e3f7e08f516184ab4c94530d4c032c1bbdbcfa895464db",
+    "scripts/materialize_m017.py": "sha256:ffb667df314ced62cb523b9e8c8430e22e9b04b421762703bcfc4c7c15fa93cb"
+  },
+  "frozen_models": {
+    "legacy_dev_pins": {
+      "typed-choice": {
+        "causal_both_final": 0.0,
+        "dev_answerable_final_accuracy_v2": 0.6666666666666666,
+        "dev_conditional_argmax_accuracy_v2": 1.0,
+        "dev_false_abstention_rate_v2": 0.3333333333333333,
+        "dev_no_answer_recall_v2": 1.0,
+        "nuisance_both_final": 1.0
+      },
+      "typed-choice-compositional": {
+        "causal_both_final": 0.0,
+        "dev_answerable_final_accuracy_v2": 0.6666666666666666,
+        "dev_conditional_argmax_accuracy_v2": 1.0,
+        "dev_false_abstention_rate_v2": 0.3333333333333333,
+        "dev_no_answer_recall_v2": 1.0,
+        "nuisance_both_final": 1.0
+      },
+      "typed-choice-cross": {
+        "causal_both_final": 0.0,
+        "dev_answerable_final_accuracy_v2": 0.6666666666666666,
+        "dev_conditional_argmax_accuracy_v2": 1.0,
+        "dev_false_abstention_rate_v2": 0.3333333333333333,
+        "dev_no_answer_recall_v2": 1.0,
+        "nuisance_both_final": 1.0
+      }
+    },
+    "legacy_regeneration": {
+      "dataset_sha256": "sha256:f0d614db315836c41f2a79f998aed47331f0fc234c0e2a3b516638d9ebd702a9",
+      "procedure": "run_m016_comparison.py baselines on M015 bytes (same code commit + dataset SHAs as M016); functional DEV pins must match within 1e-9 or fail closed",
+      "split_fingerprint": "sha256:7f0e872990247cd21a45a6f7d3c2f08728272fc99763fa7c886eda53dd008e69"
+    },
+    "typed-choice-tinymlp": {
+      "artifact_file_sha256": "sha256:2761dab57ecb5c01350c01c309091dde41e60d9e8e74473cce3d46479c2e66d2",
+      "artifact_path": "/Users/davidbowman/projects/sdm/fixtures/m016-tinymlp-selected.artifact.json",
+      "artifact_tensor_sha256": "sha256:453f9ea708bb67734c9bfc9fe5552baca7cf03ad5c8459dc8e3ca1b98281a9b3",
+      "dev_pins": {
+        "causal_both_final": 0.98125,
+        "dev_answerable_final_accuracy_v2": 1.0,
+        "dev_conditional_argmax_accuracy_v2": 1.0,
+        "dev_false_abstention_rate_v2": 0.0,
+        "dev_no_answer_recall_v2": 0.9875,
+        "nuisance_both_final": 1.0
+      },
+      "dev_threshold": 0.63
+    }
+  },
+  "generator": "scripts/generate_m017_suite.py",
+  "generator_sha256": "sha256:1208c499cb0122a25e4b1c5a6e378f3702f39470087e37c4eebec0b3095b5d94",
+  "m016_comparison": "target/m016/m016-comparison.json",
+  "m016_disposition": "positive-dev-only",
+  "materializer": "scripts/materialize_m017.py",
+  "materializer_sha256": "sha256:ffb667df314ced62cb523b9e8c8430e22e9b04b421762703bcfc4c7c15fa93cb",
+  "protocol": "docs/m017-protocol-v1.json",
+  "protocol_sha256": "sha256:0ca6123b5a06ef2186c4157e2abe684e8618bec8fa298e64593e3ba0f893bb83",
+  "schema": "sdm-m017-preliminary-v1",
+  "support_minimum_groups_per_family": 150
+}

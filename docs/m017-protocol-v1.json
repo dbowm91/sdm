@@ -5,7 +5,8 @@
     "generator": "scripts/generate_m017_suite.py",
     "canary": {"groups": 60, "seed": 170017},
     "final": {"groups": 1000, "seed": 170018},
-    "minimum_eligible_groups_per_family_per_primary_metric": 150
+    "minimum_eligible_groups_per_family_per_primary_metric": 150,
+    "minimum_note": "150 applies to the final cohort; the public canary needs every family present (>= 5 groups)"
   },
   "models": {
     "primary": "typed-choice-tinymlp (frozen fixture fixtures/m016-tinymlp-selected.artifact.json, DEV threshold 0.63)",

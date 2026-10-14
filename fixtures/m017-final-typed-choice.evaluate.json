@@ -1,0 +1,8 @@
+{
+  "cohort": "final",
+  "cohort_output_sha256": "sha256:743b6dce873bc5c8e5242f3a63fcd2ae16e23621cdeb2f0cc90bc1b430a67b9d",
+  "expected_architecture": "typed-choice",
+  "note": "exact artifact/dataset/split/provenance SHAs bound at final materialization time; this config binds the frozen preliminary inputs and the cohort/test-membership SHAs",
+  "preliminary": "docs/m017-preliminary-v1.json",
+  "preliminary_sha256": "sha256:9889a47031757a4fd2d73d119020a4943acd5f50958fef3d9b56d3f8097ed521"
+}

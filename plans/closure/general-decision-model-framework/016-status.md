@@ -1,7 +1,7 @@
 # SDM M016 — TinyChoice compact Choice/answerability head and baseline comparison: closure
 
-Status: **CLOSING (implementation + DEV evidence complete on `work/plans-sdm-m016-tinymlp`;
-branch CI + review + merged-main CI pending)**.
+Status: **CLOSED (PR #6 merged as `c17492a5`; merged-main CI 38489890063 green
+11/11)**.
 Plan: `plans/implementation/general-decision-model-framework/016-tinychoice-mlp-and-baseline-comparison.md`.
 Planning baseline: `main@0dd2ff470285c09309e3c823fb07dcb76efea229` (M015a merge).
 
@@ -59,7 +59,7 @@ below; no FINAL has been observed).
 | M16-5 same-input comparison + legitimate tree | PASS | `scripts/run_m016_comparison.py`: same dataset/split/encoder bytes for 3 legacy heads (20-epoch `experiment run`), 36-config TinyMLP grid, isolated histogram-GBDT tree (depth 3, 30 estimators, lr 0.1, 32 bins, min-leaf 20, no RNG) on the exact exported vectors; paired diffs with 95% CIs |
 | M16-6 DEV-only metrics, CIs, negative controls | PASS | AUROC 0.9997 / AP 0.9999 / ECE 0.0113 / NLL 4e-6; per-family final 1.0 (5/5); per-option-count final 1.0 (k=2..8, support 51..84); group bootstrap CIs in every sidecar; context-only ablation 0.29 vs candidate-only 1.0 (candidate projections embed context+rule by M015 construction — disclosed, same for all heads); tree as independent control |
 | M16-7 capacity, resources, ≥2 hosts + third | PASS | h=32: 1607 params / 104545 bytes; h=64: 3143 params (below the provisional 5k–50k: encoder dim is 23, no padding per plan); release latency encode+infer 0.2µs (2 opts) … 9.1µs (128 opts), sub-ms on all counts; training host linux-x86_64 release (authoritative); inference parity test runs on all CI hosts over committed bytes (decisions exact, probs 1e-9). PLATFORM FINDING (M014c precedent): macOS-arm64 release training selects the identical config with identical metrics but differs in last-ulp weight bytes (fixture `453f9ea7…` macOS vs `2761dab5…` linux); CI asserts hosted byte-reproducibility and failed once on the macOS bytes (retained failure) before the fixture was re-frozen to the hosted bytes |
-| M16-8 no bleed, no scope creep, honest closure | PASS (pending merge) | `cargo tree -p sdm-runtime` shows no training/eval/Python/GPU/network deps; no CodeGG/corpus/publisher changes; no FINAL observed; this file; branch CI + merged-main CI pending |
+| M16-8 no bleed, no scope creep, honest closure | PASS | `cargo tree -p sdm-runtime` shows no training/eval/Python/GPU/network deps; no CodeGG/corpus/publisher changes; no FINAL observed; this file; branch CI + merged-main CI 38489890063 green |
 
 ## 4. Full grid (36 configs, 20 epochs, release)
 
