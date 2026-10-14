@@ -1,6 +1,7 @@
 //! Reproducible, frozen-split Rank experiments. Training and calibration APIs
 //! receive only their respective partitions; test labels are evaluation-only.
 pub mod m015a;
+pub mod m016;
 use sdm_core::{features_for, DecisionSpec};
 use sdm_data::{
     validate_dataset, validate_split, DatasetExample, Provenance, SplitManifest, TargetLabel,
@@ -544,6 +545,7 @@ fn semantic_task(architecture: &str) -> Option<&'static str> {
     match architecture {
         "typed-binary" => Some("binary"),
         "typed-choice" | "typed-choice-cross" | "typed-choice-compositional" => Some("choice"),
+        "typed-choice-tinymlp" => Some("choice"),
         "typed-score" => Some("score"),
         _ => None,
     }
@@ -1106,6 +1108,11 @@ fn bounded_nontext_choice_triples(
 pub fn run_semantic(
     spec: &ExperimentSpec,
 ) -> Result<SemanticExperimentRunManifest, ExperimentError> {
+    if spec.architecture == "typed-choice-tinymlp" {
+        return Err(ExperimentError::Invalid(
+            "typed-choice-tinymlp trains only via experiment m016-train (bounded grid)".into(),
+        ));
+    }
     let task = semantic_task(&spec.architecture)
         .ok_or_else(|| ExperimentError::Invalid("not a typed non-Rank architecture".into()))?;
     let choice_cross = spec.architecture == "typed-choice-cross";
@@ -1947,10 +1954,11 @@ pub struct EvaluateSpec {
     pub expected_split_fingerprint: String,
     pub expected_test_membership_sha256: String,
     /// Spec architecture: typed-binary, typed-choice, typed-choice-cross,
-    /// typed-choice-compositional, typed-score.
+    /// typed-choice-compositional, typed-choice-tinymlp, typed-score.
     pub expected_architecture: String,
     /// Envelope architecture: sdm-typed-task-v1,
-    /// sdm-typed-choice-cross-v1, sdm-typed-choice-compositional-v1.
+    /// sdm-typed-choice-cross-v1, sdm-typed-choice-compositional-v1,
+    /// sdm-typed-choice-tinymlp-v1.
     pub expected_artifact_architecture: String,
     pub expected_feature_schema_sha256: String,
     pub expected_calibration_sha256: String,
@@ -1976,6 +1984,9 @@ pub struct SemanticEvaluateOutcome {
     pub answerability_probability: Option<f64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub nuisance_probabilities: Option<BTreeMap<String, f64>>,
+    /// Request option IDs in `raw_probabilities` order (Choice only).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub option_ids: Option<Vec<String>>,
     pub abstained: bool,
 }
 
@@ -2038,7 +2049,71 @@ fn expected_envelope_architecture(spec_arch: &str) -> Option<&'static str> {
         "typed-binary" | "typed-choice" | "typed-score" => Some("sdm-typed-task-v1"),
         "typed-choice-cross" => Some("sdm-typed-choice-cross-v1"),
         "typed-choice-compositional" => Some("sdm-typed-choice-compositional-v1"),
+        "typed-choice-tinymlp" => Some("sdm-typed-choice-tinymlp-v1"),
         _ => None,
+    }
+}
+
+/// Inference-only runtime dispatch for `run_evaluate`: legacy typed heads
+/// share `TypedTaskRuntime`; TinyMLP uses its own runtime behind the same
+/// four Choice methods. Training is unreachable from this path.
+enum EvalRuntime<'a> {
+    Legacy(&'a sdm_runtime::TypedTaskRuntime),
+    TinyMlp(&'a sdm_runtime::tinymlp::TinyMlpChoiceRuntime),
+}
+
+impl EvalRuntime<'_> {
+    fn decide_typed(
+        &self,
+        request: &sdm_core::DecisionRequest,
+        features: &sdm_core::TypedRankProjectionV2,
+    ) -> Result<sdm_core::DecisionResponse, sdm_core::DecisionError> {
+        match self {
+            EvalRuntime::Legacy(rt) => rt.decide_typed(request, features),
+            EvalRuntime::TinyMlp(rt) => rt.decide_typed(request, features),
+        }
+    }
+    fn choice_probabilities(
+        &self,
+        request: &sdm_core::DecisionRequest,
+        features: &sdm_core::TypedRankProjectionV2,
+    ) -> Result<Vec<f64>, sdm_core::DecisionError> {
+        match self {
+            EvalRuntime::Legacy(rt) => rt.choice_probabilities(request, features),
+            EvalRuntime::TinyMlp(rt) => rt.choice_probabilities(request, features),
+        }
+    }
+    fn choice_logits(
+        &self,
+        request: &sdm_core::DecisionRequest,
+        features: &sdm_core::TypedRankProjectionV2,
+    ) -> Result<Vec<f64>, sdm_core::DecisionError> {
+        match self {
+            EvalRuntime::Legacy(rt) => rt.choice_logits(request, features),
+            EvalRuntime::TinyMlp(rt) => rt.choice_logits(request, features),
+        }
+    }
+    fn choice_answerability_probability(
+        &self,
+        request: &sdm_core::DecisionRequest,
+        features: &sdm_core::TypedRankProjectionV2,
+    ) -> Result<f64, sdm_core::DecisionError> {
+        match self {
+            EvalRuntime::Legacy(rt) => rt.choice_answerability_probability(request, features),
+            EvalRuntime::TinyMlp(rt) => rt.choice_answerability_probability(request, features),
+        }
+    }
+    fn binary_probability(
+        &self,
+        request: &sdm_core::DecisionRequest,
+        features: &sdm_core::TypedRankProjectionV2,
+    ) -> Result<f64, sdm_core::DecisionError> {
+        match self {
+            EvalRuntime::Legacy(rt) => rt.binary_probability(request, features),
+            EvalRuntime::TinyMlp(_) => Err(sdm_core::DecisionError::InvalidRequest(
+                "tinymlp is Choice-only".into(),
+            )),
+        }
     }
 }
 
@@ -2139,13 +2214,40 @@ pub fn run_evaluate(spec: &EvaluateSpec) -> Result<SemanticEvaluateManifest, Exp
         )));
     }
     // Load artifact read-only; reuse pure scoring logic. No training call.
+    // TinyMLP dispatches to its own runtime; architectures must match exactly.
     let loaded =
         load_artifact(&artifact_bytes).map_err(|e| ExperimentError::Invalid(e.to_string()))?;
-    let LoadedArtifact::TypedTaskV2(runtime) = loaded else {
-        return Err(ExperimentError::Invalid(
-            "evaluate supports typed task artifacts only".into(),
-        ));
+    let legacy_runtime;
+    let tinymlp_runtime;
+    let runtime = match &loaded {
+        LoadedArtifact::TypedTaskV2(rt) => {
+            legacy_runtime = rt;
+            EvalRuntime::Legacy(legacy_runtime)
+        }
+        LoadedArtifact::TinyMlpChoiceV2(rt) => {
+            tinymlp_runtime = rt;
+            EvalRuntime::TinyMlp(tinymlp_runtime)
+        }
+        _ => {
+            return Err(ExperimentError::Invalid(
+                "evaluate supports typed task artifacts only".into(),
+            ))
+        }
     };
+    if matches!(runtime, EvalRuntime::TinyMlp(_))
+        && spec.expected_architecture != "typed-choice-tinymlp"
+    {
+        return Err(ExperimentError::Invalid(
+            "tinymlp artifact requires typed-choice-tinymlp architecture".into(),
+        ));
+    }
+    if matches!(runtime, EvalRuntime::Legacy(_))
+        && spec.expected_architecture == "typed-choice-tinymlp"
+    {
+        return Err(ExperimentError::Invalid(
+            "typed-choice-tinymlp requires tinymlp artifact".into(),
+        ));
+    }
     let envelope: ArtifactEnvelopeV2 = serde_json::from_slice(&artifact_bytes)
         .map_err(|e| ExperimentError::Invalid(e.to_string()))?;
     if envelope.architecture != spec.expected_artifact_architecture {
@@ -2229,6 +2331,7 @@ pub fn run_evaluate(spec: &EvaluateSpec) -> Result<SemanticEvaluateManifest, Exp
                         raw_logits: None,
                         answerability_probability: None,
                         nuisance_probabilities: None,
+                        option_ids: None,
                         abstained: was_abstained,
                     });
                 }
@@ -2301,6 +2404,9 @@ pub fn run_evaluate(spec: &EvaluateSpec) -> Result<SemanticEvaluateManifest, Exp
                         }
                         _ => serde_json::Value::Null,
                     };
+                    let sdm_core::DecisionSpec::Choice { options, .. } = &e.request.spec else {
+                        unreachable!()
+                    };
                     outcomes.push(SemanticEvaluateOutcome {
                         case_id: e.case_id.clone(),
                         leakage_group: e.leakage_group.clone(),
@@ -2312,6 +2418,7 @@ pub fn run_evaluate(spec: &EvaluateSpec) -> Result<SemanticEvaluateManifest, Exp
                         raw_logits,
                         answerability_probability: answerability,
                         nuisance_probabilities: None,
+                        option_ids: Some(options.iter().map(|o| o.id.clone()).collect()),
                         abstained,
                     });
                 }
@@ -2360,6 +2467,7 @@ pub fn run_evaluate(spec: &EvaluateSpec) -> Result<SemanticEvaluateManifest, Exp
                             raw_logits: None,
                             answerability_probability: None,
                             nuisance_probabilities: None,
+                            option_ids: None,
                             abstained: false,
                         });
                     } else {
@@ -2375,6 +2483,7 @@ pub fn run_evaluate(spec: &EvaluateSpec) -> Result<SemanticEvaluateManifest, Exp
                             raw_logits: None,
                             answerability_probability: None,
                             nuisance_probabilities: None,
+                            option_ids: None,
                             abstained: true,
                         });
                     }
@@ -2566,6 +2675,11 @@ pub fn run(spec: &ExperimentSpec) -> Result<ExperimentRunManifest, ExperimentErr
                     ExperimentError::Invalid("typed task features absent at inference".into())
                 })?,
             ),
+            LoadedArtifact::TinyMlpChoiceV2(_) => {
+                return Err(ExperimentError::Invalid(
+                    "tinymlp Choice artifact does not support Rank inference".into(),
+                ))
+            }
             LoadedArtifact::UnsupportedV2(_) => {
                 return Err(ExperimentError::Invalid(
                     "runtime does not support trained artifact".into(),

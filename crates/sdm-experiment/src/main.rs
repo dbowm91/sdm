@@ -10,10 +10,15 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = env::args().collect();
     if args.len() != 5
         || args[1] != "experiment"
-        || (args[2] != "run" && args[2] != "evaluate" && args[2] != "m015a-replay")
+        || (args[2] != "run"
+            && args[2] != "evaluate"
+            && args[2] != "m015a-replay"
+            && args[2] != "m016-train")
         || args[3] != "--config"
     {
-        return Err("usage: sdm experiment (run|evaluate|m015a-replay) --config PATH".into());
+        return Err(
+            "usage: sdm experiment (run|evaluate|m015a-replay|m016-train) --config PATH".into(),
+        );
     }
     let path = &args[4];
     let mut bytes = Vec::new();
@@ -37,6 +42,14 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         // test, never rewrites historical artifacts.
         let spec: sdm_experiment::m015a::M015aReplaySpec = serde_json::from_slice(&bytes)?;
         let result = serde_json::to_value(sdm_experiment::m015a::run_m015a_replay(&spec)?)?;
+        println!("{}", serde_json::to_string_pretty(&result)?);
+        return Ok(());
+    }
+    if args[2] == "m016-train" {
+        // M016 bounded-grid TinyMLP training on TRAIN with DEV-only selection.
+        // Never touches test; writes one envelope artifact + report atomically.
+        let spec: sdm_experiment::m016::M016TrainSpec = serde_json::from_slice(&bytes)?;
+        let result = serde_json::to_value(sdm_experiment::m016::run_m016_train(&spec)?)?;
         println!("{}", serde_json::to_string_pretty(&result)?);
         return Ok(());
     }

@@ -86,3 +86,25 @@ bootstrap seed/replicates/method, deterministic `report_sha256`). Legacy
 carry a `_v2` suffix. Atomic unique outputs under `target/m015a/` refuse
 overwrite; interruption leaves no accepted partial. See
 `docs/m015a-evaluation-erratum.md`.
+
+# M016 TinyMLP Choice architecture (additive, new identifier)
+
+`sdm-typed-choice-tinymlp-v1` is a separate additive Choice-only architecture:
+shared single-hidden-layer tanh scorer `s_i = W2·tanh(W1·[ctx;cand_i]+b1)+b2`
+(same `W1/b1/W2/b2` for every candidate; no position/ID input) plus a separately
+supervised symmetric answerability head `a = sigmoid(W·[ctx;mean(cands);
+max(cands)]+b)` with mean/max pooling over encoded candidates (permutation
+invariant). Payload binds the fitted encoder, schema fingerprint, hidden width
+(32/64), tanh activation, training fingerprint/seed, and dev calibration
+digest; task is choice-only with `2..=128` options and `Choice(None)` for
+no-answer (no synthetic None option). v2 envelope caps apply (16 MiB,
+1M params, candidate bound 128, finite weights/outputs); tensor SHA is checked
+before allocation/inference and declared parameter count must match payload
+bytes. `sdm-typed-task-v1`, cross and compositional artifacts are preserved
+byte-for-byte; v1 Rank wire is unchanged. Training (M016, `sdm-experiment`)
+is deterministic (seeded init/shuffle, bounded lr/epochs/L2, joint
+`CE(answerability)+lambda*CE(choice|answerable)` loss, DEV-calibrated
+threshold); runtime (`sdm-runtime::tinymlp`, no training/Python/GPU/network
+deps) is inference-only with exact ID membership and fail-closed malformed/
+oversized/unsupported/corrupted/drifted/mismatched inputs. See
+`plans/closure/general-decision-model-framework/016-status.md` (pending).

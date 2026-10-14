@@ -1,7 +1,7 @@
 # General Decision-Model Framework and First Consumer Roadmap
 
-Status: M014c closed and merged (11/11 main CI); **M015 source merged by PR #4 (`e7655429`), merged-main CI/closure reconciliation pending**; **M015a corrective CLOSING (branch implementation complete, review/merge/merged-main CI pending)**; M016 architecture/baselines BLOCKED on accepted M015 + M015a closures; M017 independent qualification BLOCKED on M016. M005 and crates.io separately gated.
-Audit baseline: original historical audit at 8139b064bdcf3212e8f6fd912e801a479b55751c (2026-10-05); current TinyChoice planning baseline main@e7655429b0695177a30a56aaeaeea8c83abfbe55 (2026-10-13).
+Status: M014c closed and merged (11/11 main CI); **M015 source merged by PR #4 (`e7655429`, merged-main CI 38447673360 green)**; **M015a corrective CLOSED (PR #5 `0dd2ff4`, merged-main CI 38460909332 green)**; M016 ACTIVE (unblocked, implementation in progress on `work/plans-sdm-m016-tinymlp`); M017 independent qualification BLOCKED on M016. M005 and crates.io separately gated.
+Audit baseline: original historical audit at 8139b064bdcf3212e8f6fd912e801a479b55751c (2026-10-05); current TinyChoice planning baseline main@0dd2ff470285c09309e3c823fb07dcb76efea229 (2026-10-13).
 Planning date: 2026-10-10
 Primary decisions: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md; plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md
 Planning governance: plans/003-planning-process.md
@@ -154,7 +154,7 @@ M014 -> M015 generalized tiny architecture comparisons is a SOFT, unregistered s
 
 Research rationale: [docs/m015-small-model-research.md](../../docs/m015-small-model-research.md). M014c closes source/evaluator parity and provenance mechanics, NOT model generalization. M014b tested fixed old AND/XOR candidates against changed AND-XOR/XNOR labels without observably specifying the changed target rule, and therefore cannot decide whether a model is robust to label-preserving nuisance shifts. New M015 research separates these identifiable questions and has no CodeGG-data hard dependency.
 
-Dependency graph (hard): `M014c (closed) → M015 (PR #4 merged; merged-main CI/closure verification pending) → M015a (READY; final-action evaluation-integrity corrective) → M016 (blocked) → M017 (blocked)`. M005 still externally deferred and publication still legal-gated.
+Dependency graph (hard): `M014c (closed) → M015 (PR #4 merged, merged-main green) → M015a (closed, PR #5 merged, merged-main green) → M016 (active) → M017 (blocked)`. M005 still externally deferred and publication still legal-gated.
 
 ### M015 — Oracle-audited synthetic corpus and prospective design foundation
 Class: capability / research infrastructure. Status: **source merged by PR #4; historical closure predates merge; merged-main CI/closure reconciliation not yet verified**. Plan: [015](../implementation/general-decision-model-framework/015-tinychoice-corpus-and-research-foundation.md); closure evidence: [015-status](../closure/general-decision-model-framework/015-status.md).
@@ -165,7 +165,7 @@ Class: corrective infrastructure/evaluation. Status: **CLOSING (branch implement
 Repaired false-abstention accounting, causally matched both-final-correct metrics, nuisance pair validity, contextual-only answerability impossibility, no-answer provenance support and group-level confidence intervals; preserved original M015 outputs/metrics and added source-bound retrospective TRAIN/DEV erratum (`docs/m015a-evaluation-erratum.md`, `target/m015a/`). Retrospective DEV: raw 1.0, final answerable 0.666…, causal both-final 0.0, nuisance both-final 1.0. Required M15a-1..8 proven locally; reviewed merge and green merged-main CI still required before M016. This is diagnostic repair, not a new model, threshold retuning, held-out evaluation or CodeGG policy change.
 
 ### M016 — TinyChoice native-CPU shared scorer and answerability
-Class: capability. Status: **blocked** on M015 integration AND M015a corrected DEV diagnostics/accepted merged-main closure. Plan: [016](../implementation/general-decision-model-framework/016-tinychoice-mlp-and-baseline-comparison.md).
+Class: capability. Status: **active** (unblocked 2026-10-13; M015a closed with merged-main green; implementation in progress). Plan: [016](../implementation/general-decision-model-framework/016-tinychoice-mlp-and-baseline-comparison.md).
 Introduce an **additive** `sdm-typed-choice-tinymlp-v1` optional Choice artifact: shared order-equivariant candidate MLP, separately supervised symmetric answerability head and dev-calibrated conditional score/abstention semantics. Probe 32/64-unit capacities and record actual parameters; evaluate existing linear/legacy/cross/compositional controls and independent shallow-tree benchmark on same feature/candidate universe. Any tree tooling is offline research-only and must not contaminate Rust runtime. Finite gradients, bounds, dependency isolation, metamorphic tests, 2..128 option contract and quantified DEV-only resource/quality evidence are required. No new FINAL evaluation or consumer promotion.
 
 ### M017 — Prospective one-time synthetic qualification and portability

@@ -31,6 +31,7 @@
     "examples/standalone_consumer.rs",
     "src/lib.rs",
     "src/m015a.rs",
+    "src/m016.rs",
     "src/main.rs"
   ],
   "sdm-nonlinear": [
@@ -49,7 +50,8 @@
     "examples/benchmark.rs",
     "examples/benchmark_nonlinear.rs",
     "examples/benchmark_typed_choice.rs",
-    "src/lib.rs"
+    "src/lib.rs",
+    "src/tinymlp.rs"
   ],
   "sdm-training": [
     ".cargo_vcs_info.json",

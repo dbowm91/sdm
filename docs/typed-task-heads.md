@@ -103,3 +103,17 @@ Retrospective DEV findings: raw 1.0, final answerable 0.666…, false abstention
 0.333…, causal both-final 0.0 (context-only impossibility), nuisance
 both-final 1.0. No retuning, no new FINAL, no M016 benefit claimed. M016 must
 consume the v2 contract.
+
+# M016 TinyMLP Choice head
+
+The opt-in `sdm-typed-choice-tinymlp-v1` runtime (`sdm-runtime::tinymlp`) adds
+a bounded shared candidate MLP plus a symmetric candidate-aware answerability
+head. For each permitted option it concatenates context + candidate encodings
+(no position/ID/leak features), applies the SAME tanh hidden layer (32/64
+units) and linear output; answerability pools mean/max over encoded candidates
+with the context (order invariant) and applies a DEV-calibrated threshold
+separate from conditional softmax ranking. Training (`sdm-experiment::m016`)
+is deterministic SGD on TRAIN only with joint answerability + conditional
+choice loss, finite-difference verified, and reproducible bytes; selection and
+calibration use DEV only via the M015a v2 final-action contract (no FINAL).
+Legacy diagonal/cross/compositional heads are preserved byte-for-byte.

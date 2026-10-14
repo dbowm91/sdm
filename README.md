@@ -48,19 +48,22 @@ groups into the existing typed Choice schema and runs the linear, cross, and
 compositional baselines with an empty test partition. These are synthetic
 research artifacts, not CodeGG evidence or model qualification.
 
-M015 source merged via PR #4; historical development accuracy and causal-pair
+M015 source merged via PR #4 (merged-main CI 38447673360 green); historical
+development accuracy and causal-pair
 summary values must not be read as complete *final-action* Choice accuracy:
 the legacy diagnostic uses raw conditional argmax for answerable cases and
 final abstention for no-answer cases. The
 [M015a evaluation-integrity corrective](plans/implementation/general-decision-model-framework/015a-choice-development-evaluation-integrity-corrective.md)
-is implemented on this branch with immutable-history erratum
+is closed (PR #5 `0dd2ff4`, merged-main CI 38460909332 green) with
+immutable-history erratum
 (`docs/m015a-evaluation-erratum.md`) and DEV-only revised final-action metrics
 (`target/m015a/`, contract `choice-final-v2`): raw conditional 1.0, final
 answerable 0.666…, false abstention 0.333…, causal both-final 0.0
 (context-only impossibility), nuisance both-final 1.0. No retuning, no new
 FINAL, no model qualification. [M016](plans/implementation/general-decision-model-framework/016-tinychoice-mlp-and-baseline-comparison.md)
-remains blocked until M015a is reviewed, merged, green on merged-main CI, and
-accepted via `015a-status.md`; it must consume the v2 contract.
+is active (unblocked; `sdm-typed-choice-tinymlp-v1` shared scorer + symmetric
+answerability in progress on `work/plans-sdm-m016-tinymlp`); it consumes the
+v2 contract.
 
 ## Build and qualify
 
@@ -197,4 +200,4 @@ M014c implementation `af74c01` on `work/plans-sdm-m014c-closure-evidence-reconci
 
 ## M015–M017 TinyChoice research line (2026-10-13)
 
-[M015](plans/implementation/general-decision-model-framework/015-tinychoice-corpus-and-research-foundation.md) now has a conditionally closed implementation branch: its source-defined train/dev corpus, independent oracle, counterfactual checks and existing typed-head baseline harness are recorded in [M015 closure evidence](plans/closure/general-decision-model-framework/015-status.md). Reviewed merge and merged-main CI remain pending. [M016](plans/implementation/general-decision-model-framework/016-tinychoice-mlp-and-baseline-comparison.md) stays **blocked** until M015 integration closes; it covers a small shared candidate MLP, separate answerability head and tabular baselines. [M017](plans/implementation/general-decision-model-framework/017-tinychoice-prospective-qualification-and-portability.md) stays **blocked on M015/M016** and defines a new preregistered synthetic final test with two-phase artifact hashes and one-time read-only evaluation. [Research justification](docs/m015-small-model-research.md); authoritative status is in the [registry](plans/registry.md). The already-consumed M014b FINAL is immutable; there is no CodeGG model/data integration or crates.io approval. Existing Choice requests require 2–128 options; zero- and one-option cases fail closed.
+[M015](plans/implementation/general-decision-model-framework/015-tinychoice-corpus-and-research-foundation.md) source is merged (PR #4, merged-main green): its source-defined train/dev corpus, independent oracle, counterfactual checks and existing typed-head baseline harness are recorded in [M015 closure evidence](plans/closure/general-decision-model-framework/015-status.md). [M015a](plans/implementation/general-decision-model-framework/015a-choice-development-evaluation-integrity-corrective.md) is closed (PR #5, merged-main green). [M016](plans/implementation/general-decision-model-framework/016-tinychoice-mlp-and-baseline-comparison.md) is active (unblocked, implementation in progress); it covers a small shared candidate MLP, separate answerability head and tabular baselines. [M017](plans/implementation/general-decision-model-framework/017-tinychoice-prospective-qualification-and-portability.md) stays **blocked on M015/M016** and defines a new preregistered synthetic final test with two-phase artifact hashes and one-time read-only evaluation. [Research justification](docs/m015-small-model-research.md); authoritative status is in the [registry](plans/registry.md). The already-consumed M014b FINAL is immutable; there is no CodeGG model/data integration or crates.io approval. Existing Choice requests require 2–128 options; zero- and one-option cases fail closed.
