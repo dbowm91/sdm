@@ -83,7 +83,10 @@ def main():
         fams = {}
         for r in rows:
             fams.setdefault(r["family"], set()).add(r["group_id"])
-        minimum = prelim["support_minimum_groups_per_family"]
+        # Support minimums: final cohort needs powered families (150); the
+        # public canary only needs every family present (>= 5 groups).
+        minimum = prelim["support_minimum_groups_per_family"] \
+            if cohort == "final" else 5
         for fam, groups in sorted(fams.items()):
             check(f"support:{cohort}:{fam}", len(groups) >= minimum,
                   f"{len(groups)} groups < {minimum}")

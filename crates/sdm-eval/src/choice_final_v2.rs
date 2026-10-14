@@ -115,9 +115,13 @@ impl ChoiceFinalCase {
         if self.case_id.is_empty() || self.leakage_group.is_empty() || self.family.is_empty() {
             return Err(EvalError::Invalid("empty case/group/family id".into()));
         }
-        if self.split != "train" && self.split != "dev" {
+        // The v2 math is partition-agnostic; train/dev/test are admitted and
+        // pair matching requires same-split pairs. Partition discipline
+        // (M015a DEV-only, M017 test-only) lives with the callers, which
+        // enforce it via census and split-membership checks.
+        if self.split != "train" && self.split != "dev" && self.split != "test" {
             return Err(EvalError::Invalid(format!(
-                "split must be train/dev, got '{}'",
+                "split must be train/dev/test, got '{}'",
                 self.split
             )));
         }
@@ -1494,6 +1498,30 @@ mod tests {
         );
         assert_eq!(report.dev_answerable_final_accuracy_v2.value, None);
         assert_eq!(report.dev_no_answer_final_recall_v2.value, Some(1.0));
+    }
+
+    #[test]
+    fn split_admits_train_dev_and_test_partitions() {
+        // The v2 math is partition-agnostic (M015a DEV-only, M017 test-only);
+        // callers enforce partition discipline. Empty/unknown splits fail.
+        let mut c = case(
+            "c1",
+            "g1",
+            Some("a"),
+            Some("a"),
+            &["a", "b"],
+            &[0.9, 0.1],
+            0.9,
+            None,
+        );
+        for split in ["train", "dev", "test"] {
+            c.split = split.into();
+            assert!(c.validate().is_ok(), "{split}");
+        }
+        c.split = String::new();
+        assert!(c.validate().is_err());
+        c.split = "final".into();
+        assert!(c.validate().is_err());
     }
 
     #[test]

@@ -1,8 +1,8 @@
 # SDM M017 — TinyChoice prospective synthetic qualification and portable model evidence
 
-Status: **blocked on M015 + M015a + M016 accepted closures** (registered future handoff; NO final dataset generated).
+Status: **closing (freeze committed + CI green pre-final; final consumed exactly once 2026-10-14 with synthetic-only negative disposition; ledger + manifests committed; PR #7 review/merge pending)**.
 Class: capability / prospective evidence qualification.
-Planning baseline: dbowm91/sdm@c048189d7026d723c7da584d7429cb275c714d23 (2026-10-13); re-audit before implementation.
+Planning baseline: dbowm91/sdm@c17492a5c6348bab842a6c39650897733eb5c77f (2026-10-14); M016 merged-main CI 38489890063 green.
 Research: docs/m015-small-model-research.md.
 Roadmap and governance: general-decision-model-framework-roadmap.md; plans/003-planning-process.md.
 Hard predecessors: M015 generator/oracle/protocol accepted and merged; M015a versioned final-action evaluation/pair-support correction accepted, merged and main CI green; M016 trained model and valid DEV-only comparison closed, integrated main green; sufficient independent eligible support for new test predeclared. M017 must not inherit the historical mixed raw/final M015 diagnostic keys.

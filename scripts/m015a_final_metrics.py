@@ -56,8 +56,8 @@ def conditional_argmax(option_ids, probs):
 def validate_case(c):
     if not c.get("case_id") or not c.get("leakage_group") or not c.get("family"):
         raise ValueError("empty case/group/family id")
-    if c.get("split") not in ("train", "dev"):
-        raise ValueError(f"split must be train/dev, got {c.get('split')!r}")
+    if c.get("split") not in ("train", "dev", "test"):
+        raise ValueError(f"split must be train/dev/test, got {c.get('split')!r}")
     options = c.get("option_ids") or []
     if not 2 <= len(options) <= 128:
         raise ValueError(f"Choice requires 2..=128 options, got {len(options)}")

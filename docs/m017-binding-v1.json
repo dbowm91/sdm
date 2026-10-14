@@ -1,0 +1,13 @@
+{
+  "binding_sha256": "sha256:49f0bde34f8cbb59e4e7ae3b00898bea3623a4618a7bb5effddc0a3bea91ad68",
+  "final_configs": {
+    "fixtures/m017-final-typed-choice-compositional.evaluate.json": "sha256:ce5a9bed543a551c51f01de040d7012d7b4224dc1981fc421480ac96af44a400",
+    "fixtures/m017-final-typed-choice-cross.evaluate.json": "sha256:b7e3e5704af1f3e58bef55817691cf17d5d7bb4308f88e7a0a5be9407e0ae960",
+    "fixtures/m017-final-typed-choice-tinymlp.evaluate.json": "sha256:b79eecdadb875777cbba1fa95a092cf93eebb753eaf4af6f8370c9ca683e7b14",
+    "fixtures/m017-final-typed-choice.evaluate.json": "sha256:4ba4981cddc04bc925ab3cf1c36bd49a8a07bc5272927589d782eee539237efd"
+  },
+  "final_status": "FINAL_NOT_YET_RUN",
+  "preliminary": "docs/m017-preliminary-v1.json",
+  "preliminary_sha256": "sha256:a68bd947e8fa540fb7a09f3ee083c6c32898b8a591a83c7f95b60bf848fa464e",
+  "schema": "sdm-m017-binding-v1"
+}

@@ -1,6 +1,6 @@
 # General Decision-Model Framework and First Consumer Roadmap
 
-Status: M014c closed and merged (11/11 main CI); **M015 source merged by PR #4 (`e7655429`, merged-main CI 38447673360 green)**; **M015a corrective CLOSED (PR #5 `0dd2ff4`, merged-main CI 38460909332 green)**; M016 ACTIVE (unblocked, implementation in progress on `work/plans-sdm-m016-tinymlp`); M017 independent qualification BLOCKED on M016. M005 and crates.io separately gated.
+Status: M014c closed and merged (11/11 main CI); **M015 source merged by PR #4 (`e7655429`, merged-main CI 38447673360 green)**; **M015a corrective CLOSED (PR #5 `0dd2ff4`, merged-main CI 38460909332 green)**; **M016 CLOSED (PR #6 `c17492a5`, merged-main CI 38489890063 green)**; M017 CLOSING (freeze committed + CI green pre-final, final consumed once with synthetic-only negative disposition, PR #7). M005 and crates.io separately gated.
 Audit baseline: original historical audit at 8139b064bdcf3212e8f6fd912e801a479b55751c (2026-10-05); current TinyChoice planning baseline main@0dd2ff470285c09309e3c823fb07dcb76efea229 (2026-10-13).
 Planning date: 2026-10-10
 Primary decisions: plans/adrs/ADR-0001-general-framework-and-model-boundaries.md; plans/adrs/ADR-0002-standalone-framework-before-consumer-qualification.md
@@ -154,7 +154,7 @@ M014 -> M015 generalized tiny architecture comparisons is a SOFT, unregistered s
 
 Research rationale: [docs/m015-small-model-research.md](../../docs/m015-small-model-research.md). M014c closes source/evaluator parity and provenance mechanics, NOT model generalization. M014b tested fixed old AND/XOR candidates against changed AND-XOR/XNOR labels without observably specifying the changed target rule, and therefore cannot decide whether a model is robust to label-preserving nuisance shifts. New M015 research separates these identifiable questions and has no CodeGG-data hard dependency.
 
-Dependency graph (hard): `M014c (closed) → M015 (PR #4 merged, merged-main green) → M015a (closed, PR #5 merged, merged-main green) → M016 (active) → M017 (blocked)`. M005 still externally deferred and publication still legal-gated.
+Dependency graph (hard): `M014c (closed) → M015 (PR #4 merged, merged-main green) → M015a (closed, PR #5 merged, merged-main green) → M016 (closed, PR #6 merged, merged-main green) → M017 (closing, PR #7)`. M005 still externally deferred and publication still legal-gated.
 
 ### M015 — Oracle-audited synthetic corpus and prospective design foundation
 Class: capability / research infrastructure. Status: **source merged by PR #4; historical closure predates merge; merged-main CI/closure reconciliation not yet verified**. Plan: [015](../implementation/general-decision-model-framework/015-tinychoice-corpus-and-research-foundation.md); closure evidence: [015-status](../closure/general-decision-model-framework/015-status.md).

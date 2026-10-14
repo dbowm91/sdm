@@ -1,6 +1,6 @@
 # SDM M016 — TinyChoice compact Choice/answerability head and baseline comparison
 
-Status: **active (unblocked 2026-10-13; M015a merged 0dd2ff4 with merged-main CI 38460909332 green; implementation in progress on `work/plans-sdm-m016-tinymlp`)**.
+Status: **closed (PR #6 merged as c17492a5 with merged-main CI 38489890063 green; see `plans/closure/general-decision-model-framework/016-status.md`)**.
 Class: capability.
 Planning baseline: dbowm91/sdm@0dd2ff470285c09309e3c823fb07dcb76efea229 (2026-10-13), M015a merge; refreshed from c048189d at start.
 Research: docs/m015-small-model-research.md.
