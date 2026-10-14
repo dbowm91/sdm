@@ -1,0 +1,448 @@
+{
+  "answerability": {
+    "auroc": 0.9926012330110691,
+    "ece_10bin": 0.3024900243207048
+  },
+  "binding_sha256": "sha256:49f0bde34f8cbb59e4e7ae3b00898bea3623a4618a7bb5effddc0a3bea91ad68",
+  "case_counts": {
+    "typed-choice": 3560,
+    "typed-choice-compositional": 3560,
+    "typed-choice-cross": 3560,
+    "typed-choice-tinymlp": 3560
+  },
+  "context_only_conditional": null,
+  "contract": "choice-final-v2",
+  "exclusive_track_final": 1.0,
+  "gates": {
+    "N1_context_only_below_060": true,
+    "N1_dev_value": 0.29375,
+    "N2_flip_responsive": false,
+    "N2_responsiveness": 0.1076923076923077,
+    "N3_rule_hidden": "not-applicable (no rule-hidden rows in M017 cohort)",
+    "P1_per_baseline_lower": {
+      "typed-choice": 0.0,
+      "typed-choice-compositional": 0.0,
+      "typed-choice-cross": 0.0
+    },
+    "P1_superiority_all_three": false,
+    "S1": false,
+    "S2": false,
+    "S3": false,
+    "S4_auroc": true,
+    "S5_ece": false,
+    "S6_exclusive_final": true
+  },
+  "original_manifest_shas": {
+    "target/m017/final/typed-choice-compositional.manifest.json": "sha256:d5b7c0d391ea53876ea2b220c363ffc55d0b3b9bd28af3dc7dc1fe5fa42b473e",
+    "target/m017/final/typed-choice-cross.manifest.json": "sha256:0837056c2049c11114286f81125f2044a4d81e48e4ebb6f5df845d60ca804cb7",
+    "target/m017/final/typed-choice-tinymlp.manifest.json": "sha256:885d870dc55001e9bf534d7c76abffeb58b966196bea4466daa02a6015798479",
+    "target/m017/final/typed-choice.manifest.json": "sha256:38b663a04a46662595dded8e5af76e3d23552527b832a43fa7eef16c86ea7da7"
+  },
+  "paired_diffs_tinymlp_minus_baseline": {
+    "typed-choice": {
+      "ci_lower": 0.0,
+      "ci_upper": 0.0,
+      "method": "paired_unit_bootstrap_percentile_sorted_v1",
+      "replicates": 2000,
+      "seed": 170018,
+      "value": 0.0
+    },
+    "typed-choice-compositional": {
+      "ci_lower": 0.0,
+      "ci_upper": 0.0,
+      "method": "paired_unit_bootstrap_percentile_sorted_v1",
+      "replicates": 2000,
+      "seed": 170018,
+      "value": 0.0
+    },
+    "typed-choice-cross": {
+      "ci_lower": 0.0,
+      "ci_upper": 0.0,
+      "method": "paired_unit_bootstrap_percentile_sorted_v1",
+      "replicates": 2000,
+      "seed": 170018,
+      "value": 0.0
+    }
+  },
+  "protocol_sha256": "sha256:0ca6123b5a06ef2186c4157e2abe684e8618bec8fa298e64593e3ba0f893bb83",
+  "schema": "sdm-m017-final-ledger-v1",
+  "v2_reports": {
+    "typed-choice": {
+      "answerable_cases": 2340,
+      "bootstrap": {
+        "confidence": 0.95,
+        "method": "grouped_bootstrap_percentile_sorted_v1",
+        "replicates": 2000,
+        "seed": 150015
+      },
+      "causal_both_final_correct_v2": {
+        "eligible_cases": 780,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 0.0
+      },
+      "contract": "choice-final-v2",
+      "dev_answerable_final_accuracy_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 1.0
+      },
+      "dev_answerable_final_coverage_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 1.0
+      },
+      "dev_answered_conditional_accuracy_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 1.0
+      },
+      "dev_conditional_argmax_accuracy_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 1.0
+      },
+      "dev_false_abstention_rate_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 0.0
+      },
+      "dev_final_action_accuracy_v2": {
+        "eligible_cases": 3560,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 0.7808988764044944
+      },
+      "dev_final_action_accuracy_v2_ci": {
+        "confidence": 0.95,
+        "groups": 1000,
+        "lower": 0.7770083102493075,
+        "method": "grouped_bootstrap_percentile_sorted_v1",
+        "replicates": 2000,
+        "seed": 150015,
+        "upper": 0.7850627137970353
+      },
+      "dev_no_answer_final_recall_v2": {
+        "eligible_cases": 1220,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 0.36065573770491804
+      },
+      "eligible_cases": 3560,
+      "eligible_groups": 1000,
+      "eligible_pairs": {
+        "causal": 780,
+        "nuisance": 1000
+      },
+      "ineligible_pairs": {},
+      "no_answer_cases": 1220,
+      "nuisance_both_final_correct_v2": {
+        "eligible_cases": 1000,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 1.0
+      },
+      "nuisance_consistency_v2": {
+        "eligible_cases": 1000,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 1.0
+      },
+      "nuisance_preserving_v2": {
+        "eligible_cases": 1000,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 1.0
+      }
+    },
+    "typed-choice-compositional": {
+      "answerable_cases": 2340,
+      "bootstrap": {
+        "confidence": 0.95,
+        "method": "grouped_bootstrap_percentile_sorted_v1",
+        "replicates": 2000,
+        "seed": 150015
+      },
+      "causal_both_final_correct_v2": {
+        "eligible_cases": 780,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 0.0
+      },
+      "contract": "choice-final-v2",
+      "dev_answerable_final_accuracy_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 1.0
+      },
+      "dev_answerable_final_coverage_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 1.0
+      },
+      "dev_answered_conditional_accuracy_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 1.0
+      },
+      "dev_conditional_argmax_accuracy_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 1.0
+      },
+      "dev_false_abstention_rate_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 0.0
+      },
+      "dev_final_action_accuracy_v2": {
+        "eligible_cases": 3560,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 0.7808988764044944
+      },
+      "dev_final_action_accuracy_v2_ci": {
+        "confidence": 0.95,
+        "groups": 1000,
+        "lower": 0.7770083102493075,
+        "method": "grouped_bootstrap_percentile_sorted_v1",
+        "replicates": 2000,
+        "seed": 150015,
+        "upper": 0.7850627137970353
+      },
+      "dev_no_answer_final_recall_v2": {
+        "eligible_cases": 1220,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 0.36065573770491804
+      },
+      "eligible_cases": 3560,
+      "eligible_groups": 1000,
+      "eligible_pairs": {
+        "causal": 780,
+        "nuisance": 1000
+      },
+      "ineligible_pairs": {},
+      "no_answer_cases": 1220,
+      "nuisance_both_final_correct_v2": {
+        "eligible_cases": 1000,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 1.0
+      },
+      "nuisance_consistency_v2": {
+        "eligible_cases": 1000,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 1.0
+      },
+      "nuisance_preserving_v2": {
+        "eligible_cases": 1000,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 1.0
+      }
+    },
+    "typed-choice-cross": {
+      "answerable_cases": 2340,
+      "bootstrap": {
+        "confidence": 0.95,
+        "method": "grouped_bootstrap_percentile_sorted_v1",
+        "replicates": 2000,
+        "seed": 150015
+      },
+      "causal_both_final_correct_v2": {
+        "eligible_cases": 780,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 0.0
+      },
+      "contract": "choice-final-v2",
+      "dev_answerable_final_accuracy_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 1.0
+      },
+      "dev_answerable_final_coverage_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 1.0
+      },
+      "dev_answered_conditional_accuracy_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 1.0
+      },
+      "dev_conditional_argmax_accuracy_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 1.0
+      },
+      "dev_false_abstention_rate_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 0.0
+      },
+      "dev_final_action_accuracy_v2": {
+        "eligible_cases": 3560,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 0.7808988764044944
+      },
+      "dev_final_action_accuracy_v2_ci": {
+        "confidence": 0.95,
+        "groups": 1000,
+        "lower": 0.7770083102493075,
+        "method": "grouped_bootstrap_percentile_sorted_v1",
+        "replicates": 2000,
+        "seed": 150015,
+        "upper": 0.7850627137970353
+      },
+      "dev_no_answer_final_recall_v2": {
+        "eligible_cases": 1220,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 0.36065573770491804
+      },
+      "eligible_cases": 3560,
+      "eligible_groups": 1000,
+      "eligible_pairs": {
+        "causal": 780,
+        "nuisance": 1000
+      },
+      "ineligible_pairs": {},
+      "no_answer_cases": 1220,
+      "nuisance_both_final_correct_v2": {
+        "eligible_cases": 1000,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 1.0
+      },
+      "nuisance_consistency_v2": {
+        "eligible_cases": 1000,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 1.0
+      },
+      "nuisance_preserving_v2": {
+        "eligible_cases": 1000,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 1.0
+      }
+    },
+    "typed-choice-tinymlp": {
+      "answerable_cases": 2340,
+      "bootstrap": {
+        "confidence": 0.95,
+        "method": "grouped_bootstrap_percentile_sorted_v1",
+        "replicates": 2000,
+        "seed": 150015
+      },
+      "causal_both_final_correct_v2": {
+        "eligible_cases": 780,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 0.18461538461538463
+      },
+      "contract": "choice-final-v2",
+      "dev_answerable_final_accuracy_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 1.0
+      },
+      "dev_answerable_final_coverage_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 1.0
+      },
+      "dev_answered_conditional_accuracy_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 1.0
+      },
+      "dev_conditional_argmax_accuracy_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 1.0
+      },
+      "dev_false_abstention_rate_v2": {
+        "eligible_cases": 2340,
+        "eligible_groups": 780,
+        "status": "ok",
+        "value": 0.0
+      },
+      "dev_final_action_accuracy_v2": {
+        "eligible_cases": 3560,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 0.697752808988764
+      },
+      "dev_final_action_accuracy_v2_ci": {
+        "confidence": 0.95,
+        "groups": 1000,
+        "lower": 0.6826685395982004,
+        "method": "grouped_bootstrap_percentile_sorted_v1",
+        "replicates": 2000,
+        "seed": 150015,
+        "upper": 0.7113592007649242
+      },
+      "dev_no_answer_final_recall_v2": {
+        "eligible_cases": 1220,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 0.1180327868852459
+      },
+      "eligible_cases": 3560,
+      "eligible_groups": 1000,
+      "eligible_pairs": {
+        "causal": 780,
+        "nuisance": 1000
+      },
+      "ineligible_pairs": {},
+      "no_answer_cases": 1220,
+      "nuisance_both_final_correct_v2": {
+        "eligible_cases": 1000,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 0.78
+      },
+      "nuisance_consistency_v2": {
+        "eligible_cases": 1000,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 1.0
+      },
+      "nuisance_preserving_v2": {
+        "eligible_cases": 1000,
+        "eligible_groups": 1000,
+        "status": "ok",
+        "value": 0.78
+      }
+    }
+  },
+  "verdicts": {
+    "fixed_rule_robustness": "FAIL",
+    "overall": "negative",
+    "rule_conditioned_composition": "PASS"
+  }
+}

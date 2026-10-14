@@ -340,6 +340,29 @@ jobs:
         run: |
           python3 scripts/verify_m017_freeze.py --out target/m017-freeze-verify.json
           test "$(python3 -c "import json; print(json.load(open('target/m017-freeze-verify.json'))['ok'])")" = "True"
+      - name: Re-analyze committed M017 final bytes (no inference)
+        if: matrix.name == 'linux-x64'
+        run: |
+          # Deterministic re-analysis of the committed one-time final: the
+          # frozen cohort regenerates in the freeze-verify workdir above and
+          # M016 DEV evidence exists on this host. Must reproduce the ledger.
+          python3 scripts/analyze_m017_final.py \
+            --manifests fixtures/m017-final-typed-choice-tinymlp.manifest.json fixtures/m017-final-typed-choice.manifest.json fixtures/m017-final-typed-choice-cross.manifest.json fixtures/m017-final-typed-choice-compositional.manifest.json \
+            --corpus target/m017-freeze-check/final.jsonl \
+            --protocol docs/m017-protocol-v1.json \
+            --binding docs/m017-binding-v1.json \
+            --dev-controls target/m016/m016-comparison.json \
+            --out target/m017-reanalysis-ledger.json
+          python3 - <<'PY'
+          import json
+          a = json.load(open('target/m017-reanalysis-ledger.json'))
+          b = json.load(open('docs/m017-final-ledger.json'))
+          assert a['verdicts'] == b['verdicts'], (a['verdicts'], b['verdicts'])
+          assert a['gates'] == b['gates'], 'gate drift on re-analysis'
+          for arch, comp in b['paired_diffs_tinymlp_minus_baseline'].items():
+              assert a['paired_diffs_tinymlp_minus_baseline'][arch] == comp, arch
+          print('M017 re-analysis reproduces committed verdicts:', a['verdicts'])
+          PY
       - name: Run M017 canary inference (public cohort, same committed bytes)
         run: |
           case "${{ matrix.name }}" in
