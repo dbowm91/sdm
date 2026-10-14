@@ -4,5 +4,5 @@
   "expected_architecture": "typed-choice-tinymlp",
   "note": "exact artifact/dataset/split/provenance SHAs bound at final materialization time; this config binds the frozen preliminary inputs and the cohort/test-membership SHAs",
   "preliminary": "docs/m017-preliminary-v1.json",
-  "preliminary_sha256": "sha256:9889a47031757a4fd2d73d119020a4943acd5f50958fef3d9b56d3f8097ed521"
+  "preliminary_sha256": "sha256:a68bd947e8fa540fb7a09f3ee083c6c32898b8a591a83c7f95b60bf848fa464e"
 }

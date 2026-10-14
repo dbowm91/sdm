@@ -92,6 +92,17 @@ def main():
     assert comp["schema"] == "sdm-m016-comparison-v1"
     assert comp["partition"] == "DEV only" and comp["test_evaluation_performed"] is False
 
+    def relpath(path):
+        # Committed references must be repo-relative (absolute local paths
+        # break verification on any other machine — fail-closed by design).
+        p = Path(path)
+        if not p.is_absolute():
+            p = ROOT / p
+        try:
+            return str(p.resolve().relative_to(ROOT.resolve()))
+        except ValueError:
+            raise SystemExit(f"freeze input outside repo: {path}")
+
     # Regenerate cohorts deterministically; bind output SHAs (labels stay local).
     cohorts = {}
     for cohort in ("canary", "final"):
@@ -144,11 +155,11 @@ def main():
         "protocol": "docs/m017-protocol-v1.json",
         "protocol_sha256": protocol_sha,
         "evaluator_sources": evaluator,
-        "m016_comparison": str(args.comparison),
+        "m016_comparison": relpath(args.comparison),
         "m016_disposition": comp["disposition"],
         "frozen_models": {
             "typed-choice-tinymlp": {
-                "artifact_path": str(args.tinymlp_artifact),
+                "artifact_path": relpath(args.tinymlp_artifact),
                 "artifact_file_sha256": tinymlp_file_sha,
                 "artifact_tensor_sha256":
                     comp["models"]["typed-choice-tinymlp"]["artifact_sha256"],

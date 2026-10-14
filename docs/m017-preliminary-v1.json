@@ -59,7 +59,7 @@
     },
     "typed-choice-tinymlp": {
       "artifact_file_sha256": "sha256:2761dab57ecb5c01350c01c309091dde41e60d9e8e74473cce3d46479c2e66d2",
-      "artifact_path": "/Users/davidbowman/projects/sdm/fixtures/m016-tinymlp-selected.artifact.json",
+      "artifact_path": "fixtures/m016-tinymlp-selected.artifact.json",
       "artifact_tensor_sha256": "sha256:453f9ea708bb67734c9bfc9fe5552baca7cf03ad5c8459dc8e3ca1b98281a9b3",
       "dev_pins": {
         "causal_both_final": 0.98125,
