@@ -33,13 +33,16 @@ def main():
                     help="winning typed-choice-tinymlp sidecar (with cases)")
     ap.add_argument("--train-report", type=Path, required=True)
     ap.add_argument("--dataset", type=Path, required=True)
+    ap.add_argument("--artifact-override", type=Path, default=None,
+                    help="explicit artifact file (resolves hosted-evidence swaps)")
     args = ap.parse_args()
 
     comp = json.loads(args.comparison.read_text())
     assert comp["schema"] == "sdm-m016-comparison-v1"
     assert comp["partition"] == "DEV only" and comp["test_evaluation_performed"] is False
     rep = json.loads(args.train_report.read_text())
-    artifact = Path(rep["selected_artifact_path"])
+    artifact = Path(args.artifact_override) if args.artifact_override \
+        else Path(rep["selected_artifact_path"])
     assert artifact.exists(), artifact
     sidecar = json.loads(args.sidecar.read_text())
     assert sidecar["partition"] == "DEV only"

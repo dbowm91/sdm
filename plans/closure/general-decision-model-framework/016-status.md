@@ -32,17 +32,21 @@ below; no FINAL has been observed).
 - Generator: `scripts/generate_m015_suite.py` groups=2000 seed=150015
   (`sha256:18a4d27cca57c639696bad560302549e837152968b2861ccf23a92e6f4ff57f9`).
 - Selected artifact tensor SHA:
-  `sha256:7e53f65f77e8afb11e0cbc26346e8c7c0cc8401ca25bea0e4774be46c292ffb9`
-  (fixture `fixtures/m016-tinymlp-selected.artifact.json`, 104545 bytes).
+  `sha256:58abde027b419fe5a8bb9d106701c3aad0ffde5fa308d49fe1e9cebc492739a9`
+  (fixture `fixtures/m016-tinymlp-selected.artifact.json`, 104545 bytes,
+  file SHA `sha256:2761dab57ecb5c01350c01c309091dde41e60d9e8e74473cce3d46479c2e66d2`).
 - Calibration SHA:
   `sha256:89405fd2e7d489eb178e11bb5a54a63684b48ca3c64090cbaacaabd134c1e32e`.
 - Model ID: `tinymlp-choice:sha256:4b4f33…ede843` (training fingerprint over
   TRAIN rows).
 - v2 sidecar report SHA:
-  `sha256:4b2da995df44b8ee16385d3374be858d74bd109c0f5dbc3dc3c1ebabcb1e1b7f`.
-- Evidence produced from source commit `eef46201f065025b7396ffafee86a103680030a6`
-  plus the M016 working tree (this branch); release profile
-  (`build_profile=release` in the train report).
+  `sha256:99e2c929685642bd5635c6dcfe069ecdd3cae9ce09417481ce038b49da7eccbd`.
+- Authoritative evidence: hosted linux-x86_64 release run (CI
+  `run_m016_comparison.py --out target/m016 --epochs 20`, 36 configs);
+  local macOS-arm64 release run selects the identical config with
+  identical metrics to 4 decimals (see platform note in M16-7).
+- Evidence produced from the M016 working branch at the merged commit;
+  release profile (`build_profile=release` in the train report).
 
 ## 3. M16-1..8 evidence
 
@@ -54,7 +58,7 @@ below; no FINAL has been observed).
 | M16-4 bounded v2 artifact, tamper/size/finite | PASS | Envelope caps (16 MiB, 1M params, 128 candidates) + SHA-before-alloc + declared-count==bytes + finite/dtype/shape checks; hostile tests (shape, oversize, task, category, corruption, drift, ID mismatch) |
 | M16-5 same-input comparison + legitimate tree | PASS | `scripts/run_m016_comparison.py`: same dataset/split/encoder bytes for 3 legacy heads (20-epoch `experiment run`), 36-config TinyMLP grid, isolated histogram-GBDT tree (depth 3, 30 estimators, lr 0.1, 32 bins, min-leaf 20, no RNG) on the exact exported vectors; paired diffs with 95% CIs |
 | M16-6 DEV-only metrics, CIs, negative controls | PASS | AUROC 0.9997 / AP 0.9999 / ECE 0.0113 / NLL 4e-6; per-family final 1.0 (5/5); per-option-count final 1.0 (k=2..8, support 51..84); group bootstrap CIs in every sidecar; context-only ablation 0.29 vs candidate-only 1.0 (candidate projections embed context+rule by M015 construction — disclosed, same for all heads); tree as independent control |
-| M16-7 capacity, resources, ≥2 hosts + third | PASS | h=32: 1607 params / 104545 bytes; h=64: 3143 params (below the provisional 5k–50k: encoder dim is 23, no padding per plan); release latency encode+infer 0.2µs (2 opts) … 9.1µs (128 opts), sub-ms on all counts; training host Darwin/arm64 release; inference parity test runs on all CI hosts over committed bytes (linux-x64 byte-reproducibility asserted in CI; macOS training bytes may differ in last ulp — documented, decisions exact) |
+| M16-7 capacity, resources, ≥2 hosts + third | PASS | h=32: 1607 params / 104545 bytes; h=64: 3143 params (below the provisional 5k–50k: encoder dim is 23, no padding per plan); release latency encode+infer 0.2µs (2 opts) … 9.1µs (128 opts), sub-ms on all counts; training host linux-x86_64 release (authoritative); inference parity test runs on all CI hosts over committed bytes (decisions exact, probs 1e-9). PLATFORM FINDING (M014c precedent): macOS-arm64 release training selects the identical config with identical metrics but differs in last-ulp weight bytes (fixture `453f9ea7…` macOS vs `2761dab5…` linux); CI asserts hosted byte-reproducibility and failed once on the macOS bytes (retained failure) before the fixture was re-frozen to the hosted bytes |
 | M16-8 no bleed, no scope creep, honest closure | PASS (pending merge) | `cargo tree -p sdm-runtime` shows no training/eval/Python/GPU/network deps; no CodeGG/corpus/publisher changes; no FINAL observed; this file; branch CI + merged-main CI pending |
 
 ## 4. Full grid (36 configs, 20 epochs, release)

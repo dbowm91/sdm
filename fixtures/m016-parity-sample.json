@@ -1,5 +1,5 @@
 {
-  "artifact_sha256": "sha256:453f9ea708bb67734c9bfc9fe5552baca7cf03ad5c8459dc8e3ca1b98281a9b3",
+  "artifact_sha256": "sha256:2761dab57ecb5c01350c01c309091dde41e60d9e8e74473cce3d46479c2e66d2",
   "contract": "choice-final-v2",
   "dataset_sha256": "sha256:f0d614db315836c41f2a79f998aed47331f0fc234c0e2a3b516638d9ebd702a9",
   "rows": [
@@ -540,8 +540,8 @@
       "expected_predicted": "tc-11b2f20a72",
       "expected_probs": [
         0.9999999988586392,
-        7.251509923909851e-10,
-        4.162098235366165e-10
+        7.251509923909825e-10,
+        4.1620982353661503e-10
       ],
       "features": {
         "candidates": {
@@ -1071,7 +1071,7 @@
       "expected_predicted": "tc-11b2f20a72",
       "expected_probs": [
         4.091023360138518e-10,
-        7.075804208564943e-10,
+        7.075804208564918e-10,
         0.9999999988833173
       ],
       "features": {
@@ -2010,7 +2010,7 @@
     },
     {
       "case_id": "m015-g000000-n0",
-      "expected_answerability": 8.233953803849088e-05,
+      "expected_answerability": 8.233953803849116e-05,
       "expected_predicted": null,
       "expected_probs": [
         0.9999999987895434,
@@ -2541,10 +2541,10 @@
     },
     {
       "case_id": "m015-g000000-n1",
-      "expected_answerability": 8.916002091918718e-05,
+      "expected_answerability": 8.916002091918558e-05,
       "expected_predicted": null,
       "expected_probs": [
-        5.236368653677597e-10,
+        5.236368653677578e-10,
         9.575006625169227e-10,
         0.9999999985188626
       ],
@@ -3060,12 +3060,12 @@
     },
     {
       "case_id": "m015-g000001-n0",
-      "expected_answerability": 1.4097988609805677e-05,
+      "expected_answerability": 1.4097988609805478e-05,
       "expected_predicted": null,
       "expected_probs": [
         0.999994027955701,
-        3.939354012723372e-06,
-        2.0326902863493974e-06
+        3.939354012723379e-06,
+        2.0326902863494046e-06
       ],
       "features": {
         "candidates": {
@@ -3591,11 +3591,11 @@
     },
     {
       "case_id": "m015-g000001-n1",
-      "expected_answerability": 1.4883154975337687e-05,
+      "expected_answerability": 1.4883154975337106e-05,
       "expected_predicted": null,
       "expected_probs": [
-        2.529815777758916e-06,
-        4.814890583121666e-06,
+        2.529815777758907e-06,
+        4.814890583121649e-06,
         0.9999926552936391
       ],
       "features": {
