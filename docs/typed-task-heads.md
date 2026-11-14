@@ -1,119 +1,74 @@
 # Typed task heads
 
-`sdm experiment run --config PATH` accepts `typed-binary`, `typed-choice`,
-`typed-choice-cross`, and
-`typed-score` architectures in addition to the two legacy Rank paths and
-`typed-linear` Rank. Each task artifact carries one semantic capability, a
-train-fitted `FittedFeatureEncoderV2`, the task head weights, the training input
-fingerprint, and a separately hashed dev calibration payload. The runtime rejects
-task, schema, option identity, shape, and resource mismatches.
+Use `sdm experiment run --config PATH` for typed Binary, Choice, Score, and Rank
+experiments. Each config names the dataset, split, architecture, seed, and output paths.
+The runtime validates the task, feature schema, candidate identities, tensor shapes,
+and resource bounds before inference.
 
-The encoder sorts feature coordinates by declared feature ID, uses numeric
-centering and max-absolute scaling fit on train data, maps declared categories to
-one-hot coordinates, carries booleans as 0/1, and uses a bounded train-only token
-vocabulary for text. It clips scaled numeric values to [-5, 5]. Unknown categories
-are rejected; unknown text terms map to all-zero vocabulary coordinates. Missing
-optional features map to zeros. This transform is serialized with the artifact and
-is shared by training and runtime inference.
+## Supported heads
 
-- Binary uses a logistic head, reports probability-based binary metrics, and may
-  abstain when confidence is below the threshold selected on dev.
-- Legacy Choice uses `sdm-typed-task-v1`'s 3*D context, option, and diagonal
-  interaction weights. It normalizes probabilities over exactly the
-  caller-supplied option IDs and retains its historical dev-selected cutoff.
-- `typed-choice-cross` is an additive `sdm-typed-choice-cross-v1` contract. It
-  stores an ordered list of up to 4,096 declared context-coordinate ×
-  option-coordinate pairs, with bounded finite weights and schema digest
-  validation. Text-vocabulary coordinates are excluded. Pair ordering and
-  architecture ID are serialized; malformed, duplicate, out-of-range, or
-  oversized coordinates fail closed. Old typed Choice artifacts are never
-  reinterpreted by this constructor.
-- `typed-choice-compositional` is an opt-in `sdm-typed-choice-compositional-v1`
-  contract. It adds an ordered list of at most 4,096 sparse nontext
-  `(context_i, context_j, option_k)` terms, with `i <= j`. It supports rules such
-  as the two-rule active-flip XOR/XNOR that are not separable by the old additive
-  pairwise option margin. Runtime loading validates every coordinate and never
-  reads text coordinates in a multilinear term.
-- Binary experiments may opt into `binary_constant_mask`. It computes exact
-  coordinate variation using train projections only, retains an explicit scalar
-  intercept, and holds invariant context weights at zero. The selected encoded
-  coordinates are reported with the run manifest; the shared v2 encoder and old
-  artifact format are unchanged. The manifest records the exact variation rule,
-  encoder and training fingerprints, retained/masked coordinates, zero L2 setting,
-  and unpenalized scalar intercept. The option defaults off for historical configs.
-- Choice normalizes probabilities over exactly the caller-supplied option IDs.
-  A dev-selected confidence threshold may
-  abstain. `Choice(None)` labels are never converted into a synthetic option;
-  they are excluded from choice log-loss and inform the dev abstention threshold.
-- Score maps a logistic output into each request's finite `[minimum, maximum]`
-  rubric and reports MAE/RMSE on the original scale.
-- Rank continues to score each caller-supplied candidate independently and retains
-  multi-relevant labels.
+| Task | `experiment run` architecture | Artifact architecture | Behavior |
+| --- | --- | --- | --- |
+| Binary | `typed-binary` | `sdm-typed-task-v1` | Logistic probability with a threshold selected on DEV |
+| Choice | `typed-choice` | `sdm-typed-task-v1` | Legacy diagonal context and option scorer |
+| Choice | `typed-choice-cross` | `sdm-typed-choice-cross-v1` | Adds up to 4,096 declared context and option coordinate pairs |
+| Choice | `typed-choice-compositional` | `sdm-typed-choice-compositional-v1` | Adds up to 4,096 nontext `(context_i, context_j, option_k)` terms |
+| Score | `typed-score` | `sdm-typed-task-v1` | Logistic output mapped to the request's finite score range |
+| Rank | `typed-linear` | `sdm-typed-linear-rank-v1` | Scores each candidate independently; multiple candidates may be relevant |
+| Rank | `nonlinear` | `sdm-pairwise-tanh-v2` | Optional bounded nonlinear CPU scorer |
 
-M015 defines a separate TRAIN/DEV-only research contract in
-[m015-task-spec-v1.md](m015-task-spec-v1.md). Its rule descriptors are
-source-defined and observable. `scripts/run_m015_baselines.py` maps that
-contract to a frozen typed feature schema and runs the existing linear, cross,
-and compositional Choice architectures against identical TRAIN/DEV membership
-with an empty test partition. The conversion is research-only; M015 adds no
-inference architecture.
+Choice requests require 2 to 128 options. Probabilities are associated with the
+caller-supplied option IDs. `Choice(None)` represents no answer; it is not added as a
+synthetic option. Legacy Choice uses a DEV-selected confidence threshold for
+abstention. The cross and compositional architectures have distinct IDs and do not
+reinterpret existing artifacts.
 
-Semantic experiments may set `quality_diagnostics: true` to record raw Choice
-logits/probabilities and answerability beside the actual final runtime decision
-and abstention. The default remains off to preserve historical M011 report
-serialization. The M013 first corpus is retained as invalid diagnostic
-evidence: its pair members differed in load as well as active. M013a uses a new
-seed, group split and frozen suite; neither result can promote an application
-model. The checked-in task suites are synthetic-only and provide no consumer
-authority, policy or actuation.
+## TinyMLP Choice training
 
-M014 source-derived truth-table proof and implementation evidence are maintained in
-[`docs/m014-model-quality-research.md`](m014-model-quality-research.md). This
-mechanical architecture work does not change M013a's negative Binary or
-indeterminate Choice dispositions and does not qualify a model.
-# M014 compositional Choice head
+The TinyMLP Choice architecture is `sdm-typed-choice-tinymlp-v1`. It shares a tanh
+scorer across candidates and uses a separate answerability head with mean and max
+candidate pooling. The pooling is invariant to candidate order. It supports 2 to 128
+options and has a 1,000,000-weight limit.
 
-The opt-in `sdm-typed-choice-compositional-v1` runtime adds a bounded conjunction of selected nontext context coordinates, multiplied by each candidate coordinate. It is a distinct artifact architecture; existing typed Choice and cross-feature artifacts retain their prior interpretation. The trainer rejects a design exceeding 4096 conjunction-by-option terms and the runtime enforces the existing 128-option bound. See [artifact-format.md](artifact-format.md) and the M014 research note for the representability proof.
+Train it with the dedicated command, not `experiment run`:
 
-# M014a inference-only evaluation (no head change)
+```sh
+cargo run --locked -p sdm-experiment -- experiment m016-train \
+  --config PATH
+```
 
-M014a changes no Binary/Choice head, training math, or thresholds. It adds `sdm experiment evaluate --config PATH` for exact frozen bytes (see `artifact-format.md`): SHA-checked read-only loading, pure scoring via the existing `TypedTaskRuntime`, and versioned `sdm-semantic-evaluate-v2` reports that always carry raw probabilities/logits/answerability beside the final thresholded decision. Choice counterfactual success requires **both** finals correct (raw-correct that abstains does not pass); no-answer targets need no extra option. Qualification (paired-group CIs, families/controls, recall/coverage, resources) lives in `scripts/qualify_semantic_v2.py`, proven on DEV-CANARY (Binary positive via OOD gain + ID noninferiority; Choice indeterminate via shifted recall). No model is qualified or promoted.
+The strict config binds the dataset and split by digest and declares a grid of training
+settings. The grid is limited to 36 configurations. Training uses TRAIN; model
+selection and threshold calibration use DEV; the command does not evaluate TEST. No
+standalone M016 config fixture is checked in. The
+[`run_m016_comparison.py`](../scripts/run_m016_comparison.py) helper generates a
+complete SHA-bound config for the comparison workflow.
 
-# M014c closure (no head change)
+## Shared feature encoding
 
-M014c changes no Binary/Choice head, training math, or thresholds. It orders CI (pure→gen→dependent + ordering regression), replaces single-host `three_host_parity=true` with measured same-artifact attestation + aggregator (`m014c_canary_attestation` / `verify_m014c_parity` + `canary-parity` job; provisional indeterminate for unverified parity is correct), and adds detached lineage + original-byte ledger for the consumed M014b FINAL (placeholder `freeze_sha256` defect preserved, never rerun). See `plans/closure/general-decision-model-framework/014c-status.md`.
+The fitted encoder is part of the artifact and is identical at training and inference:
 
-# M015a Choice final-action corrective (no head change)
+- Numeric features are centered and scaled using TRAIN statistics, then clipped to
+  [-5, 5].
+- Categories use declared one-hot coordinates. Unknown categories are rejected.
+- Booleans use 0 or 1. Missing optional values map to zero.
+- Text uses a bounded vocabulary fitted on TRAIN. Unseen terms map to zero
+  coordinates.
 
-M015a changes no Choice head, weight, threshold, encoder, or runtime behavior.
-It adds a reusable versioned `choice-final-v2` evaluator (`sdm-eval`,
-`scripts/m015a_final_metrics.py` mirror): final correctness requires answered
-exact ID for `Some` and abstention for `None`; raw conditional argmax,
-answerability, coverage and answered-only selective accuracy are separate;
-strict exactly-two matcher accepts only declarative `-nuisance`/`-causal`
-suffixes with matching labels, same group/split/family/rule, compatible option
-sets, causal exactly-one-`None` + identical context + flipped semantics, and
-nuisance identical targets + preserved semantics; origins come from corpus
-provenance; leakage-group 95% CIs use seed `150015`, 2,000 replicates, sorted
-inputs/replicates; empty strata are `insufficient_support`. The DEV-only replay
-(`sdm experiment m015a-replay`, `scripts/analyze_m015a_final_actions.py`) runs
-the three frozen M015 heads through actual `decide_typed` and records v2
-metrics plus an immutable-history erratum (`docs/m015a-evaluation-erratum.md`).
-Retrospective DEV findings: raw 1.0, final answerable 0.666…, false abstention
-0.333…, causal both-final 0.0 (context-only impossibility), nuisance
-both-final 1.0. No retuning, no new FINAL, no M016 benefit claimed. M016 must
-consume the v2 contract.
+The encoder sorts coordinates by declared feature ID. Model and schema fingerprints
+bind the fitted transform to the artifact. See [artifact formats](artifact-format.md)
+for the serialized contract and resource bounds.
 
-# M016 TinyMLP Choice head
+## Training and evaluation behavior
 
-The opt-in `sdm-typed-choice-tinymlp-v1` runtime (`sdm-runtime::tinymlp`) adds
-a bounded shared candidate MLP plus a symmetric candidate-aware answerability
-head. For each permitted option it concatenates context + candidate encodings
-(no position/ID/leak features), applies the SAME tanh hidden layer (32/64
-units) and linear output; answerability pools mean/max over encoded candidates
-with the context (order invariant) and applies a DEV-calibrated threshold
-separate from conditional softmax ranking. Training (`sdm-experiment::m016`)
-is deterministic SGD on TRAIN only with joint answerability + conditional
-choice loss, finite-difference verified, and reproducible bytes; selection and
-calibration use DEV only via the M015a v2 final-action contract (no FINAL).
-Legacy diagonal/cross/compositional heads are preserved byte-for-byte.
+Training updates weights from TRAIN only. Calibration and threshold selection use DEV.
+A configured TEST partition is held out for reporting and must not influence fitting,
+selection, or calibration. Use a frozen split and explicit output paths; existing
+outputs are not overwritten.
+
+Binary can optionally use `binary_constant_mask`, which masks coordinates that are
+constant on TRAIN while retaining a scalar intercept. The option defaults off.
+
+These checked-in task suites use synthetic data and demonstrate mechanics, not
+application quality. Current qualification status and evidence are in the
+[planning registry](../plans/registry.md).

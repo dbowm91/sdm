@@ -1,110 +1,64 @@
-# Artifact format v1
+# Artifact formats
 
-Artifacts are bounded JSON `LinearArtifact` values with a versioned manifest,
-architecture identifier, semantic capability declaration, request limits, model
-parameter digest, training fingerprint, MIT license metadata, and source identity.
-The manifest pins input-schema and calibration versions; calibration bytes are hashed
-separately from the parameters. The model digest is SHA-256 over canonical binary
-`f64` parameter bits and length-prefixed sorted feature names;
-the runtime artifact digest is SHA-256 over the artifact bytes. Artifact size is
-limited to 4 MiB; parameter count is limited to 100,000. Unknown schema/architecture,
-invalid capabilities, missing provenance, non-finite parameters, and unsafe limits
-fail closed. The runtime reads local bytes only and never downloads artifacts.
+SDM supports a legacy version 1 linear artifact and an additive version 2 envelope.
+Artifacts are bounded JSON values with explicit schemas and architecture identifiers.
+The runtime reads local bytes and loads only registered architectures. A digest detects
+byte changes relative to a trusted digest; it does not authenticate the publisher.
 
-Architecture `sdm-binary-linear-v1` declares Rank capability. Rank candidates are
-scored independently, allowing multiple candidates to be relevant. Other decision
-semantics receive an explicit Unsupported response. Runtime callers must validate
-requests and apply their own policy to every response.
+## Version 1
 
-The runtime's benchmark example measures cold load, warmed request p50/p95 at the
-supported candidate bounds, artifact bytes, malformed-artifact rejection latency, and
-process peak RSS after warmup. It uses no training dependency.
+The legacy `LinearArtifact` uses schema version 1 and architecture
+`sdm-binary-linear-v1` for Rank scoring. It scores each caller-supplied candidate
+independently, so more than one candidate may be relevant. The runtime limits the
+artifact to 4 MiB, the weight map to 100,000 entries, state to 65,536 bytes, and
+candidates to 256.
 
-## Artifact envelope v2 (additive contract)
+The manifest identifies the input schema, calibration version, capabilities, source,
+license, training fingerprint, and model digest. The model digest covers the bias and
+canonicalized weight map. Calibration has a separate digest. Invalid versions,
+unsupported capabilities, non-finite values, missing provenance, and mismatched
+hashes are rejected.
 
-`sdm_runtime::ArtifactEnvelopeV2` identifies an architecture and model, required
-feature-schema fingerprint, semantic capability set, calibration digest, resource
-limits, payload digest, license and source. The v2 payload is capped at 16 MiB and
-1,000,000 declared parameters; candidate count remains at most 256. These hashes
-detect byte changes but do not authenticate a publisher. `load_artifact` preserves v1
-loading and returns a validated `UnsupportedV2` for an architecture without a
-registered runtime. `sdm-pairwise-tanh-v2` is registered as a bounded CPU Rank engine;
-its ordered feature-coordinate fingerprint, model payload digest, parameter count,
-and calibration payload digest are checked before inference. Its training API remains
-feature-gated and is not compiled into the runtime dependency graph.
+## Version 2 envelope
 
-Typed `FeatureSchemaV2` and `FeatureProjectionV2` live in `sdm-core`. Schema
-fingerprints use canonical JSON ordering by feature ID and category. Missing required
-values, type mismatches, unknown IDs, non-finite numbers and category violations fail
-validation. The original v1 textual state projection and artifact remain unchanged.
+`ArtifactEnvelopeV2` adds an explicit architecture, model identity, required feature
+schema fingerprint, capabilities, candidate bound, calibration payload and digest,
+source, license, and architecture-specific payload. The complete artifact is limited
+to 16 MiB. The generic envelope also caps its `parameter_count` field at 1,000,000
+and candidates at 256.
 
-Typed task v2 registers `sdm-typed-task-v1` for Binary, legacy diagonal Choice,
-and Score. `sdm-typed-choice-cross-v1` is an additive Choice-only architecture:
-its payload binds the same fitted encoder and schema fingerprint and includes an
-explicit bounded list of context/option coordinate pairs. It has a hard 4,096
-cross-term cap and excludes text-vocabulary coordinates. Architecture dispatch
-preserves the old 3*D diagonal Choice loader and inference behavior. An enabled
-quality diagnostic report can record pre-threshold logits and probabilities
-without changing the serialized default M011 report format.
+The meaning of `parameter_count` is architecture-specific. Typed task, typed Rank,
+and TinyMLP constructors store serialized payload length in this field; the nonlinear
+Rank architecture stores its actual model parameter count. Architecture-specific
+validators also check tensor shapes, weight counts, candidate limits, and payload
+digests. Do not interpret the envelope field as a universal count of numeric weights.
+TinyMLP has a separate 1,000,000-weight limit and supports 2 to 128 options.
 
-`sdm-typed-choice-compositional-v1` is a separate additive Choice-only architecture
-for a declared list of up to 4,096 nontext `(context_i, context_j, option_k)`
-terms. Context coordinates are canonicalized so `i <= j`; list ordering, uniqueness,
-shape, bounds, schema digest and payload digest are validated. Text vocabulary is
-excluded from all three positions. The legacy diagonal and pairwise-cross artifact
-payloads retain their existing architecture identifiers and feature order.
-# M014 architecture compatibility
+Typed feature schemas use canonical fingerprints. Missing required values, type
+mismatches, unknown feature IDs, non-finite numbers, and invalid categories fail
+validation. The fitted encoder is shared by training and inference. The original
+version 1 text projection remains unchanged.
 
-`sdm-typed-choice-compositional-v1` is separately dispatched and serialized. It stores the selected context conjunction definition and bounded conjunction-by-option weights in its own schema; it does not reinterpret earlier `sdm-typed-choice-v1` or `sdm-typed-choice-cross-v1` payloads. Runtime validation checks feature schema identity, option count/order, interaction bounds, tensor shape and payload fingerprint before scoring. Cross-platform portability is exercised in CI with the committed M014 artifact.
+## Registered architectures
 
-# M014a inference-only evaluation (additive, no new artifact architecture)
+| Envelope | Architecture | Task | Notes |
+| --- | --- | --- | --- |
+| v1 | `sdm-binary-linear-v1` | Rank | Legacy independent candidate scorer |
+| v2 | `sdm-typed-task-v1` | Binary, Choice, Score | Typed linear heads, including diagonal Choice |
+| v2 | `sdm-typed-linear-rank-v1` | Rank | Typed linear Rank head |
+| v2 | `sdm-pairwise-tanh-v2` | Rank | Optional nonlinear CPU scorer |
+| v2 | `sdm-typed-choice-cross-v1` | Choice | Bounded declared context and option cross terms |
+| v2 | `sdm-typed-choice-compositional-v1` | Choice | Bounded nontext context conjunction terms |
+| v2 | `sdm-typed-choice-tinymlp-v1` | Choice | Shared candidate scorer with separate answerability head |
 
-M014a adds no new artifact architecture identifier. It adds `sdm experiment evaluate --config PATH` with `EvaluateSpec` (`deny_unknown_fields`; no `epochs/learning_rate/optimizer`): named dataset/split paths + SHA-256, test-membership SHA (compact `serde_json::to_vec` of sorted test IDs), protocol/freeze SHAs, expected artifact byte SHA, exact spec + envelope architectures, feature-schema and calibration SHAs, provenance, and unique report path. The path validates artifact SHA **before any inference**, calls `load_artifact`, reuses pure scoring, never calls training, and requires byte-identical input/output SHAs (16 MiB bound, ≤128 Choice options, finite scores). Reports use `sdm-semantic-evaluate-v2` (`schema_version=2`, explicit `evaluated_partition=test` + `test_evaluation_performed=true`, input hashes, per-case IDs/groups/families/targets/decisions/probabilities/abstention, deterministic `report_sha256`). Legacy `SemanticExperimentRunManifest` (omitted-true) remains readable but is never rewritten; new reports are explicitly versioned. Atomic unique outputs refuse overwrite; interruption leaves no accepted partial.
+Each architecture has its own validation rules. A valid envelope with an unregistered
+architecture is returned as unsupported; the runtime does not reinterpret it as a
+known model. See [typed task heads](typed-task-heads.md) for task behavior and training
+commands.
 
-# M014c closure (additive, no new artifact architecture)
+## Inference-only evaluation
 
-M014c adds no new artifact architecture identifier and changes no head/training math. It orders CI (pure analyzer before canary provisioning before dependent tests + `check_m014a_ci_order` regression), replaces the single-host `three_host_parity=true` literal with measured per-host attestation (`m014c_canary_attestation`: 948 Binary + 926 Choice decisions, artifact/dataset/split SHAs, source/host/build, integrity hash) and aggregator (`verify_m014c_parity`: exact `linux-x86_64`/`linux-aarch64`/`macos-aarch64`, source/case equality, exact action/abstention match; new `canary-parity` CI job), and adds read-only lineage (`verify_m014c_lineage`: detached Git/SHA-256 chain, `freeze_sha256=sha256:111…1` flagged `placeholder_unbound`, ancestry `9cc80f0`→`c277247`, one-byte corruption fails) plus original-byte ledger (`docs/m014c-evidence-ledger.json`). Frozen M014b bytes and embedded placeholder remain unchanged in place; detached attestation does not repair the field. See `plans/closure/general-decision-model-framework/014c-status.md`.
-
-# M015a DEV-only final-action sidecar (additive, no new artifact architecture)
-
-M015a adds no new artifact architecture identifier and changes no head, weight,
-threshold, encoder, or `DecisionSpec::Choice` 2..=128 semantics. It adds
-`sdm experiment m015a-replay --config PATH` with `M015aReplaySpec`
-(`deny_unknown_fields`; no training fields): named typed dataset/split/artifact
-+ corpus TRAIN/DEV + generator/task-spec paths, expected artifact/dataset/split/
-generator/spec/corpus SHAs, architecture, provenance, and unique output path.
-The path validates all input SHAs **before any inference**, loads the frozen
-artifact read-only, runs actual `TypedTaskRuntime::decide_typed` +
-`choice_probabilities`/`choice_logits`/`choice_answerability_probability` over
-the DEV partition only, derives no-answer origins from corpus provenance
-(`available=false` vs `available=true, zero satisfying`), and evaluates the
-versioned `choice-final-v2` contract. Sidecars use `sdm-m015a-dev-final-v1`
-(`schema_version=1`, explicit `partition=DEV only`, `test_membership=[]`,
-input SHAs, census, v2 report with support/CIs, legacy mixed-value glossary,
-bootstrap seed/replicates/method, deterministic `report_sha256`). Legacy
-`run_semantic` diagnostics and M011 serialization are unchanged; new v2 keys
-carry a `_v2` suffix. Atomic unique outputs under `target/m015a/` refuse
-overwrite; interruption leaves no accepted partial. See
-`docs/m015a-evaluation-erratum.md`.
-
-# M016 TinyMLP Choice architecture (additive, new identifier)
-
-`sdm-typed-choice-tinymlp-v1` is a separate additive Choice-only architecture:
-shared single-hidden-layer tanh scorer `s_i = W2·tanh(W1·[ctx;cand_i]+b1)+b2`
-(same `W1/b1/W2/b2` for every candidate; no position/ID input) plus a separately
-supervised symmetric answerability head `a = sigmoid(W·[ctx;mean(cands);
-max(cands)]+b)` with mean/max pooling over encoded candidates (permutation
-invariant). Payload binds the fitted encoder, schema fingerprint, hidden width
-(32/64), tanh activation, training fingerprint/seed, and dev calibration
-digest; task is choice-only with `2..=128` options and `Choice(None)` for
-no-answer (no synthetic None option). v2 envelope caps apply (16 MiB,
-1M params, candidate bound 128, finite weights/outputs); tensor SHA is checked
-before allocation/inference and declared parameter count must match payload
-bytes. `sdm-typed-task-v1`, cross and compositional artifacts are preserved
-byte-for-byte; v1 Rank wire is unchanged. Training (M016, `sdm-experiment`)
-is deterministic (seeded init/shuffle, bounded lr/epochs/L2, joint
-`CE(answerability)+lambda*CE(choice|answerable)` loss, DEV-calibrated
-threshold); runtime (`sdm-runtime::tinymlp`, no training/Python/GPU/network
-deps) is inference-only with exact ID membership and fail-closed malformed/
-oversized/unsupported/corrupted/drifted/mismatched inputs. See
-`plans/closure/general-decision-model-framework/016-status.md` (pending).
+`sdm experiment evaluate --config PATH` checks the named input and artifact digests
+before inference, uses the registered runtime, and does not train or rewrite the
+artifact. Its reports use the versioned `sdm-semantic-evaluate-v2` schema. This command
+is distinct from `experiment run`, which trains and evaluates according to its config.

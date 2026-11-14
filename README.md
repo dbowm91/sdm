@@ -1,102 +1,72 @@
 # Small Decision Model (SDM)
 
-SDM is the independent home for generic bounded decision semantics, local artifact
-inference, and reproducible training/evaluation. CodeGG-specific authority, tool
-projection, disclosure, capture consent, and causal-frontier behavior stay in CodeGG.
+SDM is a Rust workspace for bounded decision requests, local model inference, and
+reproducible training and evaluation. Applications provide the candidate set and
+retain control of eligibility, policy, abstention handling, and any action. SDM does
+not grant permissions or make application decisions on its own.
 
-## Repository policy
+## Requirements
 
-- License: MIT, preserving the Anomalyco copyright notice from the CodeGG source.
-- Visibility: public; immutable full-SHA downstream consumption remains the release policy.
-- Consumption/release policy: downstream projects pin an immutable full Git commit
-  SHA. Branch names and floating tags are not runtime dependencies. A source revision
-  is usable only after CI and the CodeGG compatibility fixture command pass.
-- This repository performs no implicit network access or model download.
+Rust 1.89 or newer. The runtime uses local artifacts and does not download models or
+call remote services.
+
+## Quickstart
+
+See the [standalone quickstart](docs/standalone-quickstart.md) to run the checked-in
+synthetic Binary, Choice, Score, and Rank examples and load an artifact from Rust.
+These examples demonstrate mechanics only. They do not establish real-world model
+quality.
 
 ## Workspace
 
-- `sdm-core`: semantic request/response types and validation, no application authority.
-- `sdm-runtime`: validated offline artifact loading and bounded inference. It has no
-  dependency on `sdm-training`.
-- `sdm-training`: generic decision-case dataset validation, deterministic group
-  splitting, model fitting, dev-only threshold selection, and test evaluation.
-- `sdm-data`: provenance-bearing labels and frozen leakage-aware group splits.
-- `sdm-eval`: algorithm-neutral semantic metrics and preregistered offline reports.
-- `sdm-nonlinear`: optional bounded nonlinear CPU scorer and deterministic local SGD.
-- `sdm-experiment`: explicit-input Rank orchestration, frozen-split training,
-  dev-only threshold selection, runtime reload and held-out reporting.
+| Crate | Purpose |
+| --- | --- |
+| `sdm-core` | Request, response, feature schema, and validation types |
+| `sdm-runtime` | Bounded local inference with no training dependency |
+| `sdm-data` | Dataset provenance and leakage-aware split manifests |
+| `sdm-eval` | Metrics and offline evaluation contracts |
+| `sdm-training` | Generic Rank training and compatibility tools |
+| `sdm-nonlinear` | Optional nonlinear CPU Rank model and trainer |
+| `sdm-experiment` | Explicit-config training, evaluation, and replay commands |
 
-Publication-facing package metadata is set per crate with the verified
-repository/homepage and crate-specific docs.rs destinations. The checked-in
-[standalone quickstart](docs/standalone-quickstart.md) covers the experiment,
-packaged consumer boundary, compatibility and quality limits. The locked
-[third-party inventory](docs/third-party-license-inventory.json) is metadata
-evidence only; see its [review status](docs/third-party-licenses.md) before any
-registry distribution.
-
-Legacy linear and pairwise Rank artifacts remain supported. Additive typed artifact
-versions also serve Binary, Choice, Score, and typed Rank heads. Multiple relevant
-Rank candidates remain independent labels. Applications still own policy, authority,
-and abstention handling.
-
-M015 TinyChoice task semantics are defined in
-[the task specification](docs/m015-task-spec-v1.md). The TRAIN/DEV-only
-generator and independent oracle are in `scripts/generate_m015_suite.py`;
-partition checks and development diagnostics are in
-`scripts/analyze_m015_dev.py`; `scripts/run_m015_baselines.py` projects the same
-groups into the existing typed Choice schema and runs the linear, cross, and
-compositional baselines with an empty test partition. These are synthetic
-research artifacts, not CodeGG evidence or model qualification.
-
-M015–M017 TinyChoice research milestones are complete. The frozen M017 synthetic
-evaluation was negative; no model is qualified or approved for CodeGG. See the
-[planning registry](plans/registry.md) and [M017 closure](plans/closure/general-decision-model-framework/017-status.md)
-for current status and evidence.
-
-## Build and qualify
+## Development checks
 
 ```sh
 cargo test --workspace --locked
 cargo check -p sdm-runtime --locked
 cargo check -p sdm-runtime --examples --locked
 cargo tree -p sdm-runtime --locked
-cargo run -p sdm-training --bin sdm-check-compat -- \
-  fixtures/codegg-compatibility-v1.jsonl path/to/artifact.json
-cargo run -p sdm-training --bin sdm-train -- \
-  fixtures/compatibility-rank-cases-v1.jsonl artifacts/compatibility-rank-v1.json 127 100
+cargo run --locked -p sdm-training --bin sdm-check-compat -- \
+  fixtures/codegg-compatibility-v1.jsonl artifacts/compatibility-rank-v1.json
 ```
 
-The compatibility fixture file is a sanitized, frozen copy of CodeGG's
+The compatibility fixture is a sanitized, frozen copy of CodeGG's
 `assets/decision-runtime/compatibility-v1.jsonl` at source revision
-`aec30ebbaada172cd2915b3fb068f828a8fc6709`. The authoritative fixtures and historical
-training/qualification evidence remain in CodeGG. No user session data was copied.
-`scripts/import-codegg-compat-fixtures.py` regenerates the small Rank training set from
-only the frozen source fixtures. `artifacts/compatibility-rank-v1.json` is a reproducible
-baseline artifact, not a qualified or production-promoted model.
-`cargo run -p sdm-runtime --example benchmark -- fixtures/benchmark-rank-request.json
-artifacts/compatibility-rank-v1.json` emits cold load, artifact bytes, peak resident
-memory after warming, p50/p95 latency for 16/64/128/256 candidates, and malformed
-artifact rejection latency. The RSS number is the process high-water mark, so report it
-as a conservative peak rather than an isolated runtime allocation measurement.
+`aec30ebbaada172cd2915b3fb068f828a8fc6709`. No user session data was copied. The
+fixture check verifies the response contract, not model quality. The checked-in Rank
+artifact is a reproducible baseline, not a qualified or production-approved model.
+
+## Documentation and status
+
+- [Standalone quickstart](docs/standalone-quickstart.md)
+- [Typed task heads](docs/typed-task-heads.md)
+- [Artifact formats](docs/artifact-format.md)
+- [Reproducibility](docs/reproducibility.md)
+- [Benchmark baseline](docs/benchmark-baseline.md)
+- [Third-party license review](docs/third-party-licenses.md)
+- [Planning registry and milestone evidence](plans/registry.md)
+
+M014, M014b, and M017 final cohorts have been consumed. Do not rerun them or modify
+their frozen inputs. M017's result is synthetic-only negative. No model is qualified
+for CodeGG. CodeGG M005 remains deferred, and crates.io publication remains blocked
+pending human and legal review.
 
 ## Provenance
 
 The semantic core originated in CodeGG commit
 `aec30ebbaada172cd2915b3fb068f828a8fc6709`, file
-`crates/codegg-core/src/decision.rs`. It is carried with its MIT license and source
-attribution. The runtime and generic trainer in this repository are new implementations
-that preserve the published semantic contract; they do not claim experiment-result or
-model-weight provenance from CodeGG.
-
-See [`docs/extraction-inventory.md`](docs/extraction-inventory.md),
-[`docs/artifact-format.md`](docs/artifact-format.md), and
-[`docs/reproducibility.md`](docs/reproducibility.md), plus the
-[`docs/benchmark-baseline.md`](docs/benchmark-baseline.md) runtime snapshot.
-
-## Planning status
-
-The [planning registry](plans/registry.md) is the current milestone index; detailed
-plans and closure evidence remain under `plans/`. M014/M014b final cohorts have
-been consumed and must not be rerun or modified. M017 is closed with a synthetic-only
-negative result. CodeGG M005 remains deferred, and crates.io publication remains
-blocked pending human/legal review. No milestone result authorizes model promotion.
+`crates/codegg-core/src/decision.rs`, and retains its MIT attribution. The runtime and
+generic trainer are new implementations. See the
+[extraction inventory](docs/extraction-inventory.md) for provenance details. The
+[third-party license inventory](docs/third-party-license-inventory.json) is metadata
+evidence, not legal clearance.

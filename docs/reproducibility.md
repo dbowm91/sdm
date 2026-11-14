@@ -1,4 +1,7 @@
-# Training and evaluation reproducibility
+# Rank training and evaluation reproducibility
+
+This page documents the JSONL Rank trainer and `sdm-qualify` CLI. Typed semantic
+experiments are described in [typed task heads](typed-task-heads.md).
 
 Generic JSONL decision cases have schema version 1, unique case IDs, leakage-group
 identity, and the versioned semantic request/response contract. Dataset bytes and
