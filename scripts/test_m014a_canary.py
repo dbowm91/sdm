@@ -39,7 +39,7 @@ RESOURCE = CANARY / "resource-evidence.json"
 
 
 def load_qual():
-    # Find latest qualification (qualification3.json is current positive run).
+    # Prefer the latest numbered qualification, then fall back to legacy names.
     for name in ("qualification3.json", "qualification2.json", "qualification.json"):
         p = CANARY / name
         if p.exists():

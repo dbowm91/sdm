@@ -182,7 +182,7 @@ def main():
         sidecar["legacy_comparison"] = {k: legacy.get(k) for k in legacy_keys}
         # Persist enriched sidecar (overwrite only if identical or new).
         enriched = (json.dumps(sidecar, indent=2, sort_keys=True) + "\n").encode()
-        # The on-disk file currently lacks legacy_comparison; update it once.
+
         if on_disk.get("legacy_comparison") != sidecar["legacy_comparison"]:
             # Remove old file only if we are enriching (first write); refuse
             # to silently replace differing core metrics.

@@ -119,7 +119,7 @@ def main() -> int:
         ("target/m014a/canary/candidates/canary-choice-legacy.artifact.json","target/m014a/canary/choice.json","target/m014a/canary/choice.split.json","typed-choice","target/m014a/canary/eval-choice-legacy.report.json",prov_choice),
         ("target/m014a/canary/candidates/canary-choice-cross.artifact.json","target/m014a/canary/choice.json","target/m014a/canary/choice.split.json","typed-choice-cross","target/m014a/canary/eval-choice-cross.report.json",prov_choice),
     ]
-    # Map artifact names used earlier (binary-baseline vs canary-binary-baseline): our training wrote canary-binary-baseline.artifact.json, but earlier manual run wrote binary-baseline.artifact.json. Unify: use canary-* names.
+    # Normalize legacy artifact filenames to the current canary-* names.
     # Ensure artifact paths exist; if old names exist, copy.
     import shutil
     for old, new in [("target/m014a/canary/candidates/binary-baseline.artifact.json","target/m014a/canary/candidates/canary-binary-baseline.artifact.json"),
@@ -148,7 +148,6 @@ def main() -> int:
             "provenance": prov,
         }
         spec_path = str(Path(report).with_suffix("")) + ".evaluate.json"
-        # spec_path like target/.../eval-binary-mask.report -> .evaluate.json? Fix:
         spec_path = report.replace(".report.json",".evaluate.json")
         (ROOT/spec_path).write_text(json.dumps(spec, indent=2))
         # Remove old report to allow rerun.

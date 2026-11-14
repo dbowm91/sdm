@@ -139,11 +139,7 @@ class BinaryPairingTests(unittest.TestCase):
         # Extra case.
         cand_extra = dict(cand)
         cand_extra["extra"] = {"score": 0.5}
-        # Need meta for extra to trigger mismatch? Extra not in family_cases, but
-        # cand_ids includes extra? Actually family_cases is from meta, so extra
-        # not in family_cases, but cand has extra outside family: our function
-        # only checks family_cases subset, so extra outside family is ignored.
-        # To test extra, add meta for extra but not in baseline.
+        # Add extra to meta so it belongs to family_cases and is checked against baseline.
         meta2 = dict(meta)
         meta2["extra"] = {"family": "fam-a", "leakage_group": "g2", "truth": True}
         with self.assertRaises(qv.QualifyInvalid):
@@ -162,7 +158,7 @@ class BinaryPairingTests(unittest.TestCase):
         # requires pairs). Use reference helper.
         groups = [[0.1, 0.2, 0.3], [0.9], [0.5, 0.5]]
         p1, l1, u1 = qv.reference_bootstrap_mean(groups, seed=7, replicates=1000, alpha=0.05)
-        # Independent manual calc with same seed must agree.
+        # Repeating with the same seed checks determinism.
         p2, l2, u2 = qv.reference_bootstrap_mean(groups, seed=7, replicates=1000, alpha=0.05)
         self.assertAlmostEqual(p1, p2, places=12)
         self.assertAlmostEqual(l1, l2, places=12)
@@ -218,9 +214,7 @@ class ChoiceTests(unittest.TestCase):
 
     def test_option_permutation_and_case_order_invariance(self):
         meta, cand = self.meta_and_reports()
-        # Permute option order in meta? Actually option_ids order matters for
-        # raw index mapping. If we swap option_ids and probs together, correctness
-        # preserved. Test case order invariance: reverse dict order.
+        # Case order should not affect aggregation.
         cand_rev = dict(reversed(list(cand.items())))
         agg1 = qv.aggregate_choice_family(cand, None, meta, "cfam-a")
         agg2 = qv.aggregate_choice_family(cand_rev, None, meta, "cfam-a")

@@ -857,25 +857,14 @@ def qualify(manifest_path: str, dataset_binary: str, split_binary: str,
     # Presence gates in protocol order.
     present_fams = set()
     for fam in bin_block["required_families"]:
-        # Presence determined by dataset having rows in test? Actually by having
-        # groups; if family has no test rows, invalid.
+        # A required family must have at least one test row.
         rows = [cid for cid, m in meta_bin.items() if m.get("family") == fam and cid in split_bin["test"]]
         if not rows:
             binary_gates.append(invalid_gate(f"binary_family::presence::{fam}", f"required family {fam} absent from test"))
         else:
             binary_gates.append(Gate(name=f"binary_family::presence::{fam}", status=GATE_PASS, mandatory=True, reason=f"required {fam} present"))
             present_fams.add(fam)
-    # Check undeclared families in reports? Reports cover all families; undeclared
-    # test families outside required set are rejected unless manifest allows?
-    # For M014a, test split contains exactly required families plus train/dev
-    # families; only check that required families are present (above) and that
-    # no required family is missing. Undeclared test families that are ID
-    # families for train/dev are not in test, so no check needed. If report
-    # contains a family outside required + train/dev, it would be caught via
-    # dataset meta? Simplify: check that every family appearing in test split is
-    # either required or explicitly diagnostic? Manifest has no diagnostic list
-    # for M014a; train families are not in test, so any test family outside
-    # required is undeclared => invalid.
+    # Reject test families outside the required or diagnostic sets.
     test_fams = sorted({meta_bin[cid]["family"] for cid in split_bin["test"]})
     diag_bin = set(bin_block.get("diagnostic_only_families", []))
     undeclared = sorted(set(test_fams) - set(bin_block["required_families"]) - diag_bin)
@@ -1007,26 +996,7 @@ def qualify(manifest_path: str, dataset_binary: str, split_binary: str,
         is_crit = fam in ch_block.get("critical_families", [])
         choice_gates.append(confidence_gate(f"accuracy_vs_legacy::{fam}", int_leg, minimum_support=min_ans, mandatory=True, critical=is_crit, description=f"Choice {fam} candidate minus legacy accuracy"))
         choice_gates.append(confidence_gate(f"accuracy_vs_cross::{fam}", int_cross, minimum_support=min_ans, mandatory=True, critical=is_crit, description=f"Choice {fam} candidate minus cross accuracy"))
-        # Discriminating controls always-yes/no measured on same groups.
-        # Compute always-yes/no accuracy per group from dataset labels.
-        # Yes option per case: option whose dataset meta? Need yes ID: find
-        # option whose label ends with YES? Dataset does not store labels;
-        # use target semantics: for answerable cases, yes vs no? Actually
-        # always-yes predicts semantic yes. For each case, semantic yes ID is
-        # the option that would be correct if target were yes? Hmm. Simplify:
-        # always-yes predicts the lexicographically smallest option ID? No.
-        # Instead, use dataset: for each case, determine yes_id as the option
-        # that is target when semantic_yes True? We need yes/no mapping per
-        # case. In M014 generator, options have labels "Option YES"/"Option NO"
-        # but IDs are opaque. The report does not store labels. However dataset
-        # request.spec.options stores id+label. So we can get yes_id per case
-        # from dataset file (not just meta). For analyzer, load full dataset
-        # to get labels.
-        # To avoid extra I/O here, we approximate always-yes/no via target
-        # frequency? For canary with known construction, always-yes accuracy
-        # ~0.5. For gate, we require candidate beats always-yes/no with lower>0.
-        # Compute control accuracies as 0.5 baseline? Better to compute exactly
-        # by loading dataset options labels. Implement helper below.
+        # Controls use option labels from the full dataset loaded below.
         pass
     # Load full datasets for control label mapping (yes/no).
     # Always-yes/no/answer/abstain controls on identical answerable groups.

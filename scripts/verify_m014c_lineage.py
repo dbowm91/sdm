@@ -83,13 +83,9 @@ def git_blob_sha1(path_rel: str, commit: str | None = None) -> str:
                              capture_output=True, check=True).stdout.decode().strip() if isinstance(
             subprocess.run(["git", "hash-object", "--stdin"], input=b"", cwd=ROOT,
                            capture_output=True), object) else ""
-        # Simpler: use git rev-parse <commit>:<path>
         try:
             out2 = subprocess.run(["git", "rev-parse", f"{commit}:{path_rel}"], cwd=ROOT,
                                   capture_output=True, text=True, check=True).stdout.strip()
-            # rev-parse :path gives blob SHA for committed blob? Actually
-            # <commit>:<path> rev-parse returns blob SHA only with ^{object}? Use
-            # `git ls-tree`.
             ls = subprocess.run(["git", "ls-tree", commit, "--", path_rel], cwd=ROOT,
                                 capture_output=True, text=True, check=True).stdout.strip()
             # Format: <mode> <type> <sha>\t<path>
@@ -238,12 +234,7 @@ def main(argv=None) -> int:
             return fail(f"path {rel} absent at freeze commit {args.freeze_commit[:7]}; lineage broken", out_path)
         committed_sha = "sha256:" + hashlib.sha256(committed).hexdigest()
         current_sha = sha256_file(ROOT / rel)
-        # Freeze manifest itself: current file must equal committed freeze?
-        # Freeze manifest was created AT freeze commit, so committed bytes should
-        # equal current bytes (no rewrite). For other paths same.
         if committed_sha != current_sha:
-            # For EVALUATOR, it was also frozen; check it too? Evaluator is not in
-            # this list but should also match; add explicit check below.
             return fail(f"post-freeze rewrite detected: {rel} current {current_sha} != "
                         f"committed-at-freeze {committed_sha}; original committed M014b bytes must remain exactly unchanged",
                         out_path)

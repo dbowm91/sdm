@@ -129,7 +129,7 @@ def main():
             "target/m014b/binary-support.json": bin_support_sha,
             "target/m014b/choice-support.json": choice_support_sha,
         },
-        "candidates": {v: cand_shas[k] for k, v in candidates.items() for k in [k] if True},  # placeholder, fixed below
+        "candidates": {v: cand_shas[k] for k, v in candidates.items() for k in [k] if True},
         "candidate_reports": [
             "binary-baseline.report.json",
             "binary-mask.report.json",
@@ -141,7 +141,6 @@ def main():
         "exclusion_digest_known_m014_m013a_final": exclusion,
         "note": "Freeze BEFORE any fixtures/m014b-final-*.evaluate.json run. Run frozen final set ONCE after freeze commit + green CI; outputs only under target/m014b/final/.",
     }
-    # Fix candidates dict (above comprehension was convoluted).
     freeze["candidates"] = {v: cand_shas[k] for k, v in candidates.items()}
     # Final config SHAs (with dummy freeze_sha, deterministic).
     for out_rel, _, _, _, _, _, _, _ in final_map:
