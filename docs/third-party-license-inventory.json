@@ -76,7 +76,7 @@
       "selected_branch": "MIT",
       "selection": "MIT branch selected by SDM policy",
       "source": "registry+https://github.com/rust-lang/crates.io-index",
-      "version": "1.0.18"
+      "version": "1.0.19"
     },
     {
       "license": "MIT OR Apache-2.0",
@@ -85,7 +85,7 @@
       "selected_branch": "MIT",
       "selection": "MIT branch selected by SDM policy",
       "source": "registry+https://github.com/rust-lang/crates.io-index",
-      "version": "0.2.190"
+      "version": "0.2.191"
     },
     {
       "license": "Unlicense OR MIT",
@@ -220,7 +220,7 @@
       "selected_branch": "MIT",
       "selection": "MIT branch selected by SDM policy",
       "source": "registry+https://github.com/rust-lang/crates.io-index",
-      "version": "1.0.151"
+      "version": "1.0.154"
     },
     {
       "license": "MIT OR Apache-2.0",
@@ -238,7 +238,7 @@
       "selected_branch": "MIT",
       "selection": "MIT branch selected by SDM policy",
       "source": "registry+https://github.com/rust-lang/crates.io-index",
-      "version": "3.0.6"
+      "version": "3.0.10"
     },
     {
       "license": "MIT OR Apache-2.0",
@@ -265,7 +265,7 @@
       "selected_branch": "MIT",
       "selection": "MIT branch selected by SDM policy",
       "source": "registry+https://github.com/rust-lang/crates.io-index",
-      "version": "1.53.2"
+      "version": "1.54.1"
     },
     {
       "license": "MIT",
@@ -292,7 +292,7 @@
       "selected_branch": "MIT AND Unicode-3.0",
       "selection": "MIT branch selected by SDM policy",
       "source": "registry+https://github.com/rust-lang/crates.io-index",
-      "version": "1.0.26"
+      "version": "1.0.27"
     },
     {
       "license": "MIT/Apache-2.0",
